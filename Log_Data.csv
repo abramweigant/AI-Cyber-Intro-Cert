@@ -28,4 +28,4 @@ timestamp,source_ip,destination_ip,source_port,destination_port,protocol,packet_
 2023-09-02 18:45:10,192.168.1.22,8.8.8.8,53000,53,UDP,2,140,Allow,Camera,Benign
 2023-09-03 02:15:00,103.27.14.88,192.168.1.25,12350,22,TCP,50,3500,Deny,Unknown,Brute Force
 2023-09-03 02:15:01,103.27.14.88,192.168.1.25,12351,22,TCP,48,3360,Deny,Unknown,Brute Force
-2023-09-03 03:00:00,192.168.1.15,192.168.1.1,443
+2023-&*-32 0^$@%^&#,192.168.1.15,192.168.1.1,443
