@@ -217,35 +217,85 @@ and threat modeling), so collapsing them into one module loses nothing.
 
 ## Environment notes
 
-- `tensorflow-cpu` from PyPI trains this module's models in minutes on a couple of CPUs.
+- **On Apple Silicon use `tensorflow`, not `tensorflow-cpu`.** `tensorflow-cpu` has never
+  published a macOS arm64 wheel in any release — verified against the PyPI release index on
+  2026-08-21. Plain `tensorflow` does, and 2.20/2.21 include cp313. An earlier note here
+  recommended `tensorflow-cpu`; that must have been a Linux or x86 machine, and it cannot
+  resolve on this one. Either way it trains this module's models in minutes on CPU.
   **Run every model before shipping it** — both architecture bugs found so far (the unbuilt
   `summary()` and the BatchNorm collapse) were invisible to static review.
 - Keras `validation_split` takes the **last n% without shuffling**. On family-ordered data
   like Malimg's native row order, that hands the model a validation set of classes it never
   trained on, and you see ~1% val accuracy that looks like catastrophic overfitting. Shuffle first.
-- **Colab MCP bridge — working as of 2026-08-21.** It failed earlier (timed out at 60s,
-  twice) because it was configured as `uvx git+https://github.com/googlecolab/colab-mcp`,
-  which re-resolves the git ref and rebuilds ~60 packages on every launch and never
-  finishes inside the MCP startup window. Fixed by installing it once and pointing the
-  config at the resulting binary:
+- **Colab MCP bridge (`googlecolab/colab-mcp`) — abandoned 2026-08-21. Do not retry it.**
+  The Colab page connects to the local WebSocket, authenticates, and is then dropped by
+  Colab in the same second, reproducibly (six times). Ruled out by direct test, not by
+  argument: token (an unauthenticated probe gets a logged 401, real attempts do not),
+  origin allowlist, port reachability on both address families, stale cached tokens
+  (cookies cleared), orphaned servers (killed, single process on the machine), missing
+  runtime (tested with and without a kernel), and wrong-tab (URL checked against the live
+  token). Upstream is stale — last commit 2026-04-01 — with five unresolved discussions
+  reporting connection failures: #43, #54, #81, #84, #100. Maintainers do not accept PRs
+  and route everything to Discussions.
+
+  **The decisive point:** `SCRATCH_PATH` is hardcoded to `/notebooks/empty.ipynb`, and
+  discussion #80 confirms it cannot attach to an existing notebook. Even fully working it
+  would open a blank scratchpad, never `Module5_Student.ipynb` from Drive. It could not
+  have done the job it was being fixed for.
+
+  Two real findings worth keeping. **A genuine dual-stack bug**, still unreported upstream:
+  `websockets.serve(host="localhost", port=0)` opens one socket per address family and each
+  gets its *own* ephemeral port, while only `sockets[0]`'s port is advertised in the URL
+  fragment — so the advertised port is unreachable over the other family. Observed as
+  `[::1]:64298` + `127.0.0.1:64299`. A local patch (pick one free port, bind both families
+  to it) is applied at
+  `~/.local/share/uv/tools/colab-mcp/lib/python3.13/site-packages/colab_mcp/websocket_server.py`,
+  original saved beside it as `.orig`. `uv tool upgrade` will overwrite it. And **Safari
+  cannot ever work** as the browser here: it refuses to treat `ws://localhost` as a secure
+  context and blocks the dial-back as mixed content. Chrome and Firefox exempt localhost.
+
+- **Local Jupyter + MCP is the working setup for driving notebooks (as of 2026-08-21).**
+  `datalayer/jupyter-mcp-server` — actively maintained, 18 tools (`use_notebook`,
+  `read_notebook`, `insert_cell`, `edit_cell_source`, `execute_cell`, `read_cell`,
+  `move_cell`, `execute_code`, ...).
 
   ```bash
-  uv tool install --python 3.13 git+https://github.com/googlecolab/colab-mcp
-  claude mcp add --scope local colab-mcp -- ~/.local/bin/colab-mcp   # ~/.claude.json, not committed
+  uv venv --python 3.13 ~/.venvs/aicyber
+  uv pip install --python ~/.venvs/aicyber/bin/python \
+    jupyterlab jupyter-collaboration jupyter-mcp-tools ipykernel \
+    tensorflow scikit-learn pandas numpy pyarrow matplotlib seaborn imbalanced-learn scipy
+  ~/.venvs/aicyber/bin/python -m ipykernel install --user --name aicyber \
+    --display-name "Python (AI-Cyber)"
+  uv tool install --python 3.13 "jupyter-mcp-server>=1.5.0"
   ```
 
-  Update with `uv tool upgrade colab-mcp`. Claude Desktop reads a separate file,
-  `~/Library/Application Support/Claude/claude_desktop_config.json`, and points at the
-  same binary; Claude Code never reads that file. Restart the client after config changes —
-  MCP servers load at startup.
+  Start the server (token via env so it stays out of `ps` output; loopback only — the
+  upstream README's `--ip 0.0.0.0` would expose the kernel to the network, and a Jupyter
+  token is arbitrary code execution):
 
-  It is a browser bridge, not an API client. The server opens a localhost WebSocket on an
-  ephemeral port with a random token, accepts only `Origin: colab.research.google.com`
-  (or `colab.google.com`), one client at a time. Calling its connect tool opens a Colab tab
-  carrying `#mcpProxyToken=...&mcpProxyPort=...`; that page dials back and Colab's own
-  notebook tools are then proxied in. So a signed-in browser session must be open. Note
-  the connect tool hardcodes a blank scratch notebook (`/notebooks/empty.ipynb`) — whether
-  the proxied tools can then open `Module5_Student.ipynb` from Drive is not yet tested.
+  ```bash
+  env JUPYTER_TOKEN="$(cat ~/.venvs/aicyber/.jupyter_token)" nohup \
+    ~/.venvs/aicyber/bin/jupyter lab --port 8888 --ip 127.0.0.1 --no-browser \
+    --ServerApp.root_dir="$HOME/AI-Cyber-Intro-Cert" > ~/.venvs/aicyber/jupyter.log 2>&1 &
+  ```
+
+  Token lives at `~/.venvs/aicyber/.jupyter_token` (mode 600). The MCP server is registered
+  at local scope in `~/.claude.json` (not committed) with `JUPYTER_URL` /
+  `CODE_SANDBOX_URL` set to **`http://127.0.0.1:8888`, not `localhost`** — the Jupyter
+  server binds IPv4 only, and `localhost` can resolve to `::1`. The venv lives outside the
+  repo on purpose: the remote is public.
+
+  Verified on this stack (2026-08-21): `csv.zip`, `parquet`, and `npz` all load, stratified
+  split + `StandardScaler` work, and both a functional autoencoder and a `Sequential` model
+  with `class_weight` train — under **pandas 3.0.5 / numpy 2.5.2 / TensorFlow 2.21.0 /
+  scikit-learn 1.9.0 / Python 3.13.14**.
+
+- **Local and Colab are different environments — treat local as authoring, not as proof.**
+  The versions above are ahead of what Colab pins. Anything a published number depends on
+  still needs one confirming Colab run. This is not pedantry: the BatchNorm collapse was
+  invisible until the model actually ran. Note also that Modules 1-3 contain `google.colab`
+  and `files.upload` cells (the Kaggle-token onboarding) that fail locally by design;
+  Module 5 is fully portable, its only Colab-ism being `display()`.
 - When editing notebooks programmatically, each element of a cell's `source` list must end
   with `\n` except the last. Splitting on `'\n'` without re-adding them silently concatenates
   every line into one, and the notebook still parses as valid JSON.
