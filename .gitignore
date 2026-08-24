@@ -1,1 +1,16 @@
 *.zip
+
+# macOS
+.DS_Store
+
+# Jupyter runtime artifacts (local authoring only -- never ship these)
+.ipynb_checkpoints/
+.jupyter/
+.jupyter_ystore.db
+*.ystore.db
+
+# INSTRUCTOR MATERIALS -- THIS REPO IS PUBLIC.
+# Solutions live in the private repo under instructor/ (its own git repo).
+# Never remove these two lines.
+instructor/
+Module5_Instructor.ipynb
