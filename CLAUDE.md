@@ -18,7 +18,7 @@ Condensed from a 15-week outline into 7 modules.
 | 1 | Course Introduction & The Role of AI in Cybersecurity | **Rebuilt 2026-08-26, verified on Colab** |
 | 2 | Cyber Threat Landscape, Data Sources, Preprocessing, First ML Model | **Rebuilt 2026-08-26, verified locally** |
 | 3 | Supervised Machine Learning | **Rebuilt 2026-08-26, verified locally** |
-| 4 | Unsupervised Learning: Anomaly Detection & Threat Hunting | Done, needs polish |
+| 4 | Unsupervised Learning: Anomaly Detection & Threat Hunting | **Rebuilt 2026-08-26, verified locally** |
 | 5 | Deep Learning Models for Cybersecurity | **Complete, verified on Colab 2026-08-26** |
 | 6 | LLMs + Explainable AI (capstone: LLM-assisted forensic log triage) | Not started |
 | 7 | Adversarial Attacks & the Secure AI/ML Lifecycle | Not started |
@@ -33,7 +33,7 @@ account/API-token onboarding was removed on 2026-08-26.
 Module1_Student.ipynb            rebuilt 2026-08-26 (see below)
 Module2_Student.ipynb            rebuilt 2026-08-26 (see below)
 Module3_Student.ipynb            rebuilt 2026-08-26 (see below)
-Module4_Student.ipynb
+Module4_Student.ipynb            rebuilt 2026-08-26 (see below)
 Module5_Student.ipynb
 instructor/                      a SEPARATE PRIVATE git repo -- see "Two repos" below.
                                  gitignored here; it can never be committed to this one.
@@ -81,7 +81,8 @@ and Module 1 Colab exports had to be moved. Never remove those lines.
 5. Integrity check: markdown must differ **only** at cell 0, code **only** at the exercise
    indices, and no `INSTRUCTOR`/`TEACHING NOTE` string may appear in the student copy.
 
-Cell counts, both copies: Module 1 is 59, Module 2 is 57, Module 3 is 55, Module 5 is 91. The check above
+Cell counts, both copies: Module 1 is 59, Module 2 is 57, Module 3 is 55, Module 4 is 85,
+Module 5 is 91. The check above
 is what guarantees they stayed in step.
 
 Retired originals live in the private repo, never in this one:
@@ -142,6 +143,29 @@ the perfect 100% on five test rows is the memorisation lesson. Lab 2 is new and 
 **The thesis is inverted in the rebuild, and this is the important part.** The module now
 measures the standard remedies rather than asserting them, and finds that threshold tuning
 and model choice beat all three. See the measured facts below before editing anything here.
+
+## Module 4 rebuild (2026-08-26)
+
+Module 4 was **not** rebuilt from scratch — unlike 1, 2 and 3 it executed correctly, was
+properly seeded, and its final lab was methodologically sound. It was converted from a
+**demonstration into a lab**, because it had zero student tasks and zero gradable output:
+all 21 code cells were pre-written, and the "Analysis & Reflection" headings stated
+conclusions rather than asking questions. It now has 14 coding tasks and 8 write-ups.
+
+Two curriculum gaps closed, both cases of a topic named but never taught:
+
+- **Choosing `k`.** The module said selecting k "often requires the Elbow method or Silhouette
+  analysis", demonstrated neither, and hardcoded k three times. Task 4.2 derives it — inertia
+  falls 2,591,319 → 665,602 at k=3 then flattens, silhouette peaks at k=3 (0.857).
+- **DBSCAN** was absent entirely. Task 4.3 adds it, and it doubles as the counterpart to the
+  existing scaling lesson: Isolation Forest is tree-based and scale-invariant, DBSCAN is
+  distance-based and is not.
+
+Also fixed: the "Cost of Hunting" draft text, the unreconciled PCA variance claim, a
+cross-reference to the wrong section, and a bare URL pasted as markdown. The Gradio quiz and
+its self-defeating decoder cell were removed separately — knowledge checks now live in the
+external quiz tool, with the questions preserved privately as
+`module4_knowledge_check_questions.md`.
 
 ## The organizing idea of Module 5
 
@@ -249,6 +273,35 @@ The leaky run's tell is not its F1 but its test set: **113,726 rows at 50% fraud
 than the dataset it came from. Learning curves: `max_depth=2` gives train 0.792 / val 0.761
 (underfit); `max_depth=None` gives train **1.000** / val 0.732 (memorised).
 
+**Module 4 — synthetic data plus `creditcard.csv.zip`.** Seeded; deterministic.
+
+| check | value |
+|---|---|
+| PCA on 20 noisy dimensions | PC1 **10.55%**, PC2 **6.13%**, total **16.68%** |
+| noise floor (if all 20 dims were noise) | **5.0%** per component |
+| separation on PC1 | Cohen's *d* = **3.76**; AUC **0.994** (one raw feature: 0.715) |
+| elbow / silhouette on session data | inertia 2,591,319 → **665,602** at k=3, then flat; silhouette peaks **0.857** at k=3 |
+| DBSCAN, scaled, eps=0.3 | **3 clusters, 4 noise points** — recovers k=3 untold |
+| DBSCAN, unscaled | needs eps ≈ 30–60 for the same result |
+| silhouette, predicted-normal points | **0.930** |
+| extrinsic check on injected anomalies | P 0.82, R 0.90, **F1 0.86** |
+| final lab, Isolation Forest on test | P 0.31, R 0.34, **F1 0.32** |
+| contamination sweep | 0.1% → R 0.26/P 0.39 … 5% → R 0.87/P 0.03 |
+
+**The 16.68% is not a failure and the module now says why**: PC1 is at double the noise floor,
+carries an effect size of 3.76, and reaches AUC 0.994 alone. Explained variance measures
+retained *spread*, not retained *usefulness*.
+
+**Cross-module comparison on the credit-card data** — the closing section of Module 4 depends
+on these, so keep them in step:
+
+| module | approach | labels in training? | fraud F1 |
+|---|---|---|---|
+| 3 | Logistic Regression | yes | ~0.72 |
+| 3 | + tuned threshold | yes | ~0.75 |
+| 3 | Random Forest | yes | **~0.87** |
+| 4 | Isolation Forest | **no** | **~0.32** |
+
 **DGA (Section 3).** The original notebook oversampled with `replace=True` *before*
 `train_test_split`, creating 248,032 duplicate rows out of 675,000 and putting **55.3%**
 of test domains into training. The step was never needed: the two source files are
@@ -329,7 +382,7 @@ two accuracy points between environments. Structural and dataset facts are quote
 because they reproduce exactly in every environment tested. Keep that distinction when
 editing — it is the single most useful rule this project has produced.
 
-## Known gaps in Module 4
+## Known gaps
 
 **Module 4, highest priority.** The "Interpretation: The Cost of Hunting" cell contains
 unedited draft text in student-facing material:
@@ -357,21 +410,12 @@ source-IP explanation and the `coef_[0]` error fixed. See "Module 2 rebuild" abo
 **~~Module 3.~~ Resolved 2026-08-26** — rebuilt, renamed, thesis inverted on measurement.
 See "Module 3 rebuild" above.
 
-**All of 4.** No random seeds, so student output drifts from the numbers in the prose.
-The setup cells from Modules 1, 2 or 5 can be copied in as-is.
+**~~Module 4.~~ Resolved 2026-08-26** — converted to a lab, both curriculum gaps closed,
+draft text and PCA claim fixed. See "Module 4 rebuild" above.
 
-**Module 4.** Modules 1, 2, 3 and 5 now teach students to check for missing-value sentinels,
-duplicates, contradictory labels, leakage, imbalance, and construct validity. Modules 3 and
-4 use SMOTE, splits, and the credit card dataset without those checks. Re-read them as a
-student who has already learned to audit — anywhere they could ask "wait, did you check
-that?" needs either the check or an explanation. **The bar is now considerably higher**: by
-the time a student reaches Module 3 they have found sentinels and contradictory labels by
-hand in Module 1, and in Module 2 they have measured that two of those defects changed the
-score by nothing at all.
-
-**Module 4 vs the rebuilt dataset framing.** Modules 1 and 2 are explicit about what
-their data is and is not, and make students reason about what that prevents a model from
-learning. Check that Module 4 describes its own dataset as precisely.
+**Correction to an earlier note in this file:** it claimed Modules 3–4 had no random seeds.
+That was **wrong about Module 4**, which had twelve `np.random.seed(42)` / `random_state=42`
+occurrences throughout and was the best-seeded of the original four.
 
 **~~Module 3 will need a leakage story that actually bites.~~ Delivered.** SMOTE before the
 split reports F1 0.948 against an honest 0.109 — roughly ninefold. Module 2's promise stands.
