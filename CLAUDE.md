@@ -1,6 +1,6 @@
 # AI-Cyber Intro Certification — Working Context
 
-Context for Claude Code sessions in this repo. Written 2026-08-21.
+Context for Claude Code sessions in this repo. Written 2026-08-21, last updated 2026-08-26.
 
 ## What this is
 
@@ -15,25 +15,28 @@ Condensed from a 15-week outline into 7 modules.
 
 | Module | Title | Status |
 |---|---|---|
-| 1 | Course Introduction & The Role of AI in Cybersecurity | Done, needs polish |
+| 1 | Course Introduction & The Role of AI in Cybersecurity | **Rebuilt 2026-08-26, verified on Colab** |
 | 2 | Cyber Threat Landscape, Data Sources, Preprocessing, First ML Model | Done, needs polish |
 | 3 | Supervised Machine Learning | Done, needs polish |
 | 4 | Unsupervised Learning: Anomaly Detection & Threat Hunting | Done, needs polish |
-| 5 | Deep Learning Models for Cybersecurity | **Complete, pending verification** |
+| 5 | Deep Learning Models for Cybersecurity | **Complete, verified on Colab 2026-08-26** |
 | 6 | LLMs + Explainable AI (capstone: LLM-assisted forensic log triage) | Not started |
 | 7 | Adversarial Attacks & the Secure AI/ML Lifecycle | Not started |
 
 ## Repo layout
 
-This repo is the course's **dataset host**. Notebooks pull data by raw GitHub URL,
-which deliberately keeps students off Kaggle API tokens after Module 1.
+This repo is the course's **dataset host** and holds the student-facing notebooks.
+Notebooks pull data by raw GitHub URL. **No module uses Kaggle any more** — Module 1's
+account/API-token onboarding was removed on 2026-08-26.
 
 ```
-Module1_Intro-2.ipynb            Module 1 notebook (naming is inconsistent across
-Student_Module2_.ipynb           the five files -- these are the real filenames)
-Student_Module3.ipynb
+Module1_Student.ipynb            rebuilt 2026-08-26 (see below)
+Student_Module2_.ipynb           naming is inconsistent across these files --
+Student_Module3.ipynb            these are the real filenames
 Module4_Student.ipynb
 Module5_Student.ipynb
+instructor/                      a SEPARATE PRIVATE git repo -- see "Two repos" below.
+                                 gitignored here; it can never be committed to this one.
 malimg_64.npz                    9,339 malware byte-images, 64x64 grayscale (22.7 MB)
 CEAS_08.parquet                  39,154 labelled emails with full body text (19 MB)
 creditcard.csv.zip               credit card fraud (Modules 4 and 5)
@@ -51,11 +54,51 @@ Notebooks reference data via a `DATA_URL` constant defined in the module's setup
 DATA_URL = "https://github.com/abramweigant/AI-Cyber-Intro-Cert/raw/refs/heads/main/"
 ```
 
-**All five modules are now checked in** (commit `e6843c8`, 2026-08-20). The canonical
-copies still live in Google Drive / Colab — these are downloaded snapshots, so re-export
-from Colab (File → Download → Download .ipynb) before editing if the Colab copy has moved
-ahead. Modules 1–4 are committed with saved outputs; see the student-identifier warning
-under Known gaps before pushing anything from Module 4.
+**All five modules are checked in.** The canonical copies still live in Google Drive /
+Colab — these are downloaded snapshots, so re-export from Colab before editing if the Colab
+copy has moved ahead. Modules 2–4 are committed with saved outputs; see the
+student-identifier warning under Known gaps before pushing anything from Module 4.
+
+## Two repos: student here, solutions private
+
+**This repo is PUBLIC.** Answer keys live in a separate private repo,
+`abramweigant/AI-Cyber-Intro-Cert-Instructor`, checked out at `instructor/` inside this
+working tree as its own independent git repository. `cd instructor` puts you on the private
+remote; the parent directory ignores `instructor/` entirely.
+
+`.gitignore` here guards `instructor/`, `Module5_Instructor.ipynb`, and `*.pdf` — a PDF
+render of an instructor notebook carries every solution with it, which is how the Module 5
+and Module 1 Colab exports had to be moved. Never remove those lines.
+
+**Workflow that works, established on Modules 5 and 1:**
+
+1. Edit the **instructor copy** as the master. It holds the solutions and teaching notes.
+2. Verify by executing — `nbconvert --to notebook --execute` into a scratch path.
+3. Derive the student copy from the master: replace solution cells with scaffolds, clear
+   outputs on exercise cells only, strip the instructor banner from cell 0.
+4. Transplant outputs from the verified run into both copies so teaching cells carry fresh
+   output rather than a mix of vintages.
+5. Integrity check: markdown must differ **only** at cell 0, code **only** at the exercise
+   indices, and no `INSTRUCTOR`/`TEACHING NOTE` string may appear in the student copy.
+
+Both copies are 91 cells for Module 5 and 59 for Module 1, and the check above is what
+guarantees they stayed in step.
+
+## Module 1 rebuild (2026-08-26)
+
+The original `Module1_Intro-2.ipynb` is **retired** — archived in the private repo as
+`Module1_Intro-2_SUPERSEDED.ipynb`, still in this repo's history at `e6843c8`. Do not
+restore it without reading why it was replaced:
+
+- **It called its data "emails". It was not emails.** The columns were URL lexical features
+  (`NumDots`, `UrlLength`, `AtSymbol`, `IpAddress`) with no sender, subject or body. Students
+  were told to print "the first 25 emails" and export `first_100_emails.csv`, then met real
+  email data in Module 5.
+- **Its Kaggle dependency had already gone stale.** Question 5D asked for `df.tail(400000)`
+  and `df.head(11439)` against 662,591 rows whose label boundary sits near index 100,011.
+  Those numbers matched an earlier version of the download and demonstrated nothing.
+
+The rebuild runs on `phishing_dataset1.parquet`, already hosted here.
 
 ## The organizing idea of Module 5
 
@@ -78,6 +121,33 @@ on-ramp to Module 7.
 ## Measured facts — do not re-derive, do not contradict
 
 All of these were measured by actually running the code, not estimated.
+
+**Module 1 — `phishing_dataset1.parquet` (88,647 rows, 111 features + label).**
+Every figure below reproduced **identically** on local pandas 3.0.5 and Colab pandas 2.2.3.
+They are dataset properties, not model outputs, so unlike Module 5's metrics they do not
+drift and may be quoted exactly.
+
+| check | value |
+|---|---|
+| `isnull().sum().sum()` | **0** — and it is wrong |
+| feature columns containing `-1` sentinels | **66 of 111** |
+| rows with `-1` across all 19 `_params` columns | **81,225 (91.6%)** |
+| rows with `-1` across all 17 `_directory` and all 17 `_file` columns | **47,509 each** |
+| `qty_params` mean | **−0.76** — an impossible average for a count; this is the tell |
+| `params_length` mean, with / without sentinels | **5.27 / 73.93** (14× error) |
+| exact duplicate rows | **1,438** |
+| rows sharing a feature vector | 1,937 |
+| feature vectors carrying **both** labels | **6** (13 rows, 0.015%) |
+| constant columns | **13**, every one a `_domain` punctuation count |
+| class balance | 30,647 phishing / 58,000 legitimate (**34.6%**) |
+| column families | `_url` 20, `_domain` 19, `_directory` 17, `_file` 17, `_params` 19, other 20 |
+
+The three sentinel families switch off **as blocks**, because the sentinel encodes a
+structural fact about the URL (no query string, no path) rather than a measurement failure.
+The network-lookup columns (`time_domain_activation`, `ttl_hostname`, `domain_spf`,
+`qty_ip_resolved`, `url_google_index`, …) carry `-1` for a different reason — the lookup was
+attempted and failed. Same value, different meaning; the module makes students argue about
+that distinction.
 
 **DGA (Section 3).** The original notebook oversampled with `replace=True` *before*
 `train_test_split`, creating 248,032 duplicate rows out of 675,000 and putting **55.3%**
@@ -144,18 +214,22 @@ accuracy 95.57%, macro F1 0.691, backdoor F1 0.405, backdoor recall ~0.39.
 
 ## Open items
 
-1. **Full end-to-end execution of Module 5 in one pass.** Every section has been run and
-   verified individually — the autoencoder and MLP, the DGA CNN and LSTM, the malware CNN
-   under both protocols, the phishing model and its diagnostics, and a reference solution
-   to the final lab. A single whole-notebook `nbconvert --execute` has not completed end to
-   end, purely because the DGA LSTM on ~540k domains is slow on CPU. Worth one clean run in
-   Colab on a T4 to confirm cell-to-cell state flows correctly, then save the outputs.
-2. **Modules 1–4 polish.** See the summary below.
+1. **~~Full end-to-end execution of Module 5.~~ Done.** Ran clean three times — twice
+   locally (7 minutes, 41/41 cells) and once on a Colab T4 under TensorFlow 2.20. Zero
+   execution errors. Module 1 likewise ran clean locally and on Colab.
+2. **Modules 2–4 polish.** See Known gaps below. This is now the highest-value work: after
+   the Module 1 and Module 5 rebuilds, Modules 2–4 are conspicuously less finished than the
+   material on either side of them.
 3. **Modules 6 and 7.** Not started. Design decisions are recorded below.
 
-No estimated numbers remain anywhere in Module 5's prose. Every figure is measured.
+**On quoting numbers.** Module 5's prose gives model metrics as approximations
+(`~89%`, `~0.88`) and ranges, because they drift: identical code restored EarlyStopping
+epoch 10 and 16 on CPU and 30 on a Colab T4, and the Malimg naive protocol moved more than
+two accuracy points between environments. Structural and dataset facts are quoted exactly,
+because they reproduce exactly in every environment tested. Keep that distinction when
+editing — it is the single most useful rule this project has produced.
 
-## Known gaps in Modules 1–4
+## Known gaps in Modules 2–4
 
 **Module 4, highest priority.** The "Interpretation: The Cost of Hunting" cell contains
 unedited draft text in student-facing material:
@@ -174,17 +248,22 @@ PC2 while the prose claims clear separation. The separation is probably real (th
 class has a 0.9 mean shift on all 20 dimensions) but it needs a sentence explaining why low
 retained variance is not automatically a failure.
 
-**Module 1.** Students set up a Kaggle account and API token, then later modules use raw
-GitHub URLs instead. Pick one. Also, the `df.columns` output in step 3 already shows `Index`,
-which the step 4 rename is supposed to produce — stale outputs from a re-run.
+**~~Module 1.~~ Resolved 2026-08-26** — Kaggle onboarding removed, the stale `Index`
+rename sequence gone, the whole lab rebuilt. See "Module 1 rebuild" above.
 
-**All of 1–4.** No random seeds, so student output drifts from the numbers in the prose.
-The Module 5 setup cell can be copied in as-is.
+**All of 2–4.** No random seeds, so student output drifts from the numbers in the prose.
+Module 1's and Module 5's setup cells can be copied in as-is.
 
-**All of 1–4.** Module 5 now teaches students to check for duplicates, leakage, imbalance,
-and construct validity. Modules 3 and 4 use SMOTE, splits, and the credit card dataset
-without those checks. Re-read them as a student who has already learned to audit — anywhere
-they could ask "wait, did you check that?" needs either the check or an explanation.
+**All of 2–4.** Modules 1 and 5 now teach students to check for missing-value sentinels,
+duplicates, contradictory labels, leakage, imbalance, and construct validity. Modules 3 and
+4 use SMOTE, splits, and the credit card dataset without those checks. Re-read them as a
+student who has already learned to audit — anywhere they could ask "wait, did you check
+that?" needs either the check or an explanation. **This is now sharper than it was**: a
+student arrives at Module 2 having already found six contradictory labels by hand.
+
+**Modules 2–4 vs Module 1's dataset framing.** Module 1 is explicit that its data is URLs
+and not emails, and makes students reason about what that prevents a model from learning.
+Check that Modules 2–4 describe their own datasets as precisely.
 
 ## Module 6 and 7 design decisions
 
