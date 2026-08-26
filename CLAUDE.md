@@ -16,7 +16,7 @@ Condensed from a 15-week outline into 7 modules.
 | Module | Title | Status |
 |---|---|---|
 | 1 | Course Introduction & The Role of AI in Cybersecurity | **Rebuilt 2026-08-26, verified on Colab** |
-| 2 | Cyber Threat Landscape, Data Sources, Preprocessing, First ML Model | Done, needs polish |
+| 2 | Cyber Threat Landscape, Data Sources, Preprocessing, First ML Model | **Rebuilt 2026-08-26, verified locally** |
 | 3 | Supervised Machine Learning | Done, needs polish |
 | 4 | Unsupervised Learning: Anomaly Detection & Threat Hunting | Done, needs polish |
 | 5 | Deep Learning Models for Cybersecurity | **Complete, verified on Colab 2026-08-26** |
@@ -31,8 +31,8 @@ account/API-token onboarding was removed on 2026-08-26.
 
 ```
 Module1_Student.ipynb            rebuilt 2026-08-26 (see below)
-Student_Module2_.ipynb           naming is inconsistent across these files --
-Student_Module3.ipynb            these are the real filenames
+Module2_Student.ipynb            rebuilt 2026-08-26 (see below)
+Student_Module3.ipynb            <- the one remaining odd filename; rename on rebuild
 Module4_Student.ipynb
 Module5_Student.ipynb
 instructor/                      a SEPARATE PRIVATE git repo -- see "Two repos" below.
@@ -81,8 +81,12 @@ and Module 1 Colab exports had to be moved. Never remove those lines.
 5. Integrity check: markdown must differ **only** at cell 0, code **only** at the exercise
    indices, and no `INSTRUCTOR`/`TEACHING NOTE` string may appear in the student copy.
 
-Both copies are 91 cells for Module 5 and 59 for Module 1, and the check above is what
-guarantees they stayed in step.
+Cell counts, both copies: Module 1 is 59, Module 2 is 57, Module 5 is 91. The check above
+is what guarantees they stayed in step.
+
+Retired originals live in the private repo, never in this one:
+`Module1_Intro-2_SUPERSEDED.ipynb`, `Student_Module2__SUPERSEDED.ipynb`. Both are still in
+this repo's history at `e6843c8`.
 
 ## Module 1 rebuild (2026-08-26)
 
@@ -99,6 +103,26 @@ restore it without reading why it was replaced:
   Those numbers matched an earlier version of the download and demonstrated nothing.
 
 The rebuild runs on `phishing_dataset1.parquet`, already hosted here.
+
+## Module 2 rebuild (2026-08-26)
+
+`Student_Module2_.ipynb` is retired for three reasons, all verified:
+
+- **It shipped broken.** A live `FileNotFoundError` in the load cell, with stale output in
+  the cell below it. It also could not run top to bottom at all — code lived in markdown for
+  students to copy, so five cells referenced `X_train_scaled`, `model`, `y_test` and
+  `X_train` that no code cell defined.
+- **Its Kaggle download was over a gigabyte for one `.head()` call.** A 183 MB zip extracting
+  to `iot23_combined_new.csv` at 903 MB plus a 170 MB file, used in exactly one cell and never
+  referenced again.
+- **Its central explanation was impossible.** It attributed the perfect score to the model
+  memorising the attacker's IP `103.27.14.88`. All seven brute-force rows do share that IP,
+  but `source_ip` is dropped before modelling. It also printed `model.coef_[0]` and called it
+  "the model's brain" on a three-class problem, where `coef_` is `(3, 16)`.
+
+The rebuild keeps the 24-row toy log for Lab 1 **deliberately** — you can read every row, and
+the perfect 100% on five test rows is the memorisation lesson. Lab 2 is new and runs on
+`phishing_dataset1.parquet`, so Module 1 audits that dataset and Module 2 acts on the audit.
 
 ## The organizing idea of Module 5
 
@@ -148,6 +172,26 @@ The network-lookup columns (`time_domain_activation`, `ttl_hostname`, `domain_sp
 `qty_ip_resolved`, `url_google_index`, …) carry `-1` for a different reason — the lookup was
 attempted and failed. Same value, different meaning; the module makes students argue about
 that distinction.
+
+**Module 2 — `Log_Data.csv` (30 rows) and `phishing_dataset1.parquet`.**
+Deterministic; reproduce exactly.
+
+| check | value |
+|---|---|
+| toy log cleaning | 30 → 28 (dedupe) → 27 (corrupt timestamp) → 25 (dropna) → **24** (port > 65535) |
+| toy log after cleaning | 0 nulls, `firewall_rule` collapses to **Allow 12 / Deny 12** |
+| toy log classes | Benign 12, Brute Force 7, Scan 5 |
+| toy model | 19 train / **5 test** rows, accuracy **1.00** — only multiples of 20% are reachable |
+| `model.coef_` shape | **(3, 16)** — one row per class, not one vector |
+| real drivers | `device_type_Unknown` → Brute Force, `device_type_IoT Device` → Scan, `firewall_rule_Deny` → both |
+| URL dataset after cleanup | 13 constant columns and 1,438 duplicates dropped → **87,209 rows** |
+| logistic regression on URLs | **93.35%** accuracy, **F1 0.9057**, vs a **65.03%** majority baseline |
+| dropping the 13 dead columns | changes accuracy by **exactly zero** — zero-variance columns scale to zeros |
+| leaving the 1,438 duplicates in | **93.14% / ~0.902** — slightly *worse*, not better |
+
+That last pair is the module's payoff and contradicts what students predict. It is also the
+earliest statement of Module 5's thesis: the magnitude of a data defect is an empirical
+question, not something you can reason out.
 
 **DGA (Section 3).** The original notebook oversampled with `replace=True` *before*
 `train_test_split`, creating 248,032 duplicate rows out of 675,000 and putting **55.3%**
@@ -229,7 +273,7 @@ two accuracy points between environments. Structural and dataset facts are quote
 because they reproduce exactly in every environment tested. Keep that distinction when
 editing — it is the single most useful rule this project has produced.
 
-## Known gaps in Modules 2–4
+## Known gaps in Modules 3–4
 
 **Module 4, highest priority.** The "Interpretation: The Cost of Hunting" cell contains
 unedited draft text in student-facing material:
@@ -251,19 +295,32 @@ retained variance is not automatically a failure.
 **~~Module 1.~~ Resolved 2026-08-26** — Kaggle onboarding removed, the stale `Index`
 rename sequence gone, the whole lab rebuilt. See "Module 1 rebuild" above.
 
-**All of 2–4.** No random seeds, so student output drifts from the numbers in the prose.
-Module 1's and Module 5's setup cells can be copied in as-is.
+**~~Module 2.~~ Resolved 2026-08-26** — Kaggle gone, both labs rebuilt, the impossible
+source-IP explanation and the `coef_[0]` error fixed. See "Module 2 rebuild" above.
 
-**All of 2–4.** Modules 1 and 5 now teach students to check for missing-value sentinels,
+**Module 3.** Still named `Student_Module3.ipynb`. Rename to `Module3_Student.ipynb` when
+it is rebuilt, so all five match.
+
+**All of 3–4.** No random seeds, so student output drifts from the numbers in the prose.
+The setup cells from Modules 1, 2 or 5 can be copied in as-is.
+
+**All of 3–4.** Modules 1, 2 and 5 now teach students to check for missing-value sentinels,
 duplicates, contradictory labels, leakage, imbalance, and construct validity. Modules 3 and
 4 use SMOTE, splits, and the credit card dataset without those checks. Re-read them as a
 student who has already learned to audit — anywhere they could ask "wait, did you check
-that?" needs either the check or an explanation. **This is now sharper than it was**: a
-student arrives at Module 2 having already found six contradictory labels by hand.
+that?" needs either the check or an explanation. **The bar is now considerably higher**: by
+the time a student reaches Module 3 they have found sentinels and contradictory labels by
+hand in Module 1, and in Module 2 they have measured that two of those defects changed the
+score by nothing at all.
 
-**Modules 2–4 vs Module 1's dataset framing.** Module 1 is explicit that its data is URLs
-and not emails, and makes students reason about what that prevents a model from learning.
-Check that Modules 2–4 describe their own datasets as precisely.
+**Modules 3–4 vs the rebuilt dataset framing.** Modules 1 and 2 are explicit about what
+their data is and is not, and make students reason about what that prevents a model from
+learning. Check that Modules 3 and 4 describe their own datasets as precisely.
+
+**Module 3 will need a leakage story that actually bites.** Module 2 ends by measuring two
+defects that cost nothing, and explicitly promises that Module 3 shows the same family of
+problem costing a great deal. If Module 3's SMOTE-before-split does not in fact inflate the
+score measurably, that promise needs rewording rather than the measurement being fudged.
 
 ## Module 6 and 7 design decisions
 
