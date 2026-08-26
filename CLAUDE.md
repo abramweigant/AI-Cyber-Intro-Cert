@@ -17,7 +17,7 @@ Condensed from a 15-week outline into 7 modules.
 |---|---|---|
 | 1 | Course Introduction & The Role of AI in Cybersecurity | **Rebuilt 2026-08-26, verified on Colab** |
 | 2 | Cyber Threat Landscape, Data Sources, Preprocessing, First ML Model | **Rebuilt 2026-08-26, verified locally** |
-| 3 | Supervised Machine Learning | Done, needs polish |
+| 3 | Supervised Machine Learning | **Rebuilt 2026-08-26, verified locally** |
 | 4 | Unsupervised Learning: Anomaly Detection & Threat Hunting | Done, needs polish |
 | 5 | Deep Learning Models for Cybersecurity | **Complete, verified on Colab 2026-08-26** |
 | 6 | LLMs + Explainable AI (capstone: LLM-assisted forensic log triage) | Not started |
@@ -32,7 +32,7 @@ account/API-token onboarding was removed on 2026-08-26.
 ```
 Module1_Student.ipynb            rebuilt 2026-08-26 (see below)
 Module2_Student.ipynb            rebuilt 2026-08-26 (see below)
-Student_Module3.ipynb            <- the one remaining odd filename; rename on rebuild
+Module3_Student.ipynb            rebuilt 2026-08-26 (see below)
 Module4_Student.ipynb
 Module5_Student.ipynb
 instructor/                      a SEPARATE PRIVATE git repo -- see "Two repos" below.
@@ -81,12 +81,12 @@ and Module 1 Colab exports had to be moved. Never remove those lines.
 5. Integrity check: markdown must differ **only** at cell 0, code **only** at the exercise
    indices, and no `INSTRUCTOR`/`TEACHING NOTE` string may appear in the student copy.
 
-Cell counts, both copies: Module 1 is 59, Module 2 is 57, Module 5 is 91. The check above
+Cell counts, both copies: Module 1 is 59, Module 2 is 57, Module 3 is 55, Module 5 is 91. The check above
 is what guarantees they stayed in step.
 
 Retired originals live in the private repo, never in this one:
-`Module1_Intro-2_SUPERSEDED.ipynb`, `Student_Module2__SUPERSEDED.ipynb`. Both are still in
-this repo's history at `e6843c8`.
+`Module1_Intro-2_SUPERSEDED.ipynb`, `Student_Module2__SUPERSEDED.ipynb`,
+`Student_Module3_SUPERSEDED.ipynb`. All three are still in this repo's history at `e6843c8`.
 
 ## Module 1 rebuild (2026-08-26)
 
@@ -123,6 +123,25 @@ The rebuild runs on `phishing_dataset1.parquet`, already hosted here.
 The rebuild keeps the 24-row toy log for Lab 1 **deliberately** — you can read every row, and
 the perfect 100% on five test rows is the memorisation lesson. Lab 2 is new and runs on
 `phishing_dataset1.parquet`, so Module 1 audits that dataset and Module 2 acts on the audit.
+
+## Module 3 rebuild (2026-08-26)
+
+`Student_Module3.ipynb` is retired. Three reasons, all verified:
+
+- **It could not execute.** It loaded `phishing_dataset1.parquet`, then uploaded
+  `features_at_0.9_threshold_train.parquet` — a file the notebook itself produces thirty
+  cells later. Circular. Cell 32's saved output shows 18,070 rows × 73 columns, a derived
+  subset that is not in the repo and whose class balance is *inverted* relative to the
+  source. The SMOTE lab carried no outputs while three cells below analysed its results.
+- **Its stated premise was false.** It told students the naive model would show "terrible
+  recall" on the minority class. Actual minority recall on that dataset is **0.915** — 34.6%
+  is mild imbalance, and the accuracy trap does not occur.
+- **Its prescribed fix was wrong.** Measured on genuinely imbalanced data, SMOTE,
+  undersampling and class weighting all make the model six to ten times worse.
+
+**The thesis is inverted in the rebuild, and this is the important part.** The module now
+measures the standard remedies rather than asserting them, and finds that threshold tuning
+and model choice beat all three. See the measured facts below before editing anything here.
 
 ## The organizing idea of Module 5
 
@@ -192,6 +211,43 @@ Deterministic; reproduce exactly.
 That last pair is the module's payoff and contradicts what students predict. It is also the
 earliest statement of Module 5's thesis: the magnitude of a data defect is an empirical
 question, not something you can reason out.
+
+**Module 3 — `phishing_dataset1.parquet` and `creditcard.csv.zip`.** Deterministic.
+
+*Lab A, the sentinel finding (the strongest result in the course):*
+
+| check | value |
+|---|---|
+| after Module 1's cleanup | 87,209 rows × 99 columns |
+| features tying at 0.744 correlation with the label | **8**, agreeing to three decimals |
+| `qty_dollar_file` distinct values | **exactly 2** — `-1` (46,323 rows) and `0` (40,886) |
+| binary "has a file part" indicator vs label | **r = 0.7446** — same as the column itself |
+| phishing rate, URLs with **no** path | **1.6%** |
+| phishing rate, URLs **with** a path | **72.8%** |
+| feature pairs at \|r\| ≥ 0.95 | **246** (15 at exactly 1.00) |
+| pruning survivors | 66 @ 0.95, 58 @ 0.9, 50 @ 0.8, 41 @ 0.7 |
+
+The dataset's single strongest predictor is *whether the URL has a path at all* — almost
+certainly an artifact of how the two classes were harvested, not a property of phishing.
+This is why Module 2's 93.35% came so easily. Do not remove this finding; it is the module's
+spine and the earliest construct-validity lesson in the course.
+
+*Labs B–D, credit card fraud (492 frauds in 284,807 rows, 0.173%, about 577:1):*
+
+| approach | precision | recall | F1 |
+|---|---|---|---|
+| naive logistic regression | 0.827 | 0.633 | **0.717** |
+| + SMOTE | 0.058 | 0.918 | **0.109** |
+| + random undersampling | 0.038 | 0.918 | **0.074** |
+| + `class_weight='balanced'` | 0.061 | 0.918 | **0.114** |
+| naive + tuned threshold (0.153) | 0.735 | 0.765 | **0.750** |
+| Decision Tree (depth 6) | 0.895 | 0.786 | **0.837** |
+| **Random Forest, no resampling** | 0.941 | 0.816 | **0.874** |
+| *SMOTE before the split (leaky)* | *0.974* | *0.924* | *0.948* |
+
+The leaky run's tell is not its F1 but its test set: **113,726 rows at 50% fraud**, larger
+than the dataset it came from. Learning curves: `max_depth=2` gives train 0.792 / val 0.761
+(underfit); `max_depth=None` gives train **1.000** / val 0.732 (memorised).
 
 **DGA (Section 3).** The original notebook oversampled with `replace=True` *before*
 `train_test_split`, creating 248,032 duplicate rows out of 675,000 and putting **55.3%**
@@ -273,7 +329,7 @@ two accuracy points between environments. Structural and dataset facts are quote
 because they reproduce exactly in every environment tested. Keep that distinction when
 editing — it is the single most useful rule this project has produced.
 
-## Known gaps in Modules 3–4
+## Known gaps in Module 4
 
 **Module 4, highest priority.** The "Interpretation: The Cost of Hunting" cell contains
 unedited draft text in student-facing material:
@@ -298,13 +354,13 @@ rename sequence gone, the whole lab rebuilt. See "Module 1 rebuild" above.
 **~~Module 2.~~ Resolved 2026-08-26** — Kaggle gone, both labs rebuilt, the impossible
 source-IP explanation and the `coef_[0]` error fixed. See "Module 2 rebuild" above.
 
-**Module 3.** Still named `Student_Module3.ipynb`. Rename to `Module3_Student.ipynb` when
-it is rebuilt, so all five match.
+**~~Module 3.~~ Resolved 2026-08-26** — rebuilt, renamed, thesis inverted on measurement.
+See "Module 3 rebuild" above.
 
-**All of 3–4.** No random seeds, so student output drifts from the numbers in the prose.
+**All of 4.** No random seeds, so student output drifts from the numbers in the prose.
 The setup cells from Modules 1, 2 or 5 can be copied in as-is.
 
-**All of 3–4.** Modules 1, 2 and 5 now teach students to check for missing-value sentinels,
+**Module 4.** Modules 1, 2, 3 and 5 now teach students to check for missing-value sentinels,
 duplicates, contradictory labels, leakage, imbalance, and construct validity. Modules 3 and
 4 use SMOTE, splits, and the credit card dataset without those checks. Re-read them as a
 student who has already learned to audit — anywhere they could ask "wait, did you check
@@ -313,14 +369,12 @@ the time a student reaches Module 3 they have found sentinels and contradictory 
 hand in Module 1, and in Module 2 they have measured that two of those defects changed the
 score by nothing at all.
 
-**Modules 3–4 vs the rebuilt dataset framing.** Modules 1 and 2 are explicit about what
+**Module 4 vs the rebuilt dataset framing.** Modules 1 and 2 are explicit about what
 their data is and is not, and make students reason about what that prevents a model from
-learning. Check that Modules 3 and 4 describe their own datasets as precisely.
+learning. Check that Module 4 describes its own dataset as precisely.
 
-**Module 3 will need a leakage story that actually bites.** Module 2 ends by measuring two
-defects that cost nothing, and explicitly promises that Module 3 shows the same family of
-problem costing a great deal. If Module 3's SMOTE-before-split does not in fact inflate the
-score measurably, that promise needs rewording rather than the measurement being fudged.
+**~~Module 3 will need a leakage story that actually bites.~~ Delivered.** SMOTE before the
+split reports F1 0.948 against an honest 0.109 — roughly ninefold. Module 2's promise stands.
 
 ## Module 6 and 7 design decisions
 
