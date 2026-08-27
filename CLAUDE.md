@@ -377,48 +377,96 @@ and every dropped topic must be an explicit decision. Deleting a note-to-self is
 as deleting the subject it was about — an author's note is evidence a topic was
 **under-explained**, not evidence it was unwanted.
 
-**The audit that finds this** (run it after any rebuild):
+### The audit, and two ways to run it wrong
 
-```python
-# terms appearing >=3x in the original and 0x in the rebuild
-# CamelCase classes, dotted API calls, and named concepts
-```
-Compare the retired copy in this private repo against the new student notebook. Module 1 came
-back clean; Module 2's three hits were false positives from variable renaming (`df` ->
-`log`/`clean`/`urls`); Module 3 had three real drops.
+Tokenize both notebooks, count terms appearing **>=3x in the original and 0x in the rebuild**,
+across three vocabularies: dotted API calls (`df.info`), CamelCase classes (`GridSearchCV`),
+and prose words. Script: `instructor/audit_dropped_topics.py old.ipynb new.ipynb`. About a second per module.
 
-### Known casualties
+Two mistakes cost a full re-run on 2026-08-27, both of which silently *hide* real drops behind
+noise:
 
-| topic | original | rebuild | status |
+1. **Diff the instructor copies, not the student copies.** The student copy has scaffolds where
+   solutions were, so every term that lives only in solution code reports as dropped. The
+   student-copy run returned 32 false positives on Module 4 alone and buried the one real hit.
+2. **Strip base64 before tokenizing.** Module 1's original embeds images in markdown source.
+   Undstripped, the top 65 "dropped CamelCase terms" are JPEG fragments and the signal is gone.
+
+### Coverage — all five modules audited 2026-08-27
+
+Originals for Modules 1–3 are the retired copies in this private repo; for Modules 4 and 5 they
+are the pre-rebuild state at public commit `514550c`.
+
+| module | verdict |
+|---|---|
+| 1 | **clean** — only `kaggle` (deliberate) and three typos the rebuild fixed (`phising`, `bellow`, `corrolation`) |
+| 2 | **clean** — hits were renaming (`df` -> `log`/`clean`/`urls`) and spelling (`memorizes` -> `memorisation`) |
+| 3 | **three real drops**, below |
+| 4 | **clean** — Gradio quiz removed deliberately, all 10 scenarios preserved in `module4_knowledge_check_questions.md`; supervised/unsupervised framing fully intact (`supervised` 61->61, `unsupervised` 43->44, `zero-day` 7->8, `ground truth` 9->10; only the word *paradigm* fell out of use) |
+| 5 | **clean** — sole hit is `todo`, from author notes |
+
+Modules 4 and 5 had never been audited before this date. They were edited rather than rebuilt,
+and that was assumed to be safe. It happened to be true; it was not checked.
+
+### Known casualties — all in Module 3
+
+| topic | original | rebuilds | status |
 |---|---|---|---|
-| Pearson vs **Spearman** correlation | 17 uses | 0 | **restored 2026-08-27** as Module 3 Lab A.5 |
-| **`GridSearchCV`** / hyperparameter tuning | 11 uses | 0 | **still missing, course-wide** |
-| **SVC / Support Vector Machines** | 56 uses | 0 | **still missing, course-wide** |
-| `LearningCurve` (yellowbrick) | 17 uses | 1 | intentional — replaced by sklearn `learning_curve` |
-| imputation | 3 uses | 0 | acceptable — Module 2 covers the same ground |
+| Pearson vs **Spearman** correlation | 17 | 19 | **restored 2026-08-27** as Lab A.5 |
+| **`ImbPipeline`** (`imblearn.pipeline`) | 17 | **0** | **still missing** — see below |
+| **`GridSearchCV`** / hyperparameter tuning | 11 | 1 (a passing mention in M4) | **still missing** |
+| **SVC / SVMs** | 18 | 1 (M1 concept list) | **still missing** |
+| `LearningCurve` (yellowbrick) | 4 | 0 | intentional — replaced by sklearn `learning_curve`, present in M3 |
+| `to_parquet` (persist the cleaned dataset) | 3 | 0 | acceptable — each rebuilt module now loads from `DATA_URL` and stands alone |
+| imputation | 3 | 0 | acceptable — Module 2 covers the same ground |
 
-**Hyperparameter tuning is now taught nowhere in the course.** `GridSearchCV` appears in zero
-student notebooks. Module 3's bake-off compares Logistic Regression, Decision Tree and Random
-Forest **at their library defaults** and calls that picking a model on evidence. That is the
-gap to close first, and it fits the rebuilt narrative: tuning the Random Forest would let
-students test whether tuning beats the model-family choice, which is Module 3's own argument.
+Visualization and interpretability were checked for systemic loss and **grew**: `plt.` calls
+135 -> 147 course-wide, `coef_` 3 -> 8 (Module 2 now teaches it correctly). Module 3's own
+histogram/heatmap count fell but was replaced, not removed.
 
-**SVMs are also gone** — one passing mention survives in Module 1's concept list. Recommend
-leaving them out and saying so explicitly rather than restoring them: SVC is slow on 227k rows
-and the module already compares three families. But make it a decision, not an accident.
+### `ImbPipeline` + `GridSearchCV` are one casualty, not two
+
+They were a single two-part lab: *diagnose with learning curves inside an `ImbPipeline`, then
+tune with `GridSearchCV` respecting that same pipeline.* The rebuild kept the learning curves
+and dropped the pipeline and the tuning.
+
+That leaves a **coherent hole, and it is the most important thing in this section.** Module 3
+now proves that SMOTE before the split leaks (F1 0.948 against an honest 0.109) and teaches the
+manual fix — split first. `ImbPipeline` is the *production-standard* fix: it exists precisely so
+resampling happens inside each CV fold and cannot leak. Students learn the failure mode and the
+hand-rolled remedy, but never meet the tool the field actually uses to prevent it. The module
+argues for measurement over assertion and then omits the mechanism that makes measurement safe
+under cross-validation.
+
+**Close this first, and close both halves together** — restoring `GridSearchCV` alone would
+reintroduce tuning without the fold-safety that made the original lab correct. It also fits the
+rebuilt narrative: Module 3's bake-off currently compares Logistic Regression, Decision Tree and
+Random Forest **at their library defaults** and calls that picking a model on evidence. Tuning
+the Random Forest inside an `ImbPipeline` would let students test whether tuning beats the
+model-family choice — which is Module 3's own argument, and currently untested.
+
+**SVMs stay out — this is now a decision, not an accident.** SVC is slow on 227k rows, the
+module already compares three families, and one scenario in the Module 4 knowledge check keeps
+students able to recognise an SVM as supervised. Say so in the module rather than leaving the
+silence.
 
 Module 3's learning objectives were rewritten from the new content and therefore do **not**
-promise either topic, so nothing inside the module is broken. That was luck, not diligence.
+promise any of the three, so nothing inside the module is broken. That was luck, not diligence.
 
 ## Open items
 
 1. **~~Full end-to-end execution of Module 5.~~ Done.** Ran clean three times — twice
    locally (7 minutes, 41/41 cells) and once on a Colab T4 under TensorFlow 2.20. Zero
    execution errors. Module 1 likewise ran clean locally and on Colab.
-2. **Modules 2–4 polish.** See Known gaps below. This is now the highest-value work: after
-   the Module 1 and Module 5 rebuilds, Modules 2–4 are conspicuously less finished than the
-   material on either side of them.
-3. **Modules 6 and 7.** Not started. Design decisions are recorded below.
+2. **~~Modules 2–4 polish.~~ Done 2026-08-26/27** — all three rebuilt, assessment normalised
+   across all five modules, Module 4's mixed voice fixed.
+3. **Colab confirmation runs for Modules 2, 3 and 4.** The last gate before the course ships.
+   Modules 1 and 5 are confirmed. Expect 2 and 3 to hold (they assert mostly dataset facts,
+   and Module 1's numbers reproduced identically across the pandas 2 -> 3 boundary) and
+   Module 4's Isolation Forest metrics to move slightly.
+4. **Restore the `ImbPipeline` + `GridSearchCV` lab to Module 3.** Both halves together — see
+   "Content lost in the rebuilds". This is the one substantive curriculum hole left.
+5. **Modules 6 and 7.** Not started. Design decisions are recorded below.
 
 **On quoting numbers.** Module 5's prose gives model metrics as approximations
 (`~89%`, `~0.88`) and ranges, because they drift: identical code restored EarlyStopping
