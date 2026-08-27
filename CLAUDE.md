@@ -272,31 +272,43 @@ spine and the earliest construct-validity lesson in the course.
 | *SMOTE before the split (leaky)* | *0.974* | *0.924* | *0.948* |
 
 *Lab D.3, added 2026-08-27 — fold-safe grid search.* `ImbPipeline` of `StandardScaler` ->
-`smote` -> `RandomForestClassifier(n_estimators=100)`, grid over `smote` in
+`smote` -> `RandomForestClassifier(n_estimators=50)`, grid over `smote` in
 `['passthrough', SMOTE]` and `model__max_depth` in `[None, 10]`, `scoring='f1'`,
-`cv=StratifiedKFold(3, shuffle=True, random_state=42)`. 12 fits, 124s locally.
+`cv=StratifiedKFold(3, shuffle=True, random_state=42)`, `verbose=2`.
 
 | smote | max_depth | mean CV F1 | std | rank |
 |---|---|---|---|---|
-| passthrough | None | **0.8455** | 0.0215 | 1 |
-| passthrough | 10 | 0.8435 | 0.0171 | 2 |
-| SMOTE | None | 0.8352 | 0.0200 | 3 |
-| SMOTE | 10 | **0.6122** | **0.0666** | 4 |
+| passthrough | None | **0.8411** | 0.0138 | 1 |
+| passthrough | 10 | 0.8312 | 0.0161 | 2 |
+| SMOTE | None | 0.8282 | 0.0161 | 3 |
+| SMOTE | 10 | **0.6201** | **0.0716** | 4 |
 
 `best_params_` is `{'model__max_depth': None, 'smote': 'passthrough'}` — the library defaults.
-Held-out P 0.941 / R 0.816 / **F1 0.874**, *identical* to D.2's untuned forest.
+Held-out P 0.941 / R 0.816 / **F1 0.874**, which is *exactly* D.2's 100-tree forest.
 
-**Two results, and both are negative — say so to students before they think they broke it.**
-The search was free to use SMOTE and refused it, applied the correct way inside the pipeline at
-every fold. That is what retires the objection that Lab C only beat SMOTE by applying it
-crudely, and it is the reason the lab exists. And tuning changed nothing, which confirms D.2's
-default-vs-default comparison was fair rather than lucky. Direct held-out check on the same
-forest: no resampling P 0.941 / R 0.816 / F1 0.874, against SMOTE-in-pipeline P 0.871 / R 0.827
-/ F1 0.848 — fold-safe SMOTE buys 0.011 recall for 0.070 precision, at double the training time.
+**Three results, all negative — say so to students before they think they broke it.** The
+search was free to use SMOTE and refused it, applied the correct way inside the pipeline at
+every fold; that is what retires the objection that Lab C only beat SMOTE by applying it
+crudely, and it is the reason the lab exists. Tuning changed nothing, confirming D.2's
+default-vs-default comparison was fair rather than lucky. And the winning **50**-tree forest
+ties D.2's **100**-tree forest to three decimals, so doubling the trees bought nothing either.
+Direct held-out check on the same forest: no resampling P 0.941 / R 0.816 / F1 0.874, against
+SMOTE-in-pipeline P 0.871 / R 0.827 / F1 0.848 — fold-safe SMOTE buys 0.011 recall for 0.070
+precision, at double the training time.
 
-The leaky run's tell is not its F1 but its test set: **113,726 rows at 50% fraud**, larger
-than the dataset it came from. Learning curves: `max_depth=2` gives train 0.792 / val 0.761
-(underfit); `max_depth=None` gives train **1.000** / val 0.732 (memorised).
+**The ranking is identical at 30, 50 and 100 trees** — only the cost changes. That is what
+makes the 50-tree search safe.
+
+**Grid-search timings, and the mistake worth not repeating.** 65s on 12 cores; **274s on 2**;
+Colab's two vCPUs are slower still, so budget **4–8 minutes**. The first version of this lab
+used `n_estimators=100` and `verbose=1` and was shipped with the estimate "about two minutes
+locally, longer on Colab" — extrapolated from a 12-core machine without ever testing a
+constrained one. On Colab it ran 15–25 minutes while printing **one line and then nothing**,
+which is indistinguishable from a hang, and it was reported as one. Two fixes: halve the
+forest (verified not to change the ranking), and **`verbose=2`, which prints all twelve
+`[CV] END` lines as they finish**. Generalise this: any cell over ~60s needs streaming
+progress, and any runtime estimate for Colab must come from a core-limited measurement, not
+from dividing a fast machine's number by a guess.
 
 **Module 4 — synthetic data plus `creditcard.csv.zip`.** Seeded; deterministic.
 
