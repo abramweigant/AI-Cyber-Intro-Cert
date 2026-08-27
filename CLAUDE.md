@@ -81,9 +81,11 @@ and Module 1 Colab exports had to be moved. Never remove those lines.
 5. Integrity check: markdown must differ **only** at cell 0, code **only** at the exercise
    indices, and no `INSTRUCTOR`/`TEACHING NOTE` string may appear in the student copy.
 
-Cell counts, both copies: Module 1 is 59, Module 2 is 57, Module 3 is 55, Module 4 is 85,
-Module 5 is 91. The check above
-is what guarantees they stayed in step.
+Cell counts, both copies (verified 2026-08-27): Module 1 is 61, Module 2 is 57, Module 3 is
+58, Module 4 is 83, Module 5 is 91. The check above is what guarantees they stayed in step.
+The leak check must match `INSTRUCTOR SOLUTION` and `TEACHING NOTE` as phrases -- matching the
+bare word `SOLUTION` also hits `resolution` and ordinary prose, and returns four false
+positives.
 
 Retired originals live in the private repo, never in this one:
 `Module1_Intro-2_SUPERSEDED.ipynb`, `Student_Module2__SUPERSEDED.ipynb`,
