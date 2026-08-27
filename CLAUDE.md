@@ -430,6 +430,50 @@ dropped. It shows up only by asking of each explanation, *what code does this de
 cells were rewritten on 2026-08-27 when Lab D.3 restored the machinery they had been left
 explaining.
 
+### The artifact sweep — a different tool for a different defect
+
+The topic audit answers *what did the rebuild stop teaching?* It cannot answer *what did the
+rebuild leave behind?* `instructor/sweep_artifacts.py` does that, over five categories:
+
+| check | what it catches |
+|---|---|
+| **A. orphan prose** | a backticked identifier in markdown that no code cell defines or uses |
+| **B. undefined name** | a name a code cell loads that no earlier cell bound — AST-based, so it sees lambda args and comprehension targets |
+| **C. dead xref** | a Module / Section / Lab / Task reference with no matching heading |
+| **D. draft text** | TODO, FIXME, "need video", unresolved authoring chatter |
+| **E. stale tooling** | Kaggle, Gradio, yellowbrick, `files.upload`, `drive.mount` |
+
+Category A is the one that catches the Module 3 failure mode. Run it on the **instructor**
+copies; student scaffolds make category B report every name the student is meant to create.
+
+Findings on 2026-08-27, after the fixes below: **5, all verified false positives** — three real
+dataset column names in Module 1 (the code selects them by suffix, so no literal match),
+`C2LOP.P` in Module 5 (a real Malimg family, confirmed against `malimg_64.npz`), and Module 5's
+`drive.mount`, which sits inside a markdown code block as optional guidance and never executes.
+
+**Checks the sweep does not cover, run manually 2026-08-27:** duplicate cells (none in any
+module) and URL liveness (28 distinct URLs; see below).
+
+### Fixed 2026-08-27
+
+| defect | where | fix |
+|---|---|---|
+| dead link, hard 404 | M2 cell 55, DataCamp scikit-learn cheat sheet | replaced with `scikit-learn.org/stable/machine_learning_map.html` |
+| **expired TLS certificate** | M3 cell 60, `neptune.ai` | replaced with `scikit-learn.org/stable/modules/compose.html` — students would have hit a browser security warning |
+| typo `tequniques` | M2 cell 11 | `techniques` |
+| typo `validatate` | M4 cell 1 — **a learning objective** | `validate` |
+| typos `Valuble` / `guidence` / `Dr. ismail` | M3 cell 60 | `Valuable` / `guidance` / `Dr. Ismail` |
+| hardcoded dataset URL | M4 cell 67 | routed through `DATA_URL` like every other module |
+
+`media.defense.gov` returns 403 to every automated agent (bot protection) and could not be
+verified from here. It is the only URL in the course whose state is unknown; check it in a
+browser.
+
+**On spell-checking:** `/usr/share/dict/words` is far too thin for this material — it lacks
+plurals, contractions and most ordinary technical vocabulary, and returned 294 unknown tokens
+of which 4 were real. Useful only with a large allowlist, and only for finding rare one-off
+tokens. Do not treat its output as a defect list.
+
 ### Coverage — all five modules audited 2026-08-27
 
 Originals for Modules 1–3 are the retired copies in this private repo; for Modules 4 and 5 they
