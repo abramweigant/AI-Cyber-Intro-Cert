@@ -82,7 +82,7 @@ and Module 1 Colab exports had to be moved. Never remove those lines.
    indices, and no `INSTRUCTOR`/`TEACHING NOTE` string may appear in the student copy.
 
 Cell counts, both copies (verified 2026-08-27): Module 1 is 61, Module 2 is 57, Module 3 is
-58, Module 4 is 83, Module 5 is 91. The check above is what guarantees they stayed in step.
+61, Module 4 is 83, Module 5 is 91. The check above is what guarantees they stayed in step.
 The leak check must match `INSTRUCTOR SOLUTION` and `TEACHING NOTE` as phrases -- matching the
 bare word `SOLUTION` also hits `resolution` and ordinary prose, and returns four false
 positives.
@@ -271,6 +271,29 @@ spine and the earliest construct-validity lesson in the course.
 | **Random Forest, no resampling** | 0.941 | 0.816 | **0.874** |
 | *SMOTE before the split (leaky)* | *0.974* | *0.924* | *0.948* |
 
+*Lab D.3, added 2026-08-27 — fold-safe grid search.* `ImbPipeline` of `StandardScaler` ->
+`smote` -> `RandomForestClassifier(n_estimators=100)`, grid over `smote` in
+`['passthrough', SMOTE]` and `model__max_depth` in `[None, 10]`, `scoring='f1'`,
+`cv=StratifiedKFold(3, shuffle=True, random_state=42)`. 12 fits, 124s locally.
+
+| smote | max_depth | mean CV F1 | std | rank |
+|---|---|---|---|---|
+| passthrough | None | **0.8455** | 0.0215 | 1 |
+| passthrough | 10 | 0.8435 | 0.0171 | 2 |
+| SMOTE | None | 0.8352 | 0.0200 | 3 |
+| SMOTE | 10 | **0.6122** | **0.0666** | 4 |
+
+`best_params_` is `{'model__max_depth': None, 'smote': 'passthrough'}` — the library defaults.
+Held-out P 0.941 / R 0.816 / **F1 0.874**, *identical* to D.2's untuned forest.
+
+**Two results, and both are negative — say so to students before they think they broke it.**
+The search was free to use SMOTE and refused it, applied the correct way inside the pipeline at
+every fold. That is what retires the objection that Lab C only beat SMOTE by applying it
+crudely, and it is the reason the lab exists. And tuning changed nothing, which confirms D.2's
+default-vs-default comparison was fair rather than lucky. Direct held-out check on the same
+forest: no resampling P 0.941 / R 0.816 / F1 0.874, against SMOTE-in-pipeline P 0.871 / R 0.827
+/ F1 0.848 — fold-safe SMOTE buys 0.011 recall for 0.070 precision, at double the training time.
+
 The leaky run's tell is not its F1 but its test set: **113,726 rows at 50% fraud**, larger
 than the dataset it came from. Learning curves: `max_depth=2` gives train 0.792 / val 0.761
 (underfit); `max_depth=None` gives train **1.000** / val 0.732 (memorised).
@@ -394,6 +417,19 @@ noise:
 2. **Strip base64 before tokenizing.** Module 1's original embeds images in markdown source.
    Undstripped, the top 65 "dropped CamelCase terms" are JPEG fragments and the signal is gone.
 
+### A second failure mode: the explanation outlives the lab
+
+Module 3's rebuild dropped the tuning lab but **kept its two explanatory markdown cells**, which
+survived verbatim as cells 51 and 52 (original 83 and 84). They referenced `grid_search.fit()`
+and `best_estimator_` — the only occurrences of either string in the module — with no code
+anywhere defining them, and cell 52's worked example asserted that SMOTE inside a pipeline
+teaches the model to recognise the minority class, which Lab C had already measured as false.
+
+A term-frequency audit **cannot** find this: the vocabulary is present, so nothing reports as
+dropped. It shows up only by asking of each explanation, *what code does this describe?* Both
+cells were rewritten on 2026-08-27 when Lab D.3 restored the machinery they had been left
+explaining.
+
 ### Coverage — all five modules audited 2026-08-27
 
 Originals for Modules 1–3 are the retired copies in this private repo; for Modules 4 and 5 they
@@ -415,8 +451,8 @@ and that was assumed to be safe. It happened to be true; it was not checked.
 | topic | original | rebuilds | status |
 |---|---|---|---|
 | Pearson vs **Spearman** correlation | 17 | 19 | **restored 2026-08-27** as Lab A.5 |
-| **`ImbPipeline`** (`imblearn.pipeline`) | 17 | **0** | **still missing** — see below |
-| **`GridSearchCV`** / hyperparameter tuning | 11 | 1 (a passing mention in M4) | **still missing** |
+| **`ImbPipeline`** (`imblearn.pipeline`) | 17 | 4 | **restored 2026-08-27** as Module 3 Lab D.3 |
+| **`GridSearchCV`** / hyperparameter tuning | 11 | 5 | **restored 2026-08-27**, same lab |
 | **SVC / SVMs** | 18 | 1 (M1 concept list) | **still missing** |
 | `LearningCurve` (yellowbrick) | 4 | 0 | intentional — replaced by sklearn `learning_curve`, present in M3 |
 | `to_parquet` (persist the cleaned dataset) | 3 | 0 | acceptable — each rebuilt module now loads from `DATA_URL` and stands alone |
@@ -426,7 +462,7 @@ Visualization and interpretability were checked for systemic loss and **grew**: 
 135 -> 147 course-wide, `coef_` 3 -> 8 (Module 2 now teaches it correctly). Module 3's own
 histogram/heatmap count fell but was replaced, not removed.
 
-### `ImbPipeline` + `GridSearchCV` are one casualty, not two
+### `ImbPipeline` + `GridSearchCV` were one casualty, not two — restored 2026-08-27
 
 They were a single two-part lab: *diagnose with learning curves inside an `ImbPipeline`, then
 tune with `GridSearchCV` respecting that same pipeline.* The rebuild kept the learning curves
@@ -440,12 +476,9 @@ hand-rolled remedy, but never meet the tool the field actually uses to prevent i
 argues for measurement over assertion and then omits the mechanism that makes measurement safe
 under cross-validation.
 
-**Close this first, and close both halves together** — restoring `GridSearchCV` alone would
-reintroduce tuning without the fold-safety that made the original lab correct. It also fits the
-rebuilt narrative: Module 3's bake-off currently compares Logistic Regression, Decision Tree and
-Random Forest **at their library defaults** and calls that picking a model on evidence. Tuning
-the Random Forest inside an `ImbPipeline` would let students test whether tuning beats the
-model-family choice — which is Module 3's own argument, and currently untested.
+**Both halves went back together**, as Lab D.3 — see the measured facts below. Restoring
+`GridSearchCV` alone would have reintroduced tuning without the fold-safety that made the
+original lab correct.
 
 **SVMs stay out — this is now a decision, not an accident.** SVC is slow on 227k rows, the
 module already compares three families, and one scenario in the Module 4 knowledge check keeps
@@ -466,8 +499,8 @@ promise any of the three, so nothing inside the module is broken. That was luck,
    Modules 1 and 5 are confirmed. Expect 2 and 3 to hold (they assert mostly dataset facts,
    and Module 1's numbers reproduced identically across the pandas 2 -> 3 boundary) and
    Module 4's Isolation Forest metrics to move slightly.
-4. **Restore the `ImbPipeline` + `GridSearchCV` lab to Module 3.** Both halves together — see
-   "Content lost in the rebuilds". This is the one substantive curriculum hole left.
+4. **~~Restore the `ImbPipeline` + `GridSearchCV` lab to Module 3.~~ Done 2026-08-27** as
+   Lab D.3. Module 3 is now 61 cells and runs clean end to end in 170s locally.
 5. **Modules 6 and 7.** Not started. Design decisions are recorded below.
 
 **On quoting numbers.** Module 5's prose gives model metrics as approximations
