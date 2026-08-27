@@ -365,6 +365,51 @@ contradictory labels. After cleaning: 83,458 rows, 3,215 backdoor / 80,243 ports
 **Majority-class baseline accuracy is 96.15%.** Reference solution with a tuned threshold:
 accuracy 95.57%, macro F1 0.691, backdoor F1 0.405, backdoor recall ~0.39.
 
+## Content lost in the rebuilds — READ BEFORE REBUILDING ANYTHING ELSE
+
+Modules 1, 2 and 3 were rebuilt from the dataset up: decide what the module *should* teach,
+then write it. That produced better modules and **silently dropped topics the originals
+taught**. Where the old content happened to align with the new spine it survived; where it did
+not, it vanished without anyone deciding it should.
+
+**The rule this produced:** a rebuild must be *diffed* against the original, topic by topic,
+and every dropped topic must be an explicit decision. Deleting a note-to-self is not the same
+as deleting the subject it was about — an author's note is evidence a topic was
+**under-explained**, not evidence it was unwanted.
+
+**The audit that finds this** (run it after any rebuild):
+
+```python
+# terms appearing >=3x in the original and 0x in the rebuild
+# CamelCase classes, dotted API calls, and named concepts
+```
+Compare the retired copy in this private repo against the new student notebook. Module 1 came
+back clean; Module 2's three hits were false positives from variable renaming (`df` ->
+`log`/`clean`/`urls`); Module 3 had three real drops.
+
+### Known casualties
+
+| topic | original | rebuild | status |
+|---|---|---|---|
+| Pearson vs **Spearman** correlation | 17 uses | 0 | **restored 2026-08-27** as Module 3 Lab A.5 |
+| **`GridSearchCV`** / hyperparameter tuning | 11 uses | 0 | **still missing, course-wide** |
+| **SVC / Support Vector Machines** | 56 uses | 0 | **still missing, course-wide** |
+| `LearningCurve` (yellowbrick) | 17 uses | 1 | intentional — replaced by sklearn `learning_curve` |
+| imputation | 3 uses | 0 | acceptable — Module 2 covers the same ground |
+
+**Hyperparameter tuning is now taught nowhere in the course.** `GridSearchCV` appears in zero
+student notebooks. Module 3's bake-off compares Logistic Regression, Decision Tree and Random
+Forest **at their library defaults** and calls that picking a model on evidence. That is the
+gap to close first, and it fits the rebuilt narrative: tuning the Random Forest would let
+students test whether tuning beats the model-family choice, which is Module 3's own argument.
+
+**SVMs are also gone** — one passing mention survives in Module 1's concept list. Recommend
+leaving them out and saying so explicitly rather than restoring them: SVC is slow on 227k rows
+and the module already compares three families. But make it a decision, not an accident.
+
+Module 3's learning objectives were rewritten from the new content and therefore do **not**
+promise either topic, so nothing inside the module is broken. That was luck, not diligence.
+
 ## Open items
 
 1. **~~Full end-to-end execution of Module 5.~~ Done.** Ran clean three times — twice
