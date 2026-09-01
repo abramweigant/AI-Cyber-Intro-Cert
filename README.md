@@ -27,12 +27,19 @@ learning to find out why is the skill being certified.
 | 3 | Supervised Machine Learning | EDA and correlation as interrogation; the accuracy trap; measuring (not assuming) the standard fixes for class imbalance; model comparison and fold-safe tuning | 5–6 h |
 | 4 | Unsupervised Learning: Anomaly Detection & Threat Hunting | Scaling, PCA, K-Means, DBSCAN, hierarchical clustering, Isolation Forests; evaluating without ground truth | 4–5 h |
 | 5 | Deep Learning Models for Cybersecurity | Autoencoders, MLPs, 1D/2D CNNs, LSTMs, embeddings — and auditing your own evaluation at every step | 6–8 h |
-| 6 | LLMs + Explainable AI *(in development)* | Working with large language models on security text; SHAP/LIME; capstone: LLM-assisted forensic log triage | — |
+| 6 | Large Language Models & Explainable AI | Calling an LLM over an API; phishing triage against the model you built in Module 5; prompt injection; SHAP derived from first principles; capstone: LLM-assisted forensic log triage | 5–6 h |
 | 7 | Adversarial Attacks & the Secure AI/ML Lifecycle | Attacking the DGA and backdoor detectors **you** built in Module 5 — evasion, poisoning, membership inference, model extraction — then defending them and threat-modelling the lifecycle with MITRE ATLAS | 5–6 h |
 
 Time estimates assume Colab's free tier and include the written questions. A few cells are
 long-running by design and say so where they appear (the Module 3 grid search budgets 4–8
-minutes on Colab; Module 5's networks train fastest with the T4 GPU runtime enabled).
+minutes on Colab; Module 5's networks train fastest with the T4 GPU runtime enabled; Module 6
+makes several hundred API calls and is paced by the model server, not by Colab).
+
+**Module 6 is the one module you cannot complete offline.** It needs a live language-model
+endpoint. Your instructor will give you a base URL and an API key to store in Colab's secrets
+manager (**Runtime → Secrets**) as `OPENWEBUI_BASE_URL` and `OPENWEBUI_API_KEY`. Never paste
+either one into a notebook cell — Section 1 explains why at length, and the reason is the
+subject of the module.
 
 Modules 6 and 7 preview two sister courses — one on LLMs in depth, one on securing AI
 systems in depth — while standing on their own.
@@ -45,6 +52,8 @@ JSON). Module 7 attacks the exact model you build there.
 - Comfortable reading and writing basic Python.
 - Introductory security concepts help but are reviewed where needed.
 - No prior machine learning experience is assumed.
+- A Google account, for Colab. Module 6 additionally needs endpoint credentials from your
+  instructor.
 
 ## Datasets
 
@@ -58,7 +67,8 @@ All hosted in this repository and loaded by URL from each notebook's setup cell:
 | `dga_websites.csv` / `legit_websites.csv` | ~675k generated vs. legitimate domains | Module 5 |
 | `malimg_64.npz` | 9,339 malware binaries rendered as 64×64 grayscale images | Module 5 |
 | `CEAS_08.parquet` | 39,154 labelled emails with full body text | Module 5 |
-| `Backdoor_Malware.pcap.parquet` / `Recon-PortScan.pcap.parquet` | IoT network flow records | Module 5 final lab |
+| `Backdoor_Malware.pcap.parquet` / `Recon-PortScan.pcap.parquet` | IoT network flow records | Module 5 final lab, Module 7 |
+| `forensic_log.csv` / `forensic_log_truth.csv` | One week of server logs (774 lines) with a multi-stage intrusion planted inside, and its ground truth | Module 6 capstone |
 
 ## Completion
 

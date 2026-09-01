@@ -1,8 +1,8 @@
 # AI-Cyber Intro Certification — Working Context
 
-Context for Claude Code sessions in this repo. Started 2026-08-21, last updated 2026-08-30.
+Context for Claude Code sessions in this repo. Started 2026-08-21, last updated 2026-09-01.
 
-**Status: 6 of 7 modules built. Modules 1–5 ran end to end on Google Colab on 2026-08-30 with
+**Status: all 7 modules built. Modules 1–5 ran end to end on Google Colab on 2026-08-30 with
 zero execution errors** — 315 pages of output reviewed. Modules 1–4 reproduced *every* figure
 quoted in this file exactly. Module 5's model metrics moved slightly, as designed, and every
 one landed inside the ranges its notebook states. Colab PDFs are in `instructor/`.
@@ -24,7 +24,14 @@ feature-importance cells), so **the notebooks are now ahead of the verified Cola
 new cells ship without stored outputs and quote only locally-measured numbers as
 approximations. The next Colab pass must execute them and transplant outputs. Also new:
 `README.md` (public, the student-facing syllabus) and `instructor/GRADING_RUBRICS.md`
-(0/1/2 rubric for all 100+ written questions). The changes are uncommitted in both repos.
+(0/1/2 rubric for all 100+ written questions). **All of the above is committed and pushed** in
+both repos as of 2026-09-01.
+
+**Module 6 built 2026-09-01 — and it is the one module not verified by execution.** LLMs +
+Explainable AI, 62 cells, 16 coding tasks, 6 write-ups. Its labs require a live model endpoint,
+which the authoring environment does not have, so it ships for a first live pass. Read
+"Module 6" below before touching it: what *was* verified locally, what was not, and why it
+ships without stored outputs.
 
 ## What this is
 
@@ -42,11 +49,12 @@ depth. Modules 6 and 7 preview those while standing on their own.
 | 3 | Supervised Machine Learning | 67 | Rebuilt; Colab-verified 2026-08-30, then edited same day (audit) |
 | 4 | Unsupervised Learning: Anomaly Detection & Threat Hunting | 84 | Converted to a lab; Colab-verified 2026-08-30, then edited same day (audit) |
 | 5 | Deep Learning Models for Cybersecurity | 92 | Complete; Colab-verified 2026-08-30, then edited same day (audit) |
-| 6 | LLMs + Explainable AI (capstone: LLM-assisted forensic log triage) | — | Not started; design below |
+| 6 | Large Language Models & Explainable AI (capstone: LLM-assisted forensic log triage) | 62 | Built 2026-09-01; **not yet verified against a live endpoint** |
 | 7 | Adversarial Attacks & the Secure AI/ML Lifecycle | 31 | Built 2026-08-30; **Colab-verified 2026-08-31** |
 
 Across the five audited modules: **63 coding tasks, 109 written questions.** Module 7 adds 7
-attack exercises + a final lab and 6 write-up blocks.
+attack exercises + a final lab and 6 write-up blocks; Module 6 adds 16 coding tasks and 6
+write-up blocks.
 
 ## If you are here to evaluate the course
 
@@ -76,7 +84,7 @@ This repo is the course's **dataset host** and holds the student-facing notebook
 pull data by raw GitHub URL. **No module uses Kaggle** — removed 2026-08-26.
 
 ```
-Module1_Student.ipynb .. Module5_Student.ipynb
+Module1_Student.ipynb .. Module7_Student.ipynb   (no Module 6 gap -- all seven exist)
 instructor/                      a SEPARATE PRIVATE git repo -- see below.
                                  gitignored here; it can never be committed to this one.
 malimg_64.npz                    9,339 malware byte-images, 64x64 grayscale (22.7 MB)
@@ -88,6 +96,11 @@ Recon-PortScan.pcap.parquet      IoT flow features, 82,284 rows (Modules 5 and 7
 UNSW_2018_IoT_Botnet_*.csv.zip   unused so far
 phishing_dataset1.parquet        112 lexical URL features, 88,647 rows (Modules 1, 2, 3)
 Log_Data.csv                     30 rows, toy firewall log (Module 2)
+forensic_log.csv                 774 log lines, one week, 8 hosts (Module 6 capstone)
+forensic_log_truth.csv           its ground truth: 46 malicious lines, 8 attack stages.
+                                 SEPARATE FILE on purpose -- it cannot land in a prompt
+                                 by accident. Regenerate both with
+                                 instructor/gen_forensic_log.py (byte-reproducible).
 ```
 
 Every module loads data through a `DATA_URL` constant defined in its setup cell:
@@ -131,8 +144,8 @@ Retired originals live in the private repo, never in this one:
    appear in the student copy. Match those two as *phrases* — the bare word `SOLUTION` also
    matches `resolution` and ordinary prose, and returns four false positives.
 
-Cell counts, both copies (verified 2026-08-30, post-audit): **M1 62, M2 58, M3 67, M4 84,
-M5 92.** Each module now carries one **checkpoint cell** asserting deterministic dataset
+Cell counts, both copies (verified 2026-08-30, post-audit; M6 2026-09-01): **M1 62, M2 58,
+M3 67, M4 84, M5 92, M6 62, M7 31.** Each module now carries one **checkpoint cell** asserting deterministic dataset
 facts at its most error-prone pipeline joint (the drift rule decides what is safe to
 assert — dataset facts yes, model metrics never). Keep checkpoints identical in both
 copies; they are teaching cells, not exercises.
@@ -227,6 +240,66 @@ appears to be, and each one fails by a **different mechanism**:
 
 If you edit Module 5, preserve this throughline. It is the module's spine and the
 on-ramp to Module 7.
+
+## The organizing idea of Module 6, and how it was verified
+
+**The spine: three things that sound right and are not, and one that is.** Module 5's throughline
+is six results that are not what they appear; Module 7's is that there is an optimiser on the
+other side. Module 6's is that *fluency is not evidence*, and it is what makes LLMs and
+explainability one module rather than two half-modules bolted together.
+
+| section | what you get | can you check it? |
+|---|---|---|
+| 2 | a detector with a 99.5% score | yes — and it falls to ~72% on ordinary modern email |
+| 3 | a model that follows your instructions | no — until an attacker writes instructions into the data |
+| 4 | a model's account of its own reasoning | **no.** It is generated text, produced like everything else it says |
+| 4 | a SHAP attribution | **yes.** Arithmetic on the model, verified by hand to machine precision |
+
+That last row is the constructive half and the reason the module is not merely cynical. Do not
+remove it: "explainability" is not one thing, some explanations are measurements and some are
+stories, and the whole module exists to make students able to tell which they are holding.
+
+### What was verified, and what was not
+
+**Module 6 has never run against a real language model.** The design decision recorded below —
+live endpoint, no canned-transcript fallback — means the authoring environment cannot execute
+its LLM cells. Rather than ship it unexercised, it was verified in three layers:
+
+1. **The classical, SHAP and scoring code was executed for real**, locally, against the real
+   datasets. Every number in the "Module 6" measured-facts block below came from running it.
+2. **The API client was tested against a mock OpenAI-compatible server**: endpoint discovery
+   across both path conventions, model listing, system-prompt and temperature passthrough, 401
+   handling, and unreachable-host handling all behave as documented.
+3. **The whole notebook was then executed end to end against a context-aware mock endpoint**
+   (`nbconvert --execute`, all 62 cells, **zero errors**), with `DATA_URL` pointed at local
+   files. That exercises every code path — chunking, JSON extraction, detection scoring,
+   grounding, all three plots — so a `NameError`, a bad index or a wrong API shape cannot
+   survive. What it cannot tell you is whether the *models* behave as the teaching notes claim.
+
+**So the live pass must do two things**, not one: confirm the module runs, and confirm each
+LLM-dependent claim in the direction its teaching note predicts. Those claims are the
+zero-shot/few-shot crossover (§2), the injection-vs-capability trend (§3), the rationale/
+attribution mismatch (§4), and per-stage triage recall (§5). Every one is stated as a
+*direction* in the instructor headers, never as a digit — the drift rule applies with more
+force here than anywhere else in the course, because LLM output is not reproducible even at
+`temperature=0`, which §1.2 makes students measure for themselves.
+
+**Module 6 ships with no stored outputs, deliberately.** Transplanting the mock run would put
+fabricated model replies in front of students in the one module about not trusting fluent
+output. Transplant after the first live pass, exactly as for every other module.
+
+### Build discipline
+
+Both copies are generated by `instructor/build_m6.py` from one source of truth. **Edit the
+builder, never the notebooks** — it is what makes the integrity invariants hold by
+construction (equal cell counts; markdown differs only at cell 0; code only at the 16 exercise
+indices; no `INSTRUCTOR SOLUTION` / `TEACHING NOTE` string can reach the student copy). All of
+those were re-checked after the build and pass. The artifact sweep returns **2 findings, both
+verified false positives**: `device_type_Unknown` and `firewall_rule_Deny` in cell 15, which are
+a deliberate callback to Module 2's coefficients and are correctly backticked column names.
+
+The capstone dataset is generated by `instructor/gen_forensic_log.py`, which is deterministic
+and was confirmed to reproduce the two shipped CSVs byte-identically.
 
 ## Measured facts — do not re-derive, do not contradict
 
@@ -463,6 +536,81 @@ the reference solution clears it at 0.9086. Do not raise it.
   messages contain "mailing list" and 27.4% contain "listinfo", against ~0.1% of malicious.
   The benign class is developer mailing list traffic.
 
+**Module 6 — `CEAS_08.parquet` and `forensic_log.csv`.** Everything below was measured by
+execution locally. The sklearn figures are deterministic on a fixed split and reproduced
+identically across runs; quote structural facts exactly and model metrics as approximations,
+as always.
+
+*Section 2 — the 2008 detector, rebuilt with Module 5's exact split and settings:*
+
+| check | value |
+|---|---|
+| reproduction of M5's baseline | **99.49%** accuracy, F1 **0.9954**, ~3s |
+| split | 31,323 train / 7,831 test (M5's figures, reproduced) |
+| top tokens for LEGITIMATE | `wrote` −7.23, `org` −6.52, **`2007` −4.35**, `thanks` −3.74, `python` −3.66, `perl` −2.99 |
+| top tokens for MALICIOUS | `com` +7.29, `your` +6.35, `love` +4.94, `replica` +3.80, `watches` +3.21, `cnn` +2.94 |
+| `password` coefficient | **−0.847 — evidence the message is LEGITIMATE** |
+| `verify` / `account` / `login` | −0.113 / −0.564 / −0.275, all toward legitimate |
+| `urgent` / `click` | +0.356 / +0.709 |
+| modern probe set (12 phish + 6 benign, hand-written) | **72.2%** accuracy |
+| phishing recall on the probe | **8/12 (67%)**; missed the IT-migration, DocuSign, HR-handbook and MFA-disabled lures |
+| mean p(malicious) on the 12 phishing mails | **0.577** |
+| confidence, CEAS test | mean **0.963**, **40.1%** above 0.99, 2.2% below 0.75 |
+| confidence, modern probe | mean **0.677**, **0.0%** above 0.99, **88.9%** below 0.75 |
+
+**The 99.5% model is a 2008-spam-genre detector, and `2007` being among its strongest evidence
+for "legitimate" is the cleanest construct-validity failure in the course.** An earlier
+hypothesis — that the mailing-list traffic was the culprit, so excluding it would collapse the
+score — was **measured and did not survive**: dropping every test message containing "mailing
+list" or "listinfo" moves accuracy 99.49% → 99.44%. The shortcut is real; that particular
+prediction about it was wrong. Do not reinstate it.
+
+*Section 4 — SHAP, and this is arithmetic, so it must reproduce exactly:*
+
+| check | value |
+|---|---|
+| base value `w·E[x] + b` | **+0.3873** |
+| efficiency, `base + Σφ` vs the logit | agrees to **~1e-16** on every row |
+| `shap` LinearExplainer at its DEFAULTS | max diff **6.577e-02**, base value **+0.5239** — it silently subsamples the background to 100 rows |
+| `shap` with `Independent(A_train, max_samples=31323)` | max diff **0.000e+00** — exact agreement |
+| on the missed IT-migration lure | 33 tokens present, sum φ **−1.8806**; 19,967 absent, sum φ **+1.0072** |
+| occlusion ("LIME's core idea") vs exact SHAP | Pearson **0.928**, Spearman **0.894** — and **9 of 33 tokens land on the wrong side of zero** |
+
+**Task 4.3's occlusion result is the one to protect if the section is ever trimmed.** An r of
+0.93 is the kind of number that gets an approximation waved through, and it coexists with nine
+of thirty-three tokens attributed in the *opposite* direction. The mechanism is that
+`TfidfVectorizer` L2-normalises each document, so deleting one word rescales every other
+feature and the occlusion score for word A silently absorbs the renormalisation of B..Z. It
+generalises to every perturbation explainer: they assume features can be varied independently,
+and correlated or normalised features break that quietly.
+
+**More than half the model's evidence comes from words that are not in the email.** Absent
+features get φ = −w·E[x], so every 2008 mailing-list word the message fails to contain counts as
+evidence *for* maliciousness. The email's own words say legitimate (−1.88) and the missing
+vocabulary says malicious (+1.01); they nearly cancel, which is *why* Section 2's confidence
+histogram piles up near 0.5. Sections 2 and 4 interlock on this — do not edit one without the
+other.
+
+*Section 5 — the capstone log (generated, deterministic, exact):*
+
+| check | value |
+|---|---|
+| lines / malicious | **774 / 46 (5.9%)** |
+| hosts / log sources | 8 / 7 (`cron`, `firewall`, `nginx`, `sshd`, `sudo`, `systemd`, `useradd`) |
+| message text | 45,685 chars, ~11.5k tokens — fits a 128k context; chunked at 80 lines (**10 chunks**) anyway |
+| intrusion | line_ids **212–260**, 2026-03-11 02:14–03:09, with 3 benign lines interleaved |
+| stages | recon 12, enumeration 7, brute_force 14, initial_access 2, persistence 4, lateral_movement 2, collection 1, exfiltration 4 |
+| attacker / C2 | `185.243.115.94` / `45.147.230.61` |
+| the chain | brute-force `deploy` on vpn01 → `useradd svc_update` + cron C2 → lateral to db01 → `mysqldump` → 4 large transfers out |
+| "flag everything" baseline | precision 0.059, recall 1.000, **F1 0.112** |
+
+Two design points to preserve. **Legitimate overnight activity was added on purpose** — nightly
+backups, healthchecks, logrotate, including 11–28 MB internal transfers on the intrusion night —
+so "it happened at 02:00" and "it was a big transfer" are not free answers. And **most chunks
+contain nothing**, which is the point: a model that reports a finding in every chunk produces a
+fluent, entirely fictional incident report, which is why Task 5.2 scores false positives and not
+just recall.
+
 **Final lab (IoT flows).** 85,502 rows combined; 2,043 exact duplicates (concentrated in
 PortScan); 1 row with nulls; no constant columns in the combined set; no feature rows with
 contradictory labels. After cleaning: 83,458 rows, 3,215 backdoor / 80,243 portscan (25:1).
@@ -650,7 +798,8 @@ promise any of the three, so nothing inside the module is broken. That was luck,
 
 **Genuinely open.**
 
-1. **Modules 6 and 7 are not started.** Design decisions below.
+1. **Module 6 has never run against a real model.** Everything else about it is verified;
+   see its section above for exactly what that means and what the live pass must do.
 2. **Malimg at full resolution.** Malimg encodes file size in image height and the 64×64 resize
    destroys it, so `Yuner.A` and `Autorun.K` collapse to one image each. They may be separable
    at full resolution. The raw `malimg_dataset` folder was deleted locally; the notebook flags
@@ -751,11 +900,34 @@ per-epoch DGA output are visible in the PDF.
 
 **Colab pins TensorFlow 2.20.0** against the local 2.21.0; no compatibility issues surfaced.
 
-## Modules 6 and 7 design decisions
+## Modules 6 and 7 design decisions (both now BUILT — kept for the model roster and the record)
 
-**Module 6 — LLMs + XAI, capstone = LLM-assisted forensic log triage.** Abe hosts models
-locally behind Open WebUI (OpenAI-compatible API, publicly routable), with a dedicated
-"google colab user" API key.
+**Module 6 — BUILT 2026-09-01.** See "The organizing idea of Module 6" above for the spine,
+the verification status and the build discipline. The design below was followed; five things
+were settled *during* the build and are recorded here so they stay settled:
+
+1. **No `openai` SDK — plain `requests`.** Zero install on Colab, one fewer version-drift
+   surface, and it puts the bearer token visibly on the wire, which is the point Section 1.1
+   is making. Students write the client themselves; it is six lines.
+2. **The endpoint path is discovered, not assumed.** Open WebUI serves
+   `/api/chat/completions`; a plain OpenAI-compatible gateway serves `/v1/chat/completions`.
+   Both are "OpenAI-compatible", and guessing wrong yields a 404 indistinguishable from a dead
+   server. `discover_endpoint()` probes both and is given to students rather than assigned.
+3. **`gemma3:27b` stays the capstone model; `qwen3.8:27b` was not adopted.** Its 262K context
+   would buy nothing here — the capstone log is ~11.5k tokens and *deliberately* chunked at 80
+   lines, because chunking is the lesson. Revisit only if a future capstone needs a log that
+   genuinely does not fit 128K. This also avoids depending on Ollama ≥0.32.
+4. **`phi4:latest` is used, exactly as the roster note proposed**, as the middle data point in
+   the prompt-injection demo. Three models across 3B → 14B → 27B make "capability is itself a
+   security control" a measured trend rather than a two-point anecdote.
+5. **First module in the course to `pip install` anything** (`shap`, in the Section 4 cell that
+   needs it, guarded by a try/except so it installs only when absent). Everything else runs on
+   what Colab already ships. If the live pass finds `shap` fragile on Colab's pinned numpy, the
+   fallback is already in the notebook: Task 4.1 derives the exact values by hand and does not
+   need the library at all.
+
+Abe hosts models locally behind Open WebUI (OpenAI-compatible API, publicly routable), with a
+dedicated "google colab user" API key.
 
 | use | model | why |
 |---|---|---|
@@ -768,11 +940,12 @@ Read **both** the base URL and the key from Colab secrets (`OPENWEBUI_BASE_URL`,
 `OPENWEBUI_API_KEY`), never hardcode — the URL too, because the homelab may move (the `DATA_URL`
 lesson) and a routable URL + key in a notebook a student later publishes is the exact leak the
 course preaches against. Rotate per cohort and rate-limit; scope the key server-side to just the
-course models. **Decided 2026-08-30: M6 labs require the live endpoint — no canned-transcript
-fallback.** A student whose endpoint is down cannot complete the module offline; accept that or
-revisit. This also means **M6 cannot be verified from the authoring environment** — it ships for
-a verification pass against the live endpoint, unlike every module so far. Confirm the four model
-tags below are actually served before/during that pass.
+course models. **Decided 2026-08-30, and honoured in the build: M6 labs require the live endpoint — no
+canned-transcript fallback.** A student whose endpoint is down cannot complete the module
+offline; accept that or revisit. This is why **M6 could not be verified from the authoring
+environment**, and what the three-layer mock verification described above was doing instead.
+The notebook's connectivity-check cell lists what the server actually serves and names any of
+the five required tags that are missing, so the live pass confirms the roster automatically.
 
 **Full Ollama roster, as of 2026-08-31.** All four models the design above depends on are still
 served, so the plan stands unchanged. Read the "notes" column as a *throughput tier*, because
