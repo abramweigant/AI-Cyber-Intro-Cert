@@ -2,10 +2,29 @@
 
 Context for Claude Code sessions in this repo. Started 2026-08-21, last updated 2026-08-30.
 
-**Status: 5 of 7 modules built. All five ran end to end on Google Colab on 2026-08-30 with
+**Status: 6 of 7 modules built. Modules 1–5 ran end to end on Google Colab on 2026-08-30 with
 zero execution errors** — 315 pages of output reviewed. Modules 1–4 reproduced *every* figure
 quoted in this file exactly. Module 5's model metrics moved slightly, as designed, and every
 one landed inside the ranges its notebook states. Colab PDFs are in `instructor/`.
+
+**Module 7 built 2026-08-30 and Colab-verified 2026-08-31** (adversarial attacks + secure
+AI/ML lifecycle). It ran end to end on Colab with **zero execution errors**; the export is
+`instructor/Module7_Instructor-new-Colab.pdf` (35 pages). Every attack reproduced in direction,
+and every figure landed inside its stated range — including the two that matter most: the
+one-character evasion (94% at ≤1 edit, identical to local) and the final lab's *non*-recovery
+under adversarial training. Numbers are quoted as directions, not digits: adversarial search is
+stochastic, so the drift rule applies with force. Shipped notebook outputs are from the local
+run; the Colab PDF is the proof, exactly as for Modules 1–5. **Module 6 (LLMs + XAI) is now the
+only module not started.**
+
+**Post-verification edits, same day:** a full audit (every cell of all ten copies) fixed 8
+small defects and resolved 13 findings — see `instructor/FIXES.md` for the complete log.
+This added cells to every module (checkpoint cells; M3 gained ROC/PR, cross-validation and
+feature-importance cells), so **the notebooks are now ahead of the verified Colab run**: the
+new cells ship without stored outputs and quote only locally-measured numbers as
+approximations. The next Colab pass must execute them and transplant outputs. Also new:
+`README.md` (public, the student-facing syllabus) and `instructor/GRADING_RUBRICS.md`
+(0/1/2 rubric for all 100+ written questions). The changes are uncommitted in both repos.
 
 ## What this is
 
@@ -18,15 +37,16 @@ depth. Modules 6 and 7 preview those while standing on their own.
 
 | Module | Title | Cells | Status |
 |---|---|---|---|
-| 1 | Course Introduction & The Role of AI in Cybersecurity | 61 | Rebuilt; **Colab-verified 2026-08-30** |
-| 2 | Threat Landscape, Data Sources, Preprocessing, First ML Model | 57 | Rebuilt; **Colab-verified 2026-08-30** |
-| 3 | Supervised Machine Learning | 61 | Rebuilt; **Colab-verified 2026-08-30** |
-| 4 | Unsupervised Learning: Anomaly Detection & Threat Hunting | 83 | Converted to a lab; **Colab-verified 2026-08-30** |
-| 5 | Deep Learning Models for Cybersecurity | 91 | Complete; **Colab-verified 2026-08-30** |
+| 1 | Course Introduction & The Role of AI in Cybersecurity | 62 | Rebuilt; Colab-verified 2026-08-30, then edited same day (audit) |
+| 2 | Threat Landscape, Data Sources, Preprocessing, First ML Model | 58 | Rebuilt; Colab-verified 2026-08-30, then edited same day (audit) |
+| 3 | Supervised Machine Learning | 67 | Rebuilt; Colab-verified 2026-08-30, then edited same day (audit) |
+| 4 | Unsupervised Learning: Anomaly Detection & Threat Hunting | 84 | Converted to a lab; Colab-verified 2026-08-30, then edited same day (audit) |
+| 5 | Deep Learning Models for Cybersecurity | 92 | Complete; Colab-verified 2026-08-30, then edited same day (audit) |
 | 6 | LLMs + Explainable AI (capstone: LLM-assisted forensic log triage) | — | Not started; design below |
-| 7 | Adversarial Attacks & the Secure AI/ML Lifecycle | — | Not started; design below |
+| 7 | Adversarial Attacks & the Secure AI/ML Lifecycle | 31 | Built 2026-08-30; **Colab-verified 2026-08-31** |
 
-Across the five: **63 coding tasks, 109 written questions.**
+Across the five audited modules: **63 coding tasks, 109 written questions.** Module 7 adds 7
+attack exercises + a final lab and 6 write-up blocks.
 
 ## If you are here to evaluate the course
 
@@ -64,7 +84,7 @@ CEAS_08.parquet                  39,154 labelled emails with full body text (19 
 creditcard.csv.zip               credit card fraud (Modules 3, 4 and 5)
 dga_websites.csv / legit_websites.csv   DGA vs legitimate domains (Module 5)
 Backdoor_Malware.pcap.parquet    IoT flow features, 3,218 rows (Module 5 final lab)
-Recon-PortScan.pcap.parquet      IoT flow features, 82,284 rows (Module 5 final lab)
+Recon-PortScan.pcap.parquet      IoT flow features, 82,284 rows (Modules 5 and 7)
 UNSW_2018_IoT_Botnet_*.csv.zip   unused so far
 phishing_dataset1.parquet        112 lexical URL features, 88,647 rows (Modules 1, 2, 3)
 Log_Data.csv                     30 rows, toy firewall log (Module 2)
@@ -111,7 +131,11 @@ Retired originals live in the private repo, never in this one:
    appear in the student copy. Match those two as *phrases* — the bare word `SOLUTION` also
    matches `resolution` and ordinary prose, and returns four false positives.
 
-Cell counts, both copies (verified 2026-08-30): **M1 61, M2 57, M3 61, M4 83, M5 91.**
+Cell counts, both copies (verified 2026-08-30, post-audit): **M1 62, M2 58, M3 67, M4 84,
+M5 92.** Each module now carries one **checkpoint cell** asserting deterministic dataset
+facts at its most error-prone pipeline joint (the drift rule decides what is safe to
+assert — dataset facts yes, model metrics never). Keep checkpoints identical in both
+copies; they are teaching cells, not exercises.
 
 **The drift rule — the single most useful rule this project has produced.** Structural and
 dataset facts reproduce exactly in every environment tested, so quote them exactly. Model
@@ -181,8 +205,10 @@ Isolation Forest is tree-based and scale-invariant, DBSCAN is distance-based and
 **Removed from Module 4 separately:** a Gradio quiz and a self-defeating "Teacher's Decoder
 Tool". They opened public `.live` tunnels from a student notebook — a poor pattern to model in
 a security course — the links expire after 72 hours, and the saved output contained a real
-student identifier and score. All ten quiz scenarios are preserved with answers in
-`instructor/module4_knowledge_check_questions.md` for the external quiz tool.
+student identifier and score. Since 2026-08-30 the ten quiz scenarios live
+**in the notebook itself** (Module 4 cell 3) as a written activity — no LMS or external
+quiz tool exists or is needed. `instructor/module4_knowledge_check_questions.md` is the
+answer key.
 
 ## The organizing idea of Module 5
 
@@ -313,6 +339,18 @@ precision, at double the training time.
 
 **The ranking is identical at 30, 50 and 100 trees** — only the cost changes. That is what
 makes the 50-tree search safe.
+
+*Added 2026-08-30 (audit), measured locally at seed 42 — model metrics, quote as approximate:*
+
+| model | ROC AUC | PR AUC (average precision) |
+|---|---|---|
+| naive logistic regression | 0.9605 | 0.7414 |
+| Random Forest (100 trees) | 0.9630 | 0.8734 |
+
+ROC AUC cannot separate the course's worst and best models at 577:1 (0.0025 apart); PR AUC
+separates them by 0.13. That contrast is the point of the new ROC/PR cell after Lab C.2 —
+preserve it. The new feature-importance cell's facts: V17 / V14 / V12 lead the forest's
+`feature_importances_`, top 3 carrying ~44% of the total.
 
 **Grid-search timings, and the mistake worth not repeating.** 65s on 12 cores; **274s on 2**;
 Colab's two vCPUs are slower still, so budget **4–8 minutes**. The first version of this lab
@@ -492,10 +530,15 @@ rebuild leave behind?* `instructor/sweep_artifacts.py` does that, over five cate
 Category A is the one that catches the Module 3 failure mode. Run it on the **instructor**
 copies; student scaffolds make category B report every name the student is meant to create.
 
-Findings on 2026-08-27, after the fixes below: **5, all verified false positives** — three real
+Findings on 2026-08-30, after the audit edits: **6, all verified false positives** — three real
 dataset column names in Module 1 (the code selects them by suffix, so no literal match),
-`C2LOP.P` in Module 5 (a real Malimg family, confirmed against `malimg_64.npz`), and Module 5's
-`drive.mount`, which sits inside a markdown code block as optional guidance and never executes.
+`C2LOP.P` in Module 5 (a real Malimg family, confirmed against `malimg_64.npz`; now cell 64),
+Module 5's `drive.mount` (now cell 87), which sits inside a markdown code block as optional
+guidance and never executes, and `explorer.exe` in Module 4 cell 3 — a Windows process name
+inside a knowledge-check scenario, not code. The sweep gained four category-D patterns on
+2026-08-30 (`**Reasoning**:`, `subtask`, `Data Analysis Key Findings`, `Insights or Next
+Steps`) after Module 4 was found still carrying its AI-authoring narration; they now guard
+against that class of leftover.
 
 **Checks the sweep does not cover, run manually 2026-08-27:** duplicate cells (none in any
 module) and URL liveness (28 distinct URLs; see below).
@@ -591,6 +634,19 @@ promise any of the three, so nothing inside the module is broken. That was luck,
 - **`to_parquet` / persisting a cleaned dataset.** Each rebuilt module loads from `DATA_URL`
   and stands alone.
 - **Imputation.** Module 2 covers the same ground.
+- **Regression.** Named in Module 1's taxonomy, never practiced. Decided 2026-08-30: every
+  security problem in this course is detection/classification, and that is representative of
+  the field. Recorded so it stays a decision.
+- **The reading-half prose voice.** The expository halves of Modules 1–3 are heavier and more
+  textbook-toned than the rebuilt lab halves. Reviewed 2026-08-30 and deliberately left: the
+  content is accurate and referenced, and a wholesale rewrite risks vocabulary drops the topic
+  audit would then chase. Module 4's narration cells — the actual defects — were rewritten. If
+  a full voice pass is ever done, run `audit_dropped_topics.py` before/after per module.
+- **Naive Bayes.** Appears in one knowledge-check scenario (which tests paradigm recognition,
+  not the algorithm) with an in-notebook gloss saying the course does not teach it.
+- **Gradient boosting (XGBoost/LightGBM).** Not taught. Open question rather than settled:
+  arguably more industry-relevant than SVMs; the Module 3 bake-off is the natural home if it
+  is ever added. One line in the bake-off's write-up could also simply name it.
 
 **Genuinely open.**
 
@@ -614,6 +670,87 @@ including `validatate` in a Module 4 learning objective.
 That was **wrong about Module 4**, which had twelve `np.random.seed(42)` / `random_state=42`
 occurrences and was the best-seeded of the original four.
 
+## Module 7 — built 2026-08-30, decisions and measured facts
+
+**Structure (31 cells):** intro + attack taxonomy + MITRE ATLAS framing → S1 re-arm both
+targets (DGA CNN + backdoor MLP) with the model-sync contract assertion → S2 evasion flagship
+(DGA char-insertion) → S3 feature-space FGSM + the problem-space caveat → S4 poisoning (trigger
+backdoor) → S5 membership inference + model extraction → S6 defence (adversarial training + the
+lifecycle table + governance) → final lab (attack & defend the backdoor detector) → module +
+course summary. Given cells: setup, both model rebuilds, checkpoint. Scaffolded exercises:
+2.1, 3.1, 4.1, 5.1, 5.2, 6.1, final lab.
+
+**Decisions made (record so they stay decisions):**
+- **Flagship retargeted from Malimg to the DGA CNN.** The null-byte-append attack on the malware
+  CNN needs raw binaries the course cannot distribute; the DGA character-perturbation attack is
+  trivially distributable, fully verifiable, and just as visceral. Malimg is kept as a *worked
+  explanation* in the summary, not a runnable lab. (Confirmed with Abe 2026-08-30.)
+- **M7 rebuilds both targets from public data** rather than requiring the student's saved
+  `backdoor_detector.keras` (which is private/gitignored). "Load your own if you kept it" is the
+  optional path. This keeps M7 standalone; the contract-assertion cell is the M5/M7 sync guard.
+- **Membership inference uses a random-label forced-memorisation construction.** A model trained
+  to fit random labels can only memorise, giving a reliable, reproducible loss gap (member ~0.000,
+  non-member ~4, MI ~86%). An earlier "small model, real labels, long training" version did *not*
+  reliably memorise on this separable task (one full run came back at ~50%/no-leak) — do not
+  revert to it. The production model's ~50% (no leak) is kept as the contrast.
+- **Synthetic-media / FLUX demo left out** of the core module (mentioned as an optional extension
+  only). Adds a heavy dependency for a tangential point.
+- **ATLAS technique IDs verified against MITRE, 2026-08-30** (a first build had three wrong).
+  Correct mapping: S2 greedy/query-based = **AML.T0043.001 Black-Box Optimization**; S3 FGSM =
+  **AML.T0043.000 White-Box Optimization**; S4 = **AML.T0020** + **AML.T0043.004 Insert Backdoor
+  Trigger**; S5.1 = **AML.T0024.000 Infer Training Data Membership**; S5.2 = **AML.T0024.002
+  Extract ML Model** via **AML.T0040 AI Model Inference API Access**. `AML.T0044` does not exist
+  in the ATLAS technique list — do not cite it. Re-verify if ATLAS renumbers.
+- **The backdoor threshold is tuned on the test set**, inherited from M5's final lab. Kept
+  deliberately (every attack is measured as a fall from that same baseline, so comparisons hold)
+  but now **declared in-notebook** rather than passed over. Do not silently "fix" it without
+  re-measuring every attack baseline.
+
+**Measured facts (local, seed 42, TF 2.21 — quote as DIRECTIONS, not digits; adversarial search
+is stochastic and the final-lab numbers especially move per run):**
+
+| stage | result |
+|---|---|
+| DGA CNN baseline | ~89% acc, F1 ~0.88 |
+| Backdoor MLP baseline | ~95% acc, backdoor recall ~0.43–0.46; contract: input 39 == meta n_features 39 |
+| Evasion (DGA flagship) | ~94% of flagged domains flip with **1 inserted char** (a hyphen), 100% within 2; conf 1.00→~0.02 |
+| Evasion (FGSM on MLP) | recall ~0.43 → ~0.10 (ε=0.05) → ~0.002 (ε=0.25) |
+| Poisoning (trigger `qzx7q`) | 0% control = no effect; **0.5%** of labels → ~96% trigger escape; clean F1 flat (~0.885); 3% → 100% |
+| Membership inference | production ~50% (no leak); forced-memorise member loss 0.000 / non-member ~4 → MI ~86% |
+| Model extraction | surrogate from 60k query answers (pool = **attacker-collected** held-out domains, never the target's training set) agrees ~90% on unseen domains and inherits the hyphen blind spot. A **synthetic random-string pool reaches only ~66%** — the query distribution matters, which is what makes query monitoring a real defence |
+| Adversarial training (DGA) | **like-for-like on the same fixed mid-hyphen attack**: undefended still-flags ~35% → hardened ~100%, for ~0.7–1.4 F1 points. Do NOT use Section 2's greedy ~5% as the 'before' number — different, stronger attack. **Greedy still evades ~95% with a different edit** — the honest limit |
+| Final lab (backdoor) | FGSM ε=0.05 cuts recall ~0.43→~0.10; adv-training on ε=0.1 gives **no reliable recovery** (lands ~0.09–0.15, i.e. within noise, sometimes slightly lower) — a deliberate honest-weak-result contrasting with 6.1's clean DGA defence. Single-step feature-space adv-training is known to be brittle; do not quote a recovery figure |
+
+**The flagship's throughline (preserve it):** the DGA model learned "hyphen/structure = legit"
+as a proxy — the same construct-validity shortcut M5 Section 5 exposed — and a single hyphen
+walks through it. The evasion is not generic noise; it attacks the gap between what the model
+was *named* to do and what it *learned* to do. Keep that connection explicit; it is what makes
+M7 the payoff of the whole course rather than a bolt-on.
+
+**Colab verification — DONE 2026-08-31, zero errors.** Local vs Colab, showing the drift rule
+working as designed (dataset/structural facts exact, model metrics inside range):
+
+| check | local | Colab | notebook quotes |
+|---|---|---|---|
+| DGA CNN | 89.00% / F1 0.8828 | 88.98% / 0.8825 | `~89%` / `~0.88` |
+| contract, discrete features | 39==39, 11 of 39 | 39==39, 11 of 39 | **exact both runs** |
+| evasion ≤1 / ≤2 edits | 94% / 100% | 94% / 100% | **identical** |
+| backdoor clean recall | 0.434 | 0.449 | ~0.43–0.46 |
+| FGSM ε=0.05 / 0.25 | 0.103 / 0.002 | 0.118 / 0.025 | ~0.10–0.14 / near zero |
+| poisoning 0% / 0.5% escape | 0% / 96% | 0% / 96% | **control exact** |
+| membership inference | 50.4% / 85.8% | 50.4% / 85.8% | ~50% / ~86% |
+| extraction: collected / synthetic | 90.6% / 66.3% | 90.5% / 69.2% | ~90% / ~66–69% |
+| 6.1 like-for-like | 35% → 100%, cost 0.7 | 34% → 100%, cost 0.6 | ~34–35% → ~100% |
+| final lab hardened @ε=0.05 | 0.090 (vs 0.103) | 0.087 (vs 0.118) | no reliable recovery |
+
+**The most important confirmation:** the final lab's hardened model came out *below* the
+undefended one on Colab too (0.087 vs 0.118). Had the original "adversarial training restores
+most of it" claim shipped, Colab would have contradicted the notebook in front of students.
+The streaming-progress fixes also worked — the `[1/3]…[3/3]` poisoning lines and the
+per-epoch DGA output are visible in the PDF.
+
+**Colab pins TensorFlow 2.20.0** against the local 2.21.0; no compatibility issues surfaced.
+
 ## Modules 6 and 7 design decisions
 
 **Module 6 — LLMs + XAI, capstone = LLM-assisted forensic log triage.** Abe hosts models
@@ -627,20 +764,27 @@ locally behind Open WebUI (OpenAI-compatible API, publicly routable), with a ded
 | prompt-injection demo | `llama3.2:3b` **and** `gemma3:27b` | same payload against both — the small model folds, the large one usually resists. The contrast is the lesson: model capability is itself a security control |
 | XAI section | `gpt-oss:20b` | exposes reasoning traces; compare its stated reasoning against SHAP attributions on the same email. Plausible is not faithful |
 
-Read base URL and key from Colab secrets, never hardcode. Rotate per cohort and rate-limit —
-assume a student eventually publishes a notebook containing the key.
+Read **both** the base URL and the key from Colab secrets (`OPENWEBUI_BASE_URL`,
+`OPENWEBUI_API_KEY`), never hardcode — the URL too, because the homelab may move (the `DATA_URL`
+lesson) and a routable URL + key in a notebook a student later publishes is the exact leak the
+course preaches against. Rotate per cohort and rate-limit; scope the key server-side to just the
+course models. **Decided 2026-08-30: M6 labs require the live endpoint — no canned-transcript
+fallback.** A student whose endpoint is down cannot complete the module offline; accept that or
+revisit. This also means **M6 cannot be verified from the authoring environment** — it ships for
+a verification pass against the live endpoint, unlike every module so far. Confirm the four model
+tags below are actually served before/during that pass.
 
-Also available and unused: FLUX.2 dev, FLUX.1 schnell, SDXL, Z-Image Turbo. Week 14 of the
-original outline lists "fake media" under deceptive techniques, so one could drive a short
-Module 7 demo on synthetic media for social engineering.
+Also available and unused: FLUX.2 dev, FLUX.1 schnell, SDXL, Z-Image Turbo. Left out of M7's core
+build (see below); available if a synthetic-media social-engineering demo is ever wanted.
 
-**Module 7 — adversarial attacks and the secure AI/ML lifecycle.** Attacks the students'
-*own* models from Modules 3 and 5 rather than fresh toy models. The hook: the model you were
-proud of in week 5 breaks in ten lines. The Section 4 malware CNN is the best target — it reads
-file layout, and appending null bytes shifts every subsequent byte without changing behaviour.
-**This means M3/M5 model definitions must stay in sync with M7.** Weeks 14 and 15 of the
-original outline overlap heavily (both list poisoning, model inversion and threat modeling), so
-collapsing them into one module loses nothing.
+**Module 7 — BUILT 2026-08-30. See the "Module 7 — built" section above for the full structure,
+decisions and measured facts.** The design intent recorded here originally proposed the malware
+CNN as the flagship target (append null bytes → byte layout shifts → texture smears). That was
+**changed during the build**: the attack needs raw binaries the course cannot distribute, so the
+runnable flagship is the DGA character-perturbation attack instead, with Malimg kept as a worked
+explanation. The M3/M5-in-sync requirement is enforced by a contract-assertion cell in M7 S1
+(loads the model, asserts input width == the saved meta's feature count). Weeks 14/15 were
+collapsed into the one module as planned.
 
 ## Environment notes
 
