@@ -774,6 +774,46 @@ revisit. This also means **M6 cannot be verified from the authoring environment*
 a verification pass against the live endpoint, unlike every module so far. Confirm the four model
 tags below are actually served before/during that pass.
 
+**Full Ollama roster, as of 2026-08-31.** All four models the design above depends on are still
+served, so the plan stands unchanged. Read the "notes" column as a *throughput tier*, because
+that is what decides whether a model can face a class of concurrent asynchronous students:
+
+| model | size | tier / note |
+|---|---|---|
+| `llama4:scout` | 67 GB | 109B MoE, **heavy CPU-offload, ~5-15 tok/s** |
+| `qwen3:32b` | 20 GB | dense all-rounder, partial offload |
+| `qwen3-coder:30b` | 18 GB | agentic coding MoE |
+| `qwen3.8:27b` | 17 GB | dense multimodal, **262K ctx**, needs Ollama ≥0.32 |
+| `gemma3:27b` | 17 GB | all-rounder — **capstone model** |
+| `gpt-oss:20b` | 13 GB | MoE, reasoning traces — **XAI section** |
+| `phi4:latest` | 9.1 GB | 14B, **fits VRAM** (fully GPU-resident) |
+| `qwen2.5-coder:14b` | 9.0 GB | FIM coding, recommended serve model |
+| `qwen2.5-coder:7b-instruct-q8_0` | 8.1 GB | coding, q8 |
+| `qwen3:8b` | 5.2 GB | fast all-rounder — **workhorse** |
+| `llama3.1:8b` | 4.9 GB | fast general |
+| `qwen2.5-coder:7b` | 4.7 GB | FIM coding |
+| `phi4-mini:latest` | 2.5 GB | fast small |
+| `llama3.2:3b` | 2.0 GB | fast — **prompt-injection "folds" model** |
+
+Three consequences for M6, to settle before authoring rather than during:
+
+1. **`llama4:scout` is disqualified, and that is a decision.** At ~5-15 tok/s a single capstone
+   log-triage response takes minutes, and concurrent students would collapse it. Do not reach for
+   it because it is the biggest model on the list.
+2. **`phi4:latest` is the interesting new arrival** — 14B that *fits VRAM*, so it is fully
+   GPU-resident and the best throughput-per-capability on the roster. Two uses: a faster
+   workhorse alternative to `qwen3:8b` if concurrency measurement says so, and a **middle data
+   point in the prompt-injection demo**. Three models across a capability range (3B folds → 14B →
+   27B resists) turns "model capability is itself a security control" from a two-point anecdote
+   into a measured trend. Worth doing if the endpoint can take the load.
+3. **`qwen3.8:27b` is a capstone candidate** at 262K context against `gemma3:27b`'s 128K — more
+   log per prompt, which is exactly the capstone's constraint. But it **needs Ollama ≥0.32**, so
+   confirm the container version before depending on it; otherwise stay on `gemma3:27b`. A/B the
+   two during the verification pass.
+
+Coding models (`qwen3-coder:30b`, the `qwen2.5-coder:*` family) are not relevant to M6's content,
+which is security *text*, not code generation.
+
 Also available and unused: FLUX.2 dev, FLUX.1 schnell, SDXL, Z-Image Turbo. Left out of M7's core
 build (see below); available if a synthetic-media social-engineering demo is ever wanted.
 
