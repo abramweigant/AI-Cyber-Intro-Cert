@@ -51,11 +51,17 @@ def _err(status: int, msg: str, **extra) -> JSONResponse:
 
 
 def _client_of(request: Request) -> str:
-    """One student VM per IP. X-Forwarded-For is honoured so the gateway still
-    attributes correctly if you ever put something in front of it."""
-    fwd = request.headers.get("x-forwarded-for", "")
-    if fwd:
-        return fwd.split(",")[0].strip()
+    """Which machine a request came from. One student VM per IP.
+
+    X-Forwarded-For is only believed when TRUST_FORWARDED_FOR is set, because a
+    client can set that header itself. Trusting it with nothing in front of the
+    gateway would let a student vary it per request, take an unbounded number of
+    queue slots, and starve the class -- defeating the only thing this service
+    does. Enable it when a proxy you control is in front and rewriting it."""
+    if settings.trust_forwarded_for:
+        fwd = request.headers.get("x-forwarded-for", "")
+        if fwd:
+            return fwd.split(",")[0].strip()
     return request.client.host if request.client else "unknown"
 
 
@@ -76,7 +82,8 @@ async def stats():
     knowing which VM is queueing is the point."""
     ok, detail = await ollama.healthy()
     return {"upstream": {"url": settings.ollama_url, "reachable": ok, "detail": detail},
-            "allowed_models": list(settings.allowed_models),
+            "allowed_models": list(settings.allowed_models) or "any (no allowlist)",
+            "trust_forwarded_for": settings.trust_forwarded_for,
             "uptime_seconds": round(time.time() - STARTED_AT, 1),
             **scheduler.stats()}
 
@@ -91,9 +98,11 @@ async def list_models():
     missing = [m for m in settings.allowed_models if m not in served]
     if missing:
         log.warning("course models not pulled on the box: %s", missing)
+    visible = served if not settings.allowed_models else [
+        m for m in served if m in settings.allowed_models]
     return {"object": "list",
             "data": [{"id": m, "object": "model", "owned_by": "aicyber"}
-                     for m in served if m in settings.allowed_models]}
+                     for m in visible]}
 
 
 @app.post("/v1/chat/completions")
@@ -109,8 +118,8 @@ async def chat_completions(request: Request):
     model = str(payload.get("model", "")).strip()
     if not model:
         return _err(400, "No 'model' in the request body.")
-    if model not in settings.allowed_models:
-        return _err(403, f"Model {model!r} is not available on this course endpoint.",
+    if settings.allowed_models and model not in settings.allowed_models:
+        return _err(403, f"Model {model!r} is not available on this endpoint.",
                     allowed=list(settings.allowed_models))
     if payload.get("stream"):
         return _err(400, "Streaming is not enabled on this gateway. Send "

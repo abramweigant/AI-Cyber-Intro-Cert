@@ -56,14 +56,32 @@ than one place in the global queue, and `asyncio.Semaphore` wakes waiters FIFO. 
 bookkeeping exists because none is needed. Verified live: one VM bursting 6 requests while
 another sent 1 put the second at completion position 3, not 7.
 
-**Two invariants. Breaking either is silent.**
+**Three invariants. Breaking any of them is silent.**
 
 1. **`--workers 1` is load-bearing.** The queue is in process memory, so two workers means two
    independent queues: `MAX_CONCURRENCY=2` silently becomes 4 and fairness is gone. Raise
    `MAX_CONCURRENCY`, never the worker count.
-2. **`ALLOWED_MODELS` is not a security control** and should not be defended as one. It stops a
+2. **`--no-proxy-headers` is load-bearing, and this one bit.** uvicorn defaults
+   `proxy_headers=True`, so *uvicorn* rewrites `request.client` from `X-Forwarded-For` before the
+   gateway ever sees the request. With it on, any client picks its own identity and takes
+   unlimited queue slots — defeating the only thing the service does. `_client_of()` gated the
+   header correctly and **the bypass still worked underneath**: 12 spoofed requests each got their
+   own quota. It would have been safe on the range by accident (students are on `192.168.x`,
+   outside uvicorn's default `127.0.0.1` trust list) right up until somebody set
+   `FORWARDED_ALLOW_IPS=*`. `TRUST_FORWARDED_FOR` (default off) is now the only thing that can
+   change client identity, and a test asserts both flags are still in `run.sh`.
+3. **`ALLOWED_MODELS` is not a security control** and should not be defended as one. It stops a
    student invoking `llama4:scout` at ~5–15 tok/s and wrecking throughput for the class. Keep it
-   in step with Module 6's setup cell.
+   in step with Module 6's setup cell — or set it **empty** to pass through whatever Ollama
+   serves, which is what to do if another course shares the box.
+
+**Sharing the box with another course** (asked 2026-09-30). Sharing *models* is free: Ollama
+files are content-addressed, so two courses using `qwen3:8b` share one copy and `ollama pull` is
+idempotent. Two things need a decision, with detail in `server/README.md`. If the other course
+goes **straight to Ollama** instead of through the gateway, the two do not coordinate — their
+traffic lands on top of `MAX_CONCURRENCY` and their students can starve ours. And **VRAM is what
+actually bites**: if the two model sets do not fit inside `OLLAMA_MAX_LOADED_MODELS`, Ollama
+evicts and reloads 13–17 GB per switch and the whole thing looks like a gateway problem.
 
 **Two defects the build found by testing rather than reading**, both worth keeping in mind:
 

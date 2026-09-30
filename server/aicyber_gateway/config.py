@@ -10,6 +10,10 @@ import os
 from dataclasses import dataclass, field
 
 
+def _bool(name: str, default: bool = False) -> bool:
+    return os.environ.get(name, str(default)).strip().lower() in ("1", "true", "yes", "on")
+
+
 def _int(name: str, default: int) -> int:
     try:
         return int(os.environ.get(name, default))
@@ -20,6 +24,10 @@ def _int(name: str, default: int) -> int:
 # The five models Module 6 uses. Requests for anything else are refused -- not as
 # a security control, but so one student cannot invoke llama4:scout (~5-15 tok/s)
 # and wreck throughput for the whole class.
+#
+# Set ALLOWED_MODELS to an EMPTY string to allow whatever Ollama is serving. Do
+# that if someone else's course shares this box and pulls its own models --
+# otherwise their requests get a 403 from a list that has nothing to do with them.
 DEFAULT_MODELS = "qwen3:8b,gemma3:27b,gpt-oss:20b,llama3.2:3b,phi4:latest"
 
 
@@ -39,10 +47,18 @@ class Settings:
     # A runaway loop gets a clear 429 rather than unbounded memory on the box.
     per_client_queue: int = field(default_factory=lambda: _int("PER_CLIENT_QUEUE", 8))
 
+    # Empty tuple means "no allowlist": pass through whatever Ollama serves.
     allowed_models: tuple[str, ...] = field(default_factory=lambda: tuple(
         m.strip() for m in os.environ.get("ALLOWED_MODELS", DEFAULT_MODELS).split(",")
         if m.strip()))
     max_tokens_cap: int = field(default_factory=lambda: _int("MAX_TOKENS_CAP", 4096))
+
+    # Whether to believe X-Forwarded-For when deciding which machine a request
+    # came from. Default FALSE, and that matters: with nothing in front of the
+    # gateway, any client can set that header itself, and a student who varies it
+    # per request gets unlimited concurrency and starves everyone else. Enable it
+    # only when a proxy you control is actually in front and rewriting it.
+    trust_forwarded_for: bool = field(default_factory=lambda: _bool("TRUST_FORWARDED_FOR"))
 
 
 settings = Settings()
