@@ -18,8 +18,8 @@ registration, no tokens and nothing to hand out.
 git clone https://github.com/abramweigant/AI-Cyber-Intro-Cert.git
 cd AI-Cyber-Intro-Cert/server
 
-./provision_models.sh     # pull the five course models, verify each tag
-./run.sh                  # creates .venv on first run, then serves on :8080
+./provision_models.sh        # pull the five course models, verify each tag
+sudo ./install-service.sh    # run it as a service, starting at boot
 ```
 
 That's it. Students point at it:
@@ -28,8 +28,23 @@ That's it. Students point at it:
 LLM_BASE_URL=http://192.168.1.10:8080
 ```
 
-To keep it running across reboots, edit the two paths in
-`aicyber-gateway.service` and install it — instructions are in the file.
+**Use the service, not `./run.sh &`.** `run.sh` `exec`s uvicorn, so backgrounding
+it over SSH means it takes the SIGHUP when you log out — and there is nothing to
+restart it after a crash or a reboot. `install-service.sh` detects the directory
+and the owning user, writes the unit, enables it at boot and checks `/healthz`.
+Re-running it is how you change a setting:
+
+```bash
+MAX_CONCURRENCY=3 sudo -E ./install-service.sh
+```
+
+`./run.sh` in the foreground is still the right thing for testing, and
+`./run.sh --install-only` just builds the venv (useful during an image build).
+
+```bash
+systemctl status aicyber-gateway
+journalctl -u aicyber-gateway -f
+```
 
 ## Tune it
 
@@ -145,7 +160,8 @@ courses report everything being slow, check `ollama ps` before touching
 | `aicyber_gateway/upstream.py` | async Ollama client |
 | `aicyber_gateway/config.py` | settings, from the environment |
 | `provision_models.sh` | pull and verify the five models |
-| `run.sh` | start it |
+| `run.sh` | start it in the foreground; `--install-only` just builds the venv |
+| `install-service.sh` | install it as a systemd service, paths detected |
 | `tests/test_gateway.py` | 13 tests, no network needed |
 
 ```bash

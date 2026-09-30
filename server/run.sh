@@ -1,14 +1,34 @@
 #!/usr/bin/env bash
 # Start the gateway. Creates .venv and installs deps on first run.
-#   ./run.sh                 # foreground, port 8080
-#   PORT=9000 ./run.sh       # different port
+#   ./run.sh                   # foreground, port 8080
+#   PORT=9000 ./run.sh         # different port
+#   ./run.sh --install-only    # build the venv and exit (image build, or
+#                              #   install-service.sh priming it as the right user)
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
+INSTALL_ONLY=0
+[ "${1:-}" = "--install-only" ] && INSTALL_ONLY=1
+
 PORT="${PORT:-8080}"
-[ -d .venv ] || python3 -m venv .venv
-./.venv/bin/pip install -q --upgrade pip
-./.venv/bin/pip install -q -r requirements.txt
+
+# Install only when needed. Under systemd with Restart=always a crash loop would
+# otherwise hit the network on every restart, and a pip failure would turn a
+# recoverable crash into an unrecoverable one.
+STAMP=".venv/.deps-installed"
+if [ ! -d .venv ]; then
+  python3 -m venv .venv
+fi
+if [ ! -f "$STAMP" ] || [ requirements.txt -nt "$STAMP" ]; then
+  ./.venv/bin/pip install -q --upgrade pip
+  ./.venv/bin/pip install -q -r requirements.txt
+  touch "$STAMP"
+fi
+
+if [ "$INSTALL_ONLY" -eq 1 ]; then
+  echo "dependencies ready in .venv; not starting the server"
+  exit 0
+fi
 
 echo "gateway  -> http://0.0.0.0:${PORT}"
 echo "upstream -> ${OLLAMA_URL:-http://127.0.0.1:11434}"

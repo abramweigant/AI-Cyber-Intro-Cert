@@ -37,7 +37,18 @@ ships without stored outputs.
 
 FastAPI service on the GPU box between the student VMs and Ollama. Serves `GET /v1/models` and
 `POST /v1/chat/completions`, so Module 6 needs no change beyond `LLM_BASE_URL`. Deployment is
-`./provision_models.sh` then `./run.sh`. 13 tests, upstream faked.
+`./provision_models.sh` then `sudo ./install-service.sh`. 20 tests, upstream faked.
+
+**Run it as a service, not `./run.sh &`.** `run.sh` `exec`s uvicorn, so backgrounding it over SSH
+gives uvicorn the SIGHUP on logout, and nothing restarts it after a crash or reboot.
+`install-service.sh` detects the directory and owning user, generates the unit, enables it at
+boot and checks `/healthz`; re-running it with an exported setting is how to change one. Three
+things that were wrong on the first pass and are now pinned by tests: `StartLimit*` must be
+emitted in `[Unit]` (systemd ignores them in `[Service]` with an "Unknown lvalue" warning, so the
+restart rate limit silently would not apply), `run.sh` must not re-run `pip` on every start (a
+crash loop under `Restart=always` would hit the network each time and turn a recoverable crash
+into an unrecoverable one — hence the `.venv/.deps-installed` stamp), and `run.sh --install-only`
+has to exist because `install-service.sh` primes the venv with it as the owning user.
 
 **No authentication, decided 2026-09-30.** An earlier build had per-student hashed bearer tokens,
 a reverse proxy and an issuing CLI. Abe judged it overbuilt for an isolated range where anything

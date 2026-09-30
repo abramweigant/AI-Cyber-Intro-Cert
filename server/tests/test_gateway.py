@@ -303,3 +303,21 @@ def test_run_sh_disables_uvicorn_proxy_headers_and_extra_workers():
     run_sh = (Path(__file__).resolve().parent.parent / "run.sh").read_text()
     assert "--no-proxy-headers" in run_sh, "uvicorn would trust X-Forwarded-For"
     assert "--workers 1" in run_sh, "extra workers would multiply the concurrency cap"
+
+
+def test_service_installer_puts_startlimit_in_the_unit_section():
+    """StartLimitIntervalSec/Burst are [Unit] options. In [Service] systemd logs
+    "Unknown lvalue" and ignores them, so the restart rate limit silently would
+    not apply and a persistent failure would restart forever."""
+    src = (Path(__file__).resolve().parent.parent / "install-service.sh").read_text()
+    unit_sec = src.index('echo "[Unit]"')
+    svc_sec = src.index('echo "[Service]"')
+    limit = src.index("StartLimitIntervalSec")
+    assert unit_sec < limit < svc_sec, "StartLimit* must be emitted in [Unit]"
+
+
+def test_run_sh_does_not_reinstall_on_every_start():
+    """Under Restart=always a crash loop would otherwise hit the network on every
+    restart, turning a recoverable crash into an unrecoverable one."""
+    run_sh = (Path(__file__).resolve().parent.parent / "run.sh").read_text()
+    assert ".deps-installed" in run_sh, "no install stamp; pip would run every start"
