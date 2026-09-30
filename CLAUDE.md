@@ -33,6 +33,42 @@ which the authoring environment does not have, so it ships for a first live pass
 "Module 6" below before touching it: what *was* verified locally, what was not, and why it
 ships without stored outputs.
 
+## The gateway — built 2026-09-30, lives in `server/`
+
+FastAPI service on the GPU box between the student VMs and Ollama. Does the three things Ollama
+will not: authenticates per-student bearer tokens, queues fairly, and scopes access to the five
+course models. Serves `GET /v1/models` and `POST /v1/chat/completions`, so Module 6 needed no
+change beyond `LLM_BASE_URL`. 17 tests, upstream faked, `python -m pytest tests/ -q`.
+
+**The fairness design is three sentences and worth reading in `scheduler.py`'s docstring.** A
+per-student semaphore of 1 plus a global semaphore of N gives round-robin *for free*: a student
+cannot hold more than one place in the global queue, and `asyncio.Semaphore` wakes waiters FIFO.
+No round-robin bookkeeping exists because none is needed. Verified live — alice bursting 6
+requests while bob sent 1 put bob at completion position 3, not 7.
+
+**Three invariants. Breaking any of them is silent.**
+
+1. **`--workers 1` in the systemd unit is load-bearing.** Scheduler state is in-process, so two
+   workers means two independent schedulers: `MAX_CONCURRENCY=2` silently becomes 4 and fairness
+   is gone. Raise `MAX_CONCURRENCY`, never the worker count.
+2. **A bad token must return 401, not 403.** Module 6's `discover_endpoint()` keys its "token
+   rejected, check `.env`" message off that exact status. `test_bad_token_is_401_not_403` pins it.
+3. **Tokens are stored as SHA-256 only.** Plaintext is printed once by `issue_token.py` and is
+   unrecoverable; lost tokens are rotated, not looked up. Module 6 §1.1 tells students to expect
+   exactly this, so a convenience change here contradicts the course content.
+
+**Two defects the build found by testing rather than reading**, both worth keeping in mind:
+
+- The scheduler leaked its waiting counter when a queued request was cancelled, so a student
+  would eventually get a *permanent* spurious 429. Covered by
+  `test_cancelled_while_queued_does_not_leak_waiting_count`.
+- **Module 6's own `chat()` retried permanent 4xx errors.** Integration-testing the notebook's
+  real client against the real gateway showed a 403 (model not allowed) being retried three
+  times — hammering a shared server for an error that could never resolve. The client now fails
+  fast on 4xx *except* 429, which is the one status that means "queued, try again". The teaching
+  note in that cell tells the story, because it is a better illustration of "retry the transient,
+  fail fast on the permanent" than anything invented would be.
+
 ## What this is
 
 An **introductory** certification course on AI for cybersecurity. Asynchronous — students read,
@@ -53,7 +89,7 @@ guards fire on a deliberate control.
 | student environment | range VM, VS Code + Jupyter extension, **CPU only** |
 | provisioning | `setup.sh` → `.venv` + `requirements.txt` + a kernel named **Python (AI-Cyber)** |
 | datasets | unchanged — the VMs have egress, so `DATA_URL` still points at raw GitHub |
-| model server (Module 6 only) | a GPU box on the range at **`192.168.1.10`**, Ollama behind a bearer-token reverse proxy |
+| model server (Module 6 only) | a GPU box on the range at **`192.168.1.10`**, Ollama behind the gateway in `server/` |
 | credentials | `.env` in the repo root (`LLM_BASE_URL`, `LLM_API_KEY`), gitignored, mode 600 |
 
 **Three consequences that change how you edit:**
@@ -131,6 +167,10 @@ setup.sh                         one-time VM provisioning. Refuses an unsupporte
                                  agree on where "here" is.
 .env                             NEVER COMMITTED -- gitignored, mode 600, holds the student's
                                  issued model-server token. setup.sh writes the template.
+server/                          the GPU-box gateway. Runs on 192.168.1.10 only, never on a
+                                 student VM. See "The gateway" below and server/README.md.
+                                 server/tokens.json is gitignored: it is the access-control
+                                 list for the box.
 instructor/                      a SEPARATE PRIVATE git repo -- see below.
                                  gitignored here; it can never be committed to this one.
 malimg_64.npz                    9,339 malware byte-images, 64x64 grayscale (22.7 MB)

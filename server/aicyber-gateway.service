@@ -1,0 +1,40 @@
+# Install:
+#   sudo cp aicyber-gateway.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now aicyber-gateway
+[Unit]
+Description=AI-Cyber course gateway (auth + fair queue in front of Ollama)
+After=network-online.target ollama.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=aicyber
+Group=aicyber
+WorkingDirectory=/opt/aicyber-gateway
+EnvironmentFile=/etc/aicyber-gateway/gateway.env
+ExecStart=/opt/aicyber-gateway/.venv/bin/uvicorn \
+    aicyber_gateway.app:app \
+    --host 0.0.0.0 --port 8080 \
+    --workers 1 \
+    --proxy-headers \
+    --log-level info
+Restart=always
+RestartSec=3
+
+# --- hardening --------------------------------------------------------------
+# The gateway needs to read tokens.json and talk to loopback. Nothing else.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadOnlyPaths=/etc/aicyber-gateway
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+
+[Install]
+WantedBy=multi-user.target
