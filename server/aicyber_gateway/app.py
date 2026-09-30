@@ -5,7 +5,8 @@ which is deliberate -- the gateway exists to stop ~20 students swamping one GPU,
 not to keep anyone out. Module 6 Section 1.1 teaches students exactly that, and
 what it would mean if this box were reachable from anywhere else.
 
-Serves the two paths Module 6 uses:
+Serves the OpenAI-compatible paths Module 6 uses, and streaming for anything
+else sharing the box:
     GET  /v1/models              -- what discover_endpoint() probes
     POST /v1/chat/completions    -- what chat() posts
 plus /healthz and /stats, both open.
@@ -17,7 +18,7 @@ import time
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 
 from .config import settings
 from .scheduler import QueueFull, Scheduler
@@ -105,6 +106,43 @@ async def list_models():
                      for m in visible]}
 
 
+async def _stream(client: str, model: str, payload: dict) -> StreamingResponse:
+    """Streaming passthrough. The queue slot is held for the whole stream --
+    the GPU is occupied that entire time, so releasing early would let the
+    concurrency cap be exceeded by however many streams are open.
+
+    Errors are awkward here: once the response has started we cannot change the
+    status code, so an upstream failure before the first byte returns a normal
+    error response, and one after it simply ends the stream."""
+    started = False
+
+    async def body():
+        nonlocal started
+        try:
+            async with scheduler.slot(client, model) as queue_wait:
+                t0 = time.monotonic()
+                async with ollama.stream_chat(payload) as chunks:
+                    started = True
+                    async for chunk in chunks:
+                        yield chunk
+                log.info("client=%s model=%s stream queue=%.2fs upstream=%.2fs",
+                         client, model, queue_wait, time.monotonic() - t0)
+        except QueueFull as e:
+            log.info("client=%s stream rejected: queue full (%d)", client, e.waiting)
+            if not started:
+                yield (b'data: {"error":{"message":"Too many requests queued from '
+                       b'this machine; retry shortly."}}\n\n')
+        except UpstreamError as e:
+            log.warning("client=%s model=%s stream upstream_error=%s",
+                        client, model, e.detail)
+            if not started:
+                yield b'data: {"error":{"message":"upstream error"}}\n\n'
+
+    return StreamingResponse(body(), media_type="text/event-stream",
+                             headers={"Cache-Control": "no-cache",
+                                      "X-Accel-Buffering": "no"})
+
+
 @app.post("/v1/chat/completions")
 async def chat_completions(request: Request):
     client = _client_of(request)
@@ -121,9 +159,6 @@ async def chat_completions(request: Request):
     if settings.allowed_models and model not in settings.allowed_models:
         return _err(403, f"Model {model!r} is not available on this endpoint.",
                     allowed=list(settings.allowed_models))
-    if payload.get("stream"):
-        return _err(400, "Streaming is not enabled on this gateway. Send "
-                         "stream: false (the course client already does).")
     if not isinstance(payload.get("messages"), list) or not payload["messages"]:
         return _err(400, "'messages' must be a non-empty list.")
 
@@ -133,8 +168,11 @@ async def chat_completions(request: Request):
     except (TypeError, ValueError):
         want = settings.max_tokens_cap
     payload["max_tokens"] = max(1, min(want, settings.max_tokens_cap))
-    payload["stream"] = False
 
+    if payload.get("stream"):
+        return await _stream(client, model, payload)
+
+    payload["stream"] = False
     try:
         async with scheduler.slot(client, model) as queue_wait:
             t0 = time.monotonic()
@@ -148,5 +186,5 @@ async def chat_completions(request: Request):
             return result
     except QueueFull as e:
         return _err(429, f"This machine already has {e.waiting} requests queued "
-                         f"(limit {e.limit}). Let them finish -- the course client "
-                         f"retries automatically.", retry_after=15)
+                         f"(limit {e.limit}). Let them finish and retry; the course "
+                         f"client does that automatically.", retry_after=15)

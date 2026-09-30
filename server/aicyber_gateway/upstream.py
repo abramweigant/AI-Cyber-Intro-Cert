@@ -5,6 +5,9 @@ Authorization header, which is exactly why this gateway exists.
 """
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
+from typing import AsyncIterator
+
 import httpx
 
 
@@ -56,6 +59,26 @@ class Ollama:
             return r.json()
         except ValueError as e:
             raise UpstreamError(502, f"Ollama returned non-JSON: {e}") from e
+
+    @asynccontextmanager
+    async def stream_chat(self, payload: dict) -> AsyncIterator[AsyncIterator[bytes]]:
+        """Stream a completion straight through, byte for byte.
+
+        The caller holds its queue slot for the whole stream, which is correct:
+        the GPU is busy for that entire time. Module 6 never streams, but a
+        course sharing this gateway may, so refusing outright would block it."""
+        try:
+            async with self._client.stream("POST", "/v1/chat/completions",
+                                           json=payload) as r:
+                if r.status_code >= 400:
+                    body = (await r.aread())[:400].decode("utf-8", "replace")
+                    raise UpstreamError(502 if r.status_code >= 500 else r.status_code,
+                                        f"Ollama returned {r.status_code}: {body}")
+                yield r.aiter_raw()
+        except httpx.TimeoutException as e:
+            raise UpstreamError(504, f"Ollama timed out: {e}") from e
+        except httpx.RequestError as e:
+            raise UpstreamError(502, f"cannot reach Ollama: {e}") from e
 
     async def healthy(self) -> tuple[bool, str]:
         try:

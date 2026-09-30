@@ -77,14 +77,27 @@ content-addressed files, so two courses using `qwen3:8b` share one copy and
 
 Two things do need a decision:
 
-**1. Does the other course go through this gateway, or straight to Ollama?**
+### Checklist for a second course on this gateway
 
-| | consequence |
-|---|---|
-| **Through the gateway** (recommended) | One queue, and fairness extends across both courses for free — their VMs are just more client IPs. Set `ALLOWED_MODELS=` (empty) so their models are not refused by this course's list. |
-| **Straight to Ollama on 11434** | Works, but the two courses do not coordinate. This gateway limits *itself* to `MAX_CONCURRENCY`; their traffic lands on top of that, so the box can see far more concurrency than either of you configured, and their students can starve yours. Fine if your usage does not overlap in time. |
+Fairness needs nothing: their VMs are just more client IPs, so per-client
+round-robin covers both cohorts automatically. Four things to settle:
 
-**2. VRAM, which is the one that will actually bite.**
+1. **Models.** Either add theirs to `ALLOWED_MODELS`, or set `ALLOWED_MODELS=`
+   (empty) to pass through whatever Ollama serves. Empty is simpler; keeping a
+   union list is better, because it is what stops anyone invoking
+   `llama4:scout` at ~5–15 tok/s and wrecking throughput for **both** courses.
+2. **`MAX_TOKENS_CAP`** (default 4096) applies to them too. Module 6 never wants
+   more, but a course doing long generation or code will notice the clip. Raise
+   it if so — it exists to stop one request holding a worker for minutes, not as
+   a policy.
+3. **Streaming** is supported: pass `stream: true` and it goes straight through
+   as `text/event-stream`. The queue slot is held for the whole stream, which is
+   correct — the GPU is busy that entire time. Module 6 never streams.
+4. **`MAX_CONCURRENCY`** now serves both cohorts. The queue simply gets deeper,
+   which is the right behaviour; fairness holds and latency rises. Watch
+   `queue_wait_p95` before raising it, and read the VRAM note below first.
+
+**And the one that will actually bite: VRAM.**
 
 `OLLAMA_MAX_LOADED_MODELS` caps how many models stay resident. If the two courses
 use *different* models and the sum does not fit, Ollama evicts and reloads on
@@ -103,6 +116,10 @@ VRAM allows), or agree to run the courses at different times, or agree on a
 shared model set. For reference, one full Module 6 pass is **~390 requests**
 (qwen3:8b 168, gemma3:27b 80, llama3.2:3b 70, phi4 70, gpt-oss:20b 1), so a
 cohort of 20 is roughly 7,800.
+
+This is the failure mode most likely to get blamed on the gateway. If both
+courses report everything being slow, check `ollama ps` before touching
+`MAX_CONCURRENCY`.
 
 ## Two things not to change casually
 

@@ -34,6 +34,7 @@ from aicyber_gateway.app import app, ollama, scheduler  # noqa: E402
 class Fake:
     def __init__(self):
         self.calls, self.delay, self.payloads = 0, 0.0, []
+        self.streams_completed = 0
 
     async def chat(self, payload):
         self.calls += 1
@@ -45,6 +46,28 @@ class Fake:
     async def list_models(self):
         return ["qwen3:8b", "gemma3:27b", "llama3.2:3b", "llama4:scout"]
 
+    def stream_chat(self, payload):
+        self.calls += 1
+        self.payloads.append(payload)
+        delay = self.delay
+        outer = self
+
+        class _CM:
+            async def __aenter__(self):
+                async def gen():
+                    for i in range(3):
+                        if delay:
+                            await asyncio.sleep(delay / 3)
+                        yield f'data: {{"choices":[{{"delta":{{"content":"tok{i}"}}}}]}}\n\n'.encode()
+                    yield b"data: [DONE]\n\n"
+                    outer.streams_completed += 1
+                return gen()
+
+            async def __aexit__(self, *a):
+                return False
+
+        return _CM()
+
     async def healthy(self):
         return True, "HTTP 200"
 
@@ -52,6 +75,7 @@ class Fake:
 @pytest.fixture
 def fake(monkeypatch):
     f = Fake()
+    monkeypatch.setattr(ollama, "stream_chat", f.stream_chat)
     monkeypatch.setattr(ollama, "chat", f.chat)
     monkeypatch.setattr(ollama, "list_models", f.list_models)
     monkeypatch.setattr(ollama, "healthy", f.healthy)
@@ -152,9 +176,29 @@ async def test_disallowed_model_is_403(client, fake):
 
 
 # --- request handling -------------------------------------------------------
-async def test_streaming_refused(client, fake):
+async def test_streaming_passes_through(client, fake):
+    """Module 6 never streams, but a course sharing the gateway may."""
     r = await client.post("/v1/chat/completions", json=body(stream=True))
-    assert r.status_code == 400
+    assert r.status_code == 200
+    assert r.headers["content-type"].startswith("text/event-stream")
+    text = r.text
+    assert "tok0" in text and "tok2" in text and "[DONE]" in text
+    assert fake.streams_completed == 1
+
+async def test_streaming_holds_a_queue_slot_for_its_duration(client, fake):
+    """If a stream released its slot early, open streams could exceed the
+    concurrency cap and the GPU would be oversubscribed."""
+    fake.delay = 0.3
+    ip = "10.0.9.9"
+    t0 = asyncio.get_running_loop().time()
+    # two streams from the same VM: per-client inflight is 1, so they serialise
+    r1, r2 = await asyncio.gather(
+        client.post("/v1/chat/completions", headers=vm(ip), json=body(stream=True)),
+        client.post("/v1/chat/completions", headers=vm(ip), json=body(stream=True)))
+    elapsed = asyncio.get_running_loop().time() - t0
+    assert r1.status_code == r2.status_code == 200
+    assert fake.streams_completed == 2
+    assert elapsed >= 0.55, f"streams overlapped ({elapsed:.2f}s) -- slot released early"
 
 async def test_max_tokens_capped(client, fake):
     await client.post("/v1/chat/completions", json=body(max_tokens=99999))

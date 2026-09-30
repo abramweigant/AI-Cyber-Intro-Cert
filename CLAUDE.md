@@ -75,13 +75,27 @@ another sent 1 put the second at completion position 3, not 7.
    in step with Module 6's setup cell — or set it **empty** to pass through whatever Ollama
    serves, which is what to do if another course shares the box.
 
-**Sharing the box with another course** (asked 2026-09-30). Sharing *models* is free: Ollama
-files are content-addressed, so two courses using `qwen3:8b` share one copy and `ollama pull` is
-idempotent. Two things need a decision, with detail in `server/README.md`. If the other course
-goes **straight to Ollama** instead of through the gateway, the two do not coordinate — their
-traffic lands on top of `MAX_CONCURRENCY` and their students can starve ours. And **VRAM is what
-actually bites**: if the two model sets do not fit inside `OLLAMA_MAX_LOADED_MODELS`, Ollama
-evicts and reloads 13–17 GB per switch and the whole thing looks like a gateway problem.
+**A colleague's course shares this gateway, confirmed 2026-09-30.** That makes it a shared
+service rather than a Module 6 accessory, and two things followed:
+
+- **Streaming is now supported.** It used to be refused outright with a message that said "the
+  course client already does" send `stream: false` — true of Module 6, false of any interactive
+  chat UI, and it would simply have blocked his course. `stream: true` now passes straight
+  through as `text/event-stream`. **The queue slot is held for the whole stream**, which is
+  correct because the GPU is busy that entire time; releasing early would let open streams exceed
+  `MAX_CONCURRENCY`. A test pins that (two streams from one VM must serialise).
+- **`ALLOWED_MODELS` may be empty**, meaning pass through whatever Ollama serves. Better is a
+  union list of both courses' models, because the list is what stops anyone invoking
+  `llama4:scout` and wrecking throughput for *both* cohorts.
+
+Fairness needed nothing — his VMs are just more client IPs. The full checklist (models,
+`MAX_TOKENS_CAP`, streaming, concurrency) is in `server/README.md`.
+
+**The thing most likely to get blamed on the gateway is VRAM.** Sharing *models* is free — Ollama
+files are content-addressed, so both courses using `qwen3:8b` share one copy and `ollama pull` is
+idempotent. But if the two model sets do not fit inside `OLLAMA_MAX_LOADED_MODELS`, Ollama evicts
+and reloads 13–17 GB on every switch and everything is slow for everyone. Check `ollama ps`
+before touching `MAX_CONCURRENCY`.
 
 **Two defects the build found by testing rather than reading**, both worth keeping in mind:
 
