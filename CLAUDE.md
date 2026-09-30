@@ -35,27 +35,35 @@ ships without stored outputs.
 
 ## The gateway — built 2026-09-30, lives in `server/`
 
-FastAPI service on the GPU box between the student VMs and Ollama. Does the three things Ollama
-will not: authenticates per-student bearer tokens, queues fairly, and scopes access to the five
-course models. Serves `GET /v1/models` and `POST /v1/chat/completions`, so Module 6 needed no
-change beyond `LLM_BASE_URL`. 17 tests, upstream faked, `python -m pytest tests/ -q`.
+FastAPI service on the GPU box between the student VMs and Ollama. Serves `GET /v1/models` and
+`POST /v1/chat/completions`, so Module 6 needs no change beyond `LLM_BASE_URL`. Deployment is
+`./provision_models.sh` then `./run.sh`. 13 tests, upstream faked.
 
-**The fairness design is three sentences and worth reading in `scheduler.py`'s docstring.** A
-per-student semaphore of 1 plus a global semaphore of N gives round-robin *for free*: a student
-cannot hold more than one place in the global queue, and `asyncio.Semaphore` wakes waiters FIFO.
-No round-robin bookkeeping exists because none is needed. Verified live — alice bursting 6
-requests while bob sent 1 put bob at completion position 3, not 7.
+**No authentication, decided 2026-09-30.** An earlier build had per-student hashed bearer tokens,
+a reverse proxy and an issuing CLI. Abe judged it overbuilt for an isolated range where anything
+that can reach the box may use it, and removed it — roughly 250 lines and the whole token
+lifecycle went with it. **That was a content decision as much as an infrastructure one**, because
+§1.1 had been written around the token being a real credential. See below.
 
-**Three invariants. Breaking any of them is silent.**
+**It exists for throughput, not security.** ~20 students hitting one GPU directly will swamp it
+and Ollama has no queueing. Measured: **one full Module 6 run is ~390 requests** (qwen3:8b 168,
+gemma3:27b 80, llama3.2:3b 70, phi4 70, gpt-oss:20b 1), so a cohort of 20 is ~7,800.
 
-1. **`--workers 1` in the systemd unit is load-bearing.** Scheduler state is in-process, so two
-   workers means two independent schedulers: `MAX_CONCURRENCY=2` silently becomes 4 and fairness
-   is gone. Raise `MAX_CONCURRENCY`, never the worker count.
-2. **A bad token must return 401, not 403.** Module 6's `discover_endpoint()` keys its "token
-   rejected, check `.env`" message off that exact status. `test_bad_token_is_401_not_403` pins it.
-3. **Tokens are stored as SHA-256 only.** Plaintext is printed once by `issue_token.py` and is
-   unrecoverable; lost tokens are rotated, not looked up. Module 6 §1.1 tells students to expect
-   exactly this, so a convenience change here contradicts the course content.
+**The fairness design is three sentences and worth reading in `scheduler.py`'s docstring.**
+Clients are identified by **IP** — one student VM per client, no registration. A per-client
+semaphore of 1 plus a global semaphore of N gives round-robin *for free*: a VM cannot hold more
+than one place in the global queue, and `asyncio.Semaphore` wakes waiters FIFO. No round-robin
+bookkeeping exists because none is needed. Verified live: one VM bursting 6 requests while
+another sent 1 put the second at completion position 3, not 7.
+
+**Two invariants. Breaking either is silent.**
+
+1. **`--workers 1` is load-bearing.** The queue is in process memory, so two workers means two
+   independent queues: `MAX_CONCURRENCY=2` silently becomes 4 and fairness is gone. Raise
+   `MAX_CONCURRENCY`, never the worker count.
+2. **`ALLOWED_MODELS` is not a security control** and should not be defended as one. It stops a
+   student invoking `llama4:scout` at ~5–15 tok/s and wrecking throughput for the class. Keep it
+   in step with Module 6's setup cell.
 
 **Two defects the build found by testing rather than reading**, both worth keeping in mind:
 
@@ -65,7 +73,8 @@ requests while bob sent 1 put bob at completion position 3, not 7.
 - **Module 6's own `chat()` retried permanent 4xx errors.** Integration-testing the notebook's
   real client against the real gateway showed a 403 (model not allowed) being retried three
   times — hammering a shared server for an error that could never resolve. The client now fails
-  fast on 4xx *except* 429, which is the one status that means "queued, try again". The teaching
+  fast on 4xx *except* 429, which is the one status that means "queued, try again". This survived
+  the auth removal and is the reason the 4xx branch still earns its place. The teaching
   note in that cell tells the story, because it is a better illustration of "retry the transient,
   fail fast on the permanent" than anything invented would be.
 
@@ -90,7 +99,7 @@ guards fire on a deliberate control.
 | provisioning | `setup.sh` → `.venv` + `requirements.txt` + a kernel named **Python (AI-Cyber)** |
 | datasets | unchanged — the VMs have egress, so `DATA_URL` still points at raw GitHub |
 | model server (Module 6 only) | a GPU box on the range at **`192.168.1.10`**, Ollama behind the gateway in `server/` |
-| credentials | `.env` in the repo root (`LLM_BASE_URL`, `LLM_API_KEY`), gitignored, mode 600 |
+| credentials | none — `.env` holds only `LLM_BASE_URL`. See "The gateway" above. |
 
 **Three consequences that change how you edit:**
 
@@ -1022,18 +1031,21 @@ were settled *during* the build and are recorded here so they stay settled:
 **Endpoint architecture — REPLACED 2026-09-30.** The original design put the models behind Open
 WebUI on Abe's homelab, publicly routable, with a Colab-secrets API key. None of that survives.
 The models now run on a **GPU box inside the cyber range at `192.168.1.10`**, serving Ollama's
-own OpenAI-compatible surface at `/v1/chat/completions`, behind a **bearer-token reverse proxy**.
-Abe is also writing a small queueing service in front of it so ~20 students cannot overwhelm the
-API; model swapping under load is accepted, so nothing in the notebook assumes a model stays
-resident.
+own OpenAI-compatible surface at `/v1/chat/completions`, behind the gateway in `server/`. Model
+swapping under load is accepted, so nothing in the notebook assumes a model stays resident.
 
 Two things follow that are worth keeping:
 
-- **Ollama has no authentication of any kind.** The token is validated by the proxy, not by
-  Ollama. Module 6 §1.1 was rewritten around exactly this, and it is now a *better* lesson than
-  the Colab-secrets version: the default posture of a widely deployed inference server is open,
-  somebody had to notice and add a control, and the control is not part of the product. Do not
-  flatten that passage back into "keep your key safe".
+- **There is no authentication, and §1.1 teaches that rather than hiding it.** Ollama ships with
+  none, the gateway adds none, and anything on the range that can reach the port may use it.
+  §1.1 has now been written twice: once around Colab secrets, once around a per-student token and
+  proxy. **Both were replaced.** The current version is the honest one — it has students write the
+  finding they would file on an engagement, then write the **risk acceptance** that makes shipping
+  it anyway legitimate ("contained by network isolation; if that condition changes, these controls
+  are required first"). Teaching students to name the condition a decision depends on is worth
+  more than teaching them to store a key. Do not flatten it back into "keep your key safe", and
+  if auth is ever added, §1.1 must change with it — a test in `server/tests/` (`test_no_token_needed`)
+  says so in its docstring.
 - **`discover_endpoint()` now probes `/v1` first, `/api` second.** Ollama serves `/v1`; a gateway
   in front (Open WebUI, LiteLLM, Abe's queue) may serve `/api`. Keeping the probe means the
   notebook survives whatever ends up in front of the box — which is the whole reason it was
@@ -1046,13 +1058,11 @@ Two things follow that are worth keeping:
 | prompt-injection demo | `llama3.2:3b` **and** `gemma3:27b` | same payload against both — the small model folds, the large one usually resists. The contrast is the lesson: model capability is itself a security control |
 | XAI section | `gpt-oss:20b` | exposes reasoning traces; compare its stated reasoning against SHAP attributions on the same email. Plausible is not faithful |
 
-Read **both** the base URL and the token from `.env` (`LLM_BASE_URL`, `LLM_API_KEY`), never
-hardcode — the URL too, because a hostname is coming to replace `192.168.1.10` and because a
-reachable URL plus a token is a working credential pair (the `DATA_URL` lesson, applied to a
-secret). `setup.sh` writes the `.env` template at mode 600 and `.gitignore` blocks it; verified
-that `git check-ignore` catches it, since this repo is public. Rotate per cohort and rate-limit
-at the proxy; scope tokens to just the course models. **Decided 2026-08-30, and honoured in the
-build: M6 labs require the live endpoint — no
+Read the base URL from `.env` (`LLM_BASE_URL`), never hardcode it — a hostname is coming to
+replace `192.168.1.10`, a reachable address is exactly what an attacker wants given the box
+answers anyone, and notebooks travel with their cell contents (the `DATA_URL` lesson, applied to
+an address). `setup.sh` writes the `.env` template and `.gitignore` blocks it. **Decided
+2026-08-30, and honoured in the build: M6 labs require the live endpoint — no
 canned-transcript fallback.** A student whose endpoint is down cannot complete the module
 offline; accept that or revisit. This is why **M6 could not be verified from the authoring
 environment**, and what the three-layer mock verification described above was doing instead.

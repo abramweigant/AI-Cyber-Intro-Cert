@@ -91,15 +91,16 @@ if [ -f "$REPO/.env" ]; then
   ok ".env already exists -- leaving it alone"
 else
   cat > "$REPO/.env" <<'ENDENV'
-# Module 6 talks to the course model server over HTTP. Both values come from
-# your instructor. This file is gitignored: the token must never reach a
-# notebook cell, a screenshot or a commit. Module 6 Section 1.1 explains why
-# at length -- and that section is the reason this file exists.
-LLM_BASE_URL=http://192.168.1.10
-LLM_API_KEY=replace-me-with-your-issued-token
+# Module 6 talks to the course model server over HTTP. The server needs no
+# password from you -- Section 1.1 explains why that is, and what you would
+# write in a report if you found a service like it on an engagement.
+#
+# This file is gitignored so environment-specific values stay out of the
+# notebook cells. Confirm the address with your instructor.
+LLM_BASE_URL=http://192.168.1.10:8080
 ENDENV
   chmod 600 "$REPO/.env"
-  ok "wrote .env (mode 600) -- put your issued token in it before Module 6"
+  ok "wrote .env -- check LLM_BASE_URL matches the course model server"
 fi
 
 # --- 6. verification ---------------------------------------------------------
@@ -150,7 +151,7 @@ cat <<ENDDONE
    2. Open Module1_Student.ipynb.
    3. Kernel selector (top right) -> "$KERNEL_LABEL".
 
- Before Module 6, put your issued token in .env (LLM_API_KEY).
- Everything else runs offline of the model server.
+ Module 6 needs the model server; check LLM_BASE_URL in .env matches it.
+ Every other module runs without it.
 ================================================================================
 ENDDONE

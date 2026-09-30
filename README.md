@@ -52,9 +52,10 @@ CPU. Long cells print progress while they work, so if output is still appearing,
 wrong. Module 6 is paced by the shared model server rather than by your VM.
 
 **Module 6 is the one module you cannot complete offline.** It needs a live language-model
-model server. `setup.sh` writes a `.env` file in this folder; put the token your instructor
-issues you into `LLM_API_KEY` there, and restart the notebook kernel. Never paste it into a
-notebook cell — Section 1 explains why at length, and the reason is the subject of the module.
+model server on the range. `setup.sh` writes a `.env` file in this folder holding its address;
+confirm `LLM_BASE_URL` matches what your instructor gives you and restart the notebook kernel.
+The server needs no password from you — Section 1 explains why, and what you would write in a
+report if you found a service like it on a real engagement.
 
 Modules 6 and 7 preview two sister courses — one on LLMs in depth, one on securing AI
 systems in depth — while standing on their own.
@@ -68,7 +69,7 @@ JSON). Module 7 attacks the exact model you build there.
 - Introductory security concepts help but are reviewed where needed.
 - No prior machine learning experience is assumed.
 - Your issued lab VM, with VS Code and its Python + Jupyter extensions.
-- Module 6 additionally needs a model-server token from your instructor.
+- Module 6 additionally needs the range's model server reachable from your VM.
 
 ## Datasets
 
