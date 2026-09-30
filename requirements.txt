@@ -1,0 +1,37 @@
+# AI for Cybersecurity -- Introductory Certification
+# Student environment for the cyber-range VMs (CPU-only, VS Code + Jupyter extension).
+#
+# Install with setup.sh, which creates .venv/ and registers a Jupyter kernel.
+# Once the image builds cleanly, freeze this file (pip freeze > requirements.lock)
+# so every student VM gets a byte-identical stack.
+
+# --- notebook runtime -------------------------------------------------------
+ipykernel~=6.29          # VS Code's Jupyter extension needs this in the venv
+jupyter-client~=8.6
+
+# --- core data stack --------------------------------------------------------
+numpy>=1.26,<3
+pandas>=2.2,<4
+pyarrow>=15                # .parquet datasets (Modules 1, 2, 3, 5, 7)
+scipy>=1.11                # linkage/dendrogram (Module 4)
+
+# --- classical ML -----------------------------------------------------------
+scikit-learn>=1.4,<2
+imbalanced-learn>=0.12     # SMOTE, RandomUnderSampler, ImbPipeline (Module 3)
+
+# --- plotting ---------------------------------------------------------------
+matplotlib>=3.8
+seaborn>=0.13
+
+# --- deep learning (Modules 5 and 7) ---------------------------------------
+# tensorflow-cpu is ~1/3 the download of tensorflow on Linux because it omits the
+# bundled CUDA libraries, which these VMs cannot use anyway. It has never published
+# a macOS arm64 wheel, so darwin gets plain tensorflow -- relevant only if the
+# instructor authors on a Mac.
+tensorflow-cpu>=2.16,<2.22 ; sys_platform == "linux"
+tensorflow>=2.16,<2.22     ; sys_platform == "darwin"
+
+# --- Module 6: LLMs and explainability -------------------------------------
+requests>=2.31             # the course talks to the model server over plain HTTP
+shap>=0.44                 # Section 4 confirms the hand-derived attributions
+python-dotenv>=1.0         # reads .env so the API token never enters a notebook cell

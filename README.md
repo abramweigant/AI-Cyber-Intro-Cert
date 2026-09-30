@@ -1,18 +1,33 @@
 # AI for Cybersecurity — Introductory Certification
 
 An introductory certification course on applying machine learning and AI to cybersecurity,
-taught entirely through Google Colab notebooks. Asynchronous: you read, run, and modify the
-code yourself, and every module ends with written analysis you submit for grading.
+taught as a series of Jupyter notebooks you run on your issued lab VM. Asynchronous: you read,
+run, and modify the code yourself, and every module ends with written analysis you submit for
+grading.
 
 **Author:** Abe Weigant
 
 ## How the course works
 
-Each module is one notebook. Open it in Colab, run cells top to bottom, complete the coding
-tasks (`# YOUR CODE HERE`) and written questions (`[insert response]`) as you meet them.
-Every dataset downloads automatically from this repository — no accounts, no API keys, no
-manual uploads. Checkpoint cells are placed after error-prone steps; if one passes, your
+Each module is one notebook. Open it in **VS Code** on your lab VM, run cells top to bottom,
+and complete the coding tasks (`# YOUR CODE HERE`) and written questions (`[insert response]`)
+as you meet them. Every dataset downloads automatically from this repository — no accounts and
+no manual uploads. Checkpoint cells are placed after error-prone steps; if one passes, your
 pipeline state matches the reference and you can continue with confidence.
+
+### One-time setup
+
+From a terminal in this folder on your VM:
+
+```bash
+./setup.sh
+```
+
+That creates a `.venv`, installs everything the course needs, registers a Jupyter kernel called
+**Python (AI-Cyber)**, and checks that the datasets are reachable. Then in VS Code: open this
+folder, open `Module1_Student.ipynb`, and pick that kernel from the selector in the top right.
+
+Re-running `setup.sh` is safe.
 
 One habit the course will insist on from day one: **a good-looking number is a claim, not a
 result.** Every module contains at least one number that is not what it appears to be, and
@@ -30,16 +45,16 @@ learning to find out why is the skill being certified.
 | 6 | Large Language Models & Explainable AI | Calling an LLM over an API; phishing triage against the model you built in Module 5; prompt injection; SHAP derived from first principles; capstone: LLM-assisted forensic log triage | 5–6 h |
 | 7 | Adversarial Attacks & the Secure AI/ML Lifecycle | Attacking the DGA and backdoor detectors **you** built in Module 5 — evasion, poisoning, membership inference, model extraction — then defending them and threat-modelling the lifecycle with MITRE ATLAS | 5–6 h |
 
-Time estimates assume Colab's free tier and include the written questions. A few cells are
-long-running by design and say so where they appear (the Module 3 grid search budgets 4–8
-minutes on Colab; Module 5's networks train fastest with the T4 GPU runtime enabled; Module 6
-makes several hundred API calls and is paced by the model server, not by Colab).
+Time estimates include the written questions. A few cells are long-running by design and say so
+where they appear — the Module 3 grid search and Module 5's networks each take several minutes.
+**Your VM has no GPU and does not need one**: every model in the course is sized to train on
+CPU. Long cells print progress while they work, so if output is still appearing, nothing is
+wrong. Module 6 is paced by the shared model server rather than by your VM.
 
 **Module 6 is the one module you cannot complete offline.** It needs a live language-model
-endpoint. Your instructor will give you a base URL and an API key to store in Colab's secrets
-manager (**Runtime → Secrets**) as `OPENWEBUI_BASE_URL` and `OPENWEBUI_API_KEY`. Never paste
-either one into a notebook cell — Section 1 explains why at length, and the reason is the
-subject of the module.
+model server. `setup.sh` writes a `.env` file in this folder; put the token your instructor
+issues you into `LLM_API_KEY` there, and restart the notebook kernel. Never paste it into a
+notebook cell — Section 1 explains why at length, and the reason is the subject of the module.
 
 Modules 6 and 7 preview two sister courses — one on LLMs in depth, one on securing AI
 systems in depth — while standing on their own.
@@ -52,8 +67,8 @@ JSON). Module 7 attacks the exact model you build there.
 - Comfortable reading and writing basic Python.
 - Introductory security concepts help but are reviewed where needed.
 - No prior machine learning experience is assumed.
-- A Google account, for Colab. Module 6 additionally needs endpoint credentials from your
-  instructor.
+- Your issued lab VM, with VS Code and its Python + Jupyter extensions.
+- Module 6 additionally needs a model-server token from your instructor.
 
 ## Datasets
 

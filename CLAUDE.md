@@ -1,6 +1,6 @@
 # AI-Cyber Intro Certification — Working Context
 
-Context for Claude Code sessions in this repo. Started 2026-08-21, last updated 2026-09-01.
+Context for Claude Code sessions in this repo. Started 2026-08-21, last updated 2026-09-30.
 
 **Status: all 7 modules built. Modules 1–5 ran end to end on Google Colab on 2026-08-30 with
 zero execution errors** — 315 pages of output reviewed. Modules 1–4 reproduced *every* figure
@@ -35,9 +35,44 @@ ships without stored outputs.
 
 ## What this is
 
-An **introductory** certification course on AI for cybersecurity, taught as a series of Google
-Colab notebooks. Asynchronous — students read, run and modify code in the notebook itself.
-Owner/author: Abe Weigant. Condensed from a 15-week outline into 7 modules.
+An **introductory** certification course on AI for cybersecurity. Asynchronous — students read,
+run and modify code in the notebook itself. Owner/author: Abe Weigant. Condensed from a 15-week
+outline into 7 modules.
+
+## Delivery model — CHANGED 2026-09-30. Read this before editing any notebook.
+
+**The course no longer runs on Google Colab.** Students work on an issued VM inside the school's
+cyber range, in **VS Code** with the Python and Jupyter extensions. Colab was retired entirely:
+no `google.colab` import, no `userdata`, no Drive mount, no T4 instruction, no `/content` path.
+`sweep_artifacts.py` category E now guards all of those plus `OPENWEBUI_*`, so a regression is
+caught mechanically. Verified 2026-09-30: **all seven student copies are clean**, and the new
+guards fire on a deliberate control.
+
+| | |
+|---|---|
+| student environment | range VM, VS Code + Jupyter extension, **CPU only** |
+| provisioning | `setup.sh` → `.venv` + `requirements.txt` + a kernel named **Python (AI-Cyber)** |
+| datasets | unchanged — the VMs have egress, so `DATA_URL` still points at raw GitHub |
+| model server (Module 6 only) | a GPU box on the range at **`192.168.1.10`**, Ollama behind a bearer-token reverse proxy |
+| credentials | `.env` in the repo root (`LLM_BASE_URL`, `LLM_API_KEY`), gitignored, mode 600 |
+
+**Three consequences that change how you edit:**
+
+1. **Never quote a wall-clock runtime again.** Range hardware is not guaranteed consistent
+   between cohorts, so a figure like "4–8 minutes" is a promise the course cannot keep. Say
+   "several minutes" and make the cell stream progress. This supersedes every Colab-calibrated
+   estimate, all of which have been removed. The ~60s streaming-progress rule still stands and
+   matters more than ever, because it is now the *only* signal a student has that a long cell
+   is alive.
+2. **CPU-only is fine, and that was measured rather than assumed.** Every model in the course
+   trains on CPU in minutes — see the CPU budget table under "Environment notes". No
+   subsampling, no pre-trained weights and no architecture changes were needed.
+3. **The GPU box serves Module 6 inference only.** Training stays local on each student's VM.
+   Two alternatives were considered and rejected, for reasons worth keeping: a **remote Jupyter
+   kernel** on the GPU box cannot hold 20 students' copies of these datasets, and a Jupyter
+   token is arbitrary code execution, so it would hand every student RCE on the shared box. A
+   **job-submission service** would reduce Module 5 Section 2 from "design and control your own
+   network" to filling in a form, and Module 7 needs local gradients for FGSM.
 
 Two sister courses build on this one: one on **LLMs** in depth, one on **securing AI** in
 depth. Modules 6 and 7 preview those while standing on their own.
@@ -85,6 +120,17 @@ pull data by raw GitHub URL. **No module uses Kaggle** — removed 2026-08-26.
 
 ```
 Module1_Student.ipynb .. Module7_Student.ipynb   (no Module 6 gap -- all seven exist)
+requirements.txt                 student VM stack. tensorflow-cpu on linux, tensorflow on
+                                 darwin, via platform markers. Resolves to 242 packages for
+                                 linux/py3.12. Freeze to requirements.lock once the image is
+                                 settled -- setup.sh prefers the lock when present.
+setup.sh                         one-time VM provisioning. Refuses an unsupported Python up
+                                 front rather than failing inside pip three minutes later.
+.vscode/settings.json            points VS Code at .venv, loads .env into the kernel, and
+                                 pins notebookFileRoot so M5's saved model and M7's load
+                                 agree on where "here" is.
+.env                             NEVER COMMITTED -- gitignored, mode 600, holds the student's
+                                 issued model-server token. setup.sh writes the template.
 instructor/                      a SEPARATE PRIVATE git repo -- see below.
                                  gitignored here; it can never be committed to this one.
 malimg_64.npz                    9,339 malware byte-images, 64x64 grayscale (22.7 MB)
@@ -273,8 +319,15 @@ its LLM cells. Rather than ship it unexercised, it was verified in three layers:
 3. **The whole notebook was then executed end to end against a context-aware mock endpoint**
    (`nbconvert --execute`, all 62 cells, **zero errors**), with `DATA_URL` pointed at local
    files. That exercises every code path — chunking, JSON extraction, detection scoring,
-   grounding, all three plots — so a `NameError`, a bad index or a wrong API shape cannot
+   grounding, all four plots — so a `NameError`, a bad index or a wrong API shape cannot
    survive. What it cannot tell you is whether the *models* behave as the teaching notes claim.
+
+**Re-verified 2026-09-30 after the delivery-model change**, because the endpoint moved from Open
+WebUI to Ollama-direct and the credential mechanism was rewritten. The mock was reshaped to
+match the range exactly: it serves **`/v1` only** (404 on `/api`) behind a bearer-token check, so
+endpoint discovery had to genuinely work rather than fall through to a path that happened to
+exist. Result: discovery lands on `/v1/chat/completions` on the first probe, `.env` credentials
+load, the five model tags come back, and **all 62 cells execute with zero errors** again.
 
 **So the live pass must do two things**, not one: confirm the module runs, and confirm each
 LLM-dependent claim in the direction its teaching note predicts. Those claims are the
@@ -926,8 +979,25 @@ were settled *during* the build and are recorded here so they stay settled:
    fallback is already in the notebook: Task 4.1 derives the exact values by hand and does not
    need the library at all.
 
-Abe hosts models locally behind Open WebUI (OpenAI-compatible API, publicly routable), with a
-dedicated "google colab user" API key.
+**Endpoint architecture — REPLACED 2026-09-30.** The original design put the models behind Open
+WebUI on Abe's homelab, publicly routable, with a Colab-secrets API key. None of that survives.
+The models now run on a **GPU box inside the cyber range at `192.168.1.10`**, serving Ollama's
+own OpenAI-compatible surface at `/v1/chat/completions`, behind a **bearer-token reverse proxy**.
+Abe is also writing a small queueing service in front of it so ~20 students cannot overwhelm the
+API; model swapping under load is accepted, so nothing in the notebook assumes a model stays
+resident.
+
+Two things follow that are worth keeping:
+
+- **Ollama has no authentication of any kind.** The token is validated by the proxy, not by
+  Ollama. Module 6 §1.1 was rewritten around exactly this, and it is now a *better* lesson than
+  the Colab-secrets version: the default posture of a widely deployed inference server is open,
+  somebody had to notice and add a control, and the control is not part of the product. Do not
+  flatten that passage back into "keep your key safe".
+- **`discover_endpoint()` now probes `/v1` first, `/api` second.** Ollama serves `/v1`; a gateway
+  in front (Open WebUI, LiteLLM, Abe's queue) may serve `/api`. Keeping the probe means the
+  notebook survives whatever ends up in front of the box — which is the whole reason it was
+  written as a probe instead of a constant, and it has now paid off once.
 
 | use | model | why |
 |---|---|---|
@@ -936,11 +1006,13 @@ dedicated "google colab user" API key.
 | prompt-injection demo | `llama3.2:3b` **and** `gemma3:27b` | same payload against both — the small model folds, the large one usually resists. The contrast is the lesson: model capability is itself a security control |
 | XAI section | `gpt-oss:20b` | exposes reasoning traces; compare its stated reasoning against SHAP attributions on the same email. Plausible is not faithful |
 
-Read **both** the base URL and the key from Colab secrets (`OPENWEBUI_BASE_URL`,
-`OPENWEBUI_API_KEY`), never hardcode — the URL too, because the homelab may move (the `DATA_URL`
-lesson) and a routable URL + key in a notebook a student later publishes is the exact leak the
-course preaches against. Rotate per cohort and rate-limit; scope the key server-side to just the
-course models. **Decided 2026-08-30, and honoured in the build: M6 labs require the live endpoint — no
+Read **both** the base URL and the token from `.env` (`LLM_BASE_URL`, `LLM_API_KEY`), never
+hardcode — the URL too, because a hostname is coming to replace `192.168.1.10` and because a
+reachable URL plus a token is a working credential pair (the `DATA_URL` lesson, applied to a
+secret). `setup.sh` writes the `.env` template at mode 600 and `.gitignore` blocks it; verified
+that `git check-ignore` catches it, since this repo is public. Rotate per cohort and rate-limit
+at the proxy; scope tokens to just the course models. **Decided 2026-08-30, and honoured in the
+build: M6 labs require the live endpoint — no
 canned-transcript fallback.** A student whose endpoint is down cannot complete the module
 offline; accept that or revisit. This is why **M6 could not be verified from the authoring
 environment**, and what the three-layer mock verification described above was doing instead.
@@ -1001,17 +1073,43 @@ collapsed into the one module as planned.
 
 ## Environment notes
 
-**Local is for authoring; Colab is the proof.** The local stack is ahead of what Colab pins, so
-anything a published number depends on needs a confirming Colab run. This is not pedantry — the
-BatchNorm collapse below was invisible until the model actually ran. All five modules are
-portable: no `files.upload`, no Kaggle, no absolute paths. Module 5's only Colab-ism is
-`display()`, plus an optional `drive.mount` snippet inside a markdown block that never executes.
+**The Colab verification history is still the course's evidence, and is not obsolete.** Modules
+1–5 ran clean on Colab 2026-08-30 and Module 7 on 2026-08-31; those runs are what establish that
+the quoted *metrics* reproduce across environments, and the PDFs in `instructor/` remain the
+proof. What changed on 2026-09-30 is only the **delivery target** — the metrics claim still
+stands, and now stands on two environments rather than one. Every module is portable: no
+`files.upload`, no Kaggle, no absolute paths, and as of 2026-09-30 no Colab API either.
 
-**Colab runtime is roughly 2 vCPUs and slower per core than an Apple Silicon laptop.** Estimate
-Colab cost from a *core-limited* measurement, never by dividing a fast machine's number by a
-guess. Module 3's Lab D.3 shipped as "about two minutes" from a 12-core measurement and took
-15–25 minutes on Colab. Any cell over ~60s needs streaming progress (`verbose=2`, per-epoch
-output) or it is indistinguishable from a hang — and will be reported as one.
+**CPU training budget — measured 2026-09-30, and the reason CPU-only was accepted.** Measured on
+4 CPU threads with the GPU disabled (`CUDA_VISIBLE_DEVICES=-1` plus
+`tf.config.set_visible_devices([], 'GPU')`). DGA models were timed on a 40k subsample and scaled
+linearly to the real 539,869-row split; the others were timed at full size.
+
+| model | scope | projected full run |
+|---|---|---|
+| M5 S3 1D CNN, 3 epochs | 540k domains | **~0.4 min** |
+| M5 S3 LSTM, 3 epochs | 540k domains | **~2.2 min** ← the worst case |
+| M5 S3 exercise CNN, 4 epochs | 540k domains | ~1.2 min |
+| M5 S4 Malimg 2D CNN | 9,339 images, 15 epochs | ~2.4 min |
+| M5 S5 email Conv1D | 31,323 messages, 5 epochs | ~0.7 min |
+
+Two findings that settled the design:
+
+- **Nothing needed changing.** The worst cell is ~2 minutes. No subsampling, no shipped weights,
+  no architecture edits. Apple Silicon cores are faster than a typical VM vCPU, so multiply by
+  2–4× for a pessimistic range VM and the worst case is still under ten minutes — inside Abe's
+  "a few minutes is fine".
+- **The CNN-vs-LSTM ratio survives the move to CPU: 4.9× here against 5.2× on the Colab T4.**
+  Module 5 Section 3's conclusion — the CNN is both more accurate *and* several times faster, so
+  it is what belongs in a SOC pipeline — therefore holds without a GPU. The notebook measures
+  and prints both times live rather than quoting either, which is now the rule.
+
+**Do not quote wall-clock figures in a notebook.** These numbers exist so a future editor knows
+the *scale*, not so they can be published. Range hardware is not guaranteed consistent between
+cohorts. Any cell over ~60s needs streaming progress (`verbose=2`, per-epoch output) or it is
+indistinguishable from a hang — and will be reported as one. Module 3's Lab D.3 is the cautionary
+case: it shipped as "about two minutes" from a 12-core measurement and took 15–25 minutes on
+Colab's two vCPUs.
 
 **TensorFlow on Apple Silicon: use `tensorflow`, not `tensorflow-cpu`.** `tensorflow-cpu` has
 never published a macOS arm64 wheel in any release — verified against the PyPI release index,
@@ -1048,7 +1146,8 @@ Token at `~/.venvs/aicyber/.jupyter_token` (mode 600). MCP registered at local s
 outside the repo on purpose: the remote is public. Verified stack: **pandas 3.0.5 / numpy 2.5.2
 / TensorFlow 2.21.0 / scikit-learn 1.9.0 / imbalanced-learn 0.14.2 / Python 3.13.14**.
 
-**Colab MCP bridge (`googlecolab/colab-mcp`) — abandoned 2026-08-21. Do not retry it.** The
+**Colab MCP bridge (`googlecolab/colab-mcp`) — abandoned 2026-08-21, and moot since 2026-09-30
+now that the course has left Colab entirely. Kept only so nobody re-litigates it.** The
 Colab page connects, authenticates, and is dropped in the same second, reproducibly. Ruled out
 by direct test: token, origin allowlist, port reachability on both address families, stale
 cookies, orphaned servers, missing runtime, wrong tab. Upstream is stale (last commit
