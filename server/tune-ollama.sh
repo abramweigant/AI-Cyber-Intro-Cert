@@ -31,6 +31,24 @@ die()  { printf '\033[31m    !!  %s\033[0m\n' "$*"; exit 1; }
 command -v systemctl >/dev/null 2>&1 || die "no systemd here"
 systemctl list-unit-files ollama.service >/dev/null 2>&1 || warn "no ollama.service found; writing the drop-in anyway"
 
+# Refuse to tune a unit that is already broken: a drop-in cannot fix a missing
+# ExecStart=, and layering one on top makes the real fault harder to see.
+PRE="$(systemd-analyze verify ollama.service 2>&1 || true)"
+if printf '%s' "$PRE" | grep -qi "no ExecStart"; then
+  printf '%s\n' "$PRE" | sed 's/^/    /'
+  warn "The BASE unit /etc/systemd/system/ollama.service has no ExecStart=."
+  warn "That is not something this drop-in can fix, and it is usually caused by"
+  warn "'systemctl edit --full' saving a buffer of only comment lines."
+  warn ""
+  warn "If the distro shipped a unit, the /etc copy is just shadowing it:"
+  warn "  ls -la /lib/systemd/system/ollama.service /usr/lib/systemd/system/ollama.service"
+  warn "  sudo rm /etc/systemd/system/ollama.service && sudo systemctl daemon-reload"
+  warn ""
+  warn "Otherwise see the troubleshooting section of README.md for the unit to"
+  warn "write back. Re-run this script once Ollama starts."
+  die "refusing to tune a unit that cannot start"
+fi
+
 say "Writing $CONF"
 mkdir -p "$DIR"
 [ -f "$CONF" ] && cp "$CONF" "$CONF.bak.$(date +%Y%m%d%H%M%S)" && ok "existing file backed up"

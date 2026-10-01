@@ -84,9 +84,15 @@ sudo ./tune-ollama.sh          # writes the drop-in, shows you the result
 sudo systemctl restart ollama  # when no one is mid-request
 ```
 
-If you would rather do it by hand, `sudo systemctl edit ollama` and put **exactly
-this** between the two `###` marker lines — the `[Service]` header is required,
-and nothing may be commented out:
+If you would rather do it by hand, use `sudo systemctl edit ollama` — **never
+`systemctl edit --full`**. Plain `edit` creates a drop-in; `--full` opens the
+unit itself, and saving a buffer that contains only comments replaces the real
+unit, destroying `ExecStart=`. systemd then refuses to load the service at all
+and you get `bad-setting` with Ollama *down*. Recovery is in the troubleshooting
+section below.
+
+Put **exactly this** between the two `###` marker lines — the `[Service]` header
+is required, and nothing may be commented out:
 
 ```ini
 [Service]
@@ -108,13 +114,52 @@ Loaded: bad-setting (Reason: Unit ollama.service has a bad unit file setting.)
 Active: inactive (dead)
 ```
 
-systemd has rejected the drop-in and will not load the unit at all, so Ollama is
-down rather than merely untuned. Almost always one of two things:
+systemd has rejected the unit and will not load it at all, so Ollama is down
+rather than merely untuned. **Find out which file is at fault before changing
+anything** — the three causes have different fixes:
 
-- **an `Environment=` line with no `[Service]` header above it** — an assignment
-  outside a section is a hard parse error, not a warning;
-- **a stale edit** — the warning systemd prints about files having changed on disk
-  means it is working from cached state. `daemon-reload` is not optional.
+```bash
+sudo systemd-analyze verify ollama.service
+```
+
+| what it says | cause | fix |
+|---|---|---|
+| `has no ExecStart=` | the **base unit** was overwritten, usually by `systemctl edit --full` saving a comments-only buffer. Nothing to do with the drop-in. | restore the unit — see below |
+| `Assignment outside of section` | an `Environment=` line with no `[Service]` header above it. A hard parse error, not a warning. | add the header, or re-run `tune-ollama.sh` |
+| nothing obvious | stale state; the "changed on disk" warning means systemd is using a cache | `sudo systemctl daemon-reload` |
+
+**Restoring an overwritten base unit.** If the distro shipped one, the `/etc`
+copy is only shadowing it and removing it is enough:
+
+```bash
+ls -la /lib/systemd/system/ollama.service /usr/lib/systemd/system/ollama.service
+sudo rm /etc/systemd/system/ollama.service      # only if one of the above exists
+sudo systemctl daemon-reload && sudo systemctl start ollama
+```
+
+Otherwise write it back. Check `command -v ollama` and `id ollama` first and
+adjust the paths and user to match:
+
+```ini
+[Unit]
+Description=Ollama Service
+After=network-online.target
+
+[Service]
+ExecStart=/usr/local/bin/ollama serve
+User=ollama
+Group=ollama
+Restart=always
+RestartSec=3
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+[Install]
+WantedBy=default.target
+```
+
+Re-running `curl -fsSL https://ollama.com/install.sh | sh` also rewrites the unit
+and leaves models alone, but it may swap the Ollama binary for a newer version —
+one more variable while you are debugging.
 
 Name the offending line, then overwrite the file rather than editing around it:
 
