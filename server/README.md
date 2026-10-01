@@ -74,15 +74,38 @@ which VM is queueing, which is usually the question you actually have.
 | `MAX_TOKENS_CAP` | 4096 | caps output length |
 | `PORT` | 8080 | listen port |
 
-Also worth setting on Ollama itself, so it stops unloading models between calls:
+## Tune Ollama itself
+
+By default Ollama keeps one model loaded and unloads it after 5 minutes, so with
+five course models every switch is a reload from disk.
 
 ```bash
-sudo systemctl edit ollama
-# [Service]
-# Environment="OLLAMA_MAX_LOADED_MODELS=2"
-# Environment="OLLAMA_KEEP_ALIVE=30m"
-sudo systemctl restart ollama
+sudo ./tune-ollama.sh          # writes the drop-in, shows you the result
+sudo systemctl restart ollama  # when no one is mid-request
 ```
+
+If you would rather do it by hand, `sudo systemctl edit ollama` and put **exactly
+this** between the two `###` marker lines — the `[Service]` header is required,
+and nothing may be commented out:
+
+```ini
+[Service]
+Environment="OLLAMA_MAX_LOADED_MODELS=2"
+Environment="OLLAMA_KEEP_ALIVE=30m"
+Environment="OLLAMA_HOST=127.0.0.1:11434"
+```
+
+Confirm it took effect:
+
+```bash
+systemctl show ollama -p Environment     # all three should be listed
+```
+
+`OLLAMA_HOST=127.0.0.1` binds Ollama to loopback so the gateway is the only
+exposed listener — worth doing because Ollama has no authentication of its own.
+Only set it if the gateway runs on the same box (it does), and note it **breaks
+anything connecting to `:11434` directly**, including another course that has not
+moved to the gateway yet.
 
 ## Sharing the box with another course
 
@@ -161,6 +184,7 @@ courses report everything being slow, check `ollama ps` before touching
 | `aicyber_gateway/config.py` | settings, from the environment |
 | `provision_models.sh` | pull and verify the five models |
 | `run.sh` | start it in the foreground; `--install-only` just builds the venv |
+| `tune-ollama.sh` | write Ollama's systemd drop-in correctly |
 | `install-service.sh` | install it as a systemd service, paths detected |
 | `tests/test_gateway.py` | 13 tests, no network needed |
 
