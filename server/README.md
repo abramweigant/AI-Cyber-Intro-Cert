@@ -101,6 +101,39 @@ Confirm it took effect:
 systemctl show ollama -p Environment     # all three should be listed
 ```
 
+### If systemctl says `bad-setting`
+
+```
+Loaded: bad-setting (Reason: Unit ollama.service has a bad unit file setting.)
+Active: inactive (dead)
+```
+
+systemd has rejected the drop-in and will not load the unit at all, so Ollama is
+down rather than merely untuned. Almost always one of two things:
+
+- **an `Environment=` line with no `[Service]` header above it** — an assignment
+  outside a section is a hard parse error, not a warning;
+- **a stale edit** — the warning systemd prints about files having changed on disk
+  means it is working from cached state. `daemon-reload` is not optional.
+
+Name the offending line, then overwrite the file rather than editing around it:
+
+```bash
+sudo systemd-analyze verify ollama.service
+sudo journalctl -b | grep -i ollama.service | grep -iE "lvalue|section|ignoring"
+
+sudo ./tune-ollama.sh        # writes a known-good file, keeps a .bak
+sudo systemctl daemon-reload
+sudo systemctl start ollama  # start, not restart -- it is currently dead
+```
+
+To back the change out completely:
+
+```bash
+sudo rm /etc/systemd/system/ollama.service.d/override.conf
+sudo systemctl daemon-reload && sudo systemctl start ollama
+```
+
 `OLLAMA_HOST=127.0.0.1` binds Ollama to loopback so the gateway is the only
 exposed listener — worth doing because Ollama has no authentication of its own.
 Only set it if the gateway runs on the same box (it does), and note it **breaks

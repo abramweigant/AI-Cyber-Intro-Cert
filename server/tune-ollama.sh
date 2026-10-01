@@ -52,11 +52,43 @@ sed 's/^/    /' "$CONF"
 
 say "Validating"
 systemctl daemon-reload
-if systemd-analyze verify ollama.service 2>&1 | grep -qi "ollama.service.d"; then
-  systemd-analyze verify ollama.service 2>&1 | sed 's/^/    /'
-  die "systemd rejected the drop-in; the file is above and a .bak is beside it"
+
+# Three checks, because each catches something the others miss.
+PROBLEM=0
+
+# 1. systemd's own parser. Flags "Assignment outside of section" and unknown
+#    directives, with a file and line number.
+VERIFY="$(systemd-analyze verify ollama.service 2>&1 || true)"
+if printf '%s' "$VERIFY" | grep -qiE "lvalue|outside of section|Failed to parse|bad-setting"; then
+  printf '%s\n' "$VERIFY" | sed 's/^/    /'
+  PROBLEM=1
 fi
-ok "drop-in parses"
+
+# 2. Did the unit actually load? This is the check that matters: a rejected
+#    drop-in leaves the unit in "bad-setting" and it will not start at all.
+LOADSTATE="$(systemctl show ollama -p LoadState --value 2>/dev/null || echo unknown)"
+if [ "$LOADSTATE" != "loaded" ]; then
+  warn "LoadState=$LOADSTATE (expected 'loaded')"
+  systemctl status ollama --no-pager 2>&1 | head -8 | sed 's/^/    /'
+  PROBLEM=1
+fi
+
+# 3. Did our settings survive into the merged config?
+ENVNOW="$(systemctl show ollama -p Environment --value 2>/dev/null || true)"
+if ! printf '%s' "$ENVNOW" | grep -q "OLLAMA_MAX_LOADED_MODELS"; then
+  warn "OLLAMA_MAX_LOADED_MODELS is not in the merged Environment yet"
+  warn "  (expected before restart on some systemd versions -- not fatal)"
+fi
+
+if [ "$PROBLEM" -eq 1 ]; then
+  echo
+  warn "systemd is unhappy with the unit. The file written is shown above and the"
+  warn "previous one is beside it as override.conf.bak.*"
+  warn "To back the change out entirely:"
+  warn "  sudo rm $CONF && sudo systemctl daemon-reload"
+  die "aborting before telling you to restart something that will not start"
+fi
+ok "drop-in parses and the unit loads"
 
 say "Effective configuration (after restart)"
 systemctl cat ollama 2>/dev/null | sed -n '/override.conf/,$p' | sed 's/^/    /' || true
