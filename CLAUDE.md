@@ -49,11 +49,23 @@ colleague's course shares it through the same gateway.
 
 | thing | state |
 |---|---|
-| Ollama service | **working**, after a reinstall. Earlier it was broken; see below. |
-| the five models | **pulled once (46 GB, all five listed), then `ollama list` went empty after the reinstall.** Unresolved — this is the live question. |
-| Ollama tuning drop-in | **not applied.** It was deleted during debugging and the reinstall rewrote the unit. Re-apply with `server/tune-ollama.sh`. |
-| the gateway | **never installed on the box.** `sudo server/install-service.sh`. |
+| Ollama service | **working** — native systemd install, `/usr/local/bin/ollama` 0.40, user `ollama`. |
+| the five models | **all five served**, from `/usr/share/ollama/.ollama/models`. Resolved 2026-10-07, see below. |
+| Ollama tuning drop-in | **applied** (`override.conf` from `tune-ollama.sh`, verified loading). |
+| the gateway | **installed 2026-10-07** as `aicyber-gateway.service`, enabled at boot; `/v1/models` returns all five. |
 | Module 6 live pass | **not done.** This is the actual goal; see "what the live pass must do" below. |
+
+**What the "empty `ollama list`" actually was (resolved 2026-10-07).** There were *two* Ollamas:
+the original 46 GB pull went into a **snap** (`ollama` 0.34, publisher `mz2`, store
+`/var/snap/ollama/common/models`); the reinstall added the native systemd one, whose re-pull ran
+out of disk after two models. The snap's blobs were moved (same filesystem, so a rename) into the
+native store and the snap removed with `snap remove --purge` — **`--purge` matters**, otherwise
+snapd snapshots 45 GB of data onto a nearly full disk. Disk went 96% → 88% (12 GB free). If
+`ollama list` ever looks short again, run `snap list` before pulling anything.
+
+**The GPU is a 16 GB vGPU (`GRID A100D-16C`), not a full card.** `gemma3:27b` (17 GB) cannot be
+fully GPU-resident, and two large models will not fit at once whatever `OLLAMA_MAX_LOADED_MODELS`
+says, so expect partial CPU offload and model swapping. A cold first request took ~67 s.
 
 **Start by finding out where the models are.** `ollama pull` writes to wherever *the server*
 keeps its models, not the user running the CLI — so after a reinstall that creates an `ollama`
