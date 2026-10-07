@@ -1,6 +1,8 @@
 # AI-Cyber Intro Certification — Working Context
 
-Context for Claude Code sessions in this repo. Started 2026-08-21, last updated 2026-09-30.
+Context for Claude Code sessions in this repo. Started 2026-08-21, last updated 2026-10-07.
+
+**If you are running on the GPU box, read "Working on the GPU box" below before anything else.**
 
 **Status: all 7 modules built. Modules 1–5 ran end to end on Google Colab on 2026-08-30 with
 zero execution errors** — 315 pages of output reviewed. Modules 1–4 reproduced *every* figure
@@ -27,11 +29,80 @@ approximations. The next Colab pass must execute them and transplant outputs. Al
 (0/1/2 rubric for all 100+ written questions). **All of the above is committed and pushed** in
 both repos as of 2026-09-01.
 
-**Module 6 built 2026-09-01 — and it is the one module not verified by execution.** LLMs +
-Explainable AI, 62 cells, 16 coding tasks, 6 write-ups. Its labs require a live model endpoint,
-which the authoring environment does not have, so it ships for a first live pass. Read
+**Module 6 built 2026-09-01 — and it is still the one module not verified by execution.** LLMs +
+Explainable AI, 62 cells, 16 coding tasks, 6 write-ups. Its labs require a live model endpoint.
+As of 2026-10-07 the endpoint exists — a GPU box on the range with the models pulled — so the
+live pass is finally possible and is the next real piece of work. Read
 "Module 6" below before touching it: what *was* verified locally, what was not, and why it
 ships without stored outputs.
+
+## Working on the GPU box — read this first if you are running on it
+
+Added 2026-10-07, when Abe gave a session direct access. Everything below was learned the hard
+way over several rounds of remote debugging; none of it needs rediscovering.
+
+**The box.** `R-AI-Cert-team01-gpu-ubuntu`, Ubuntu 24.04, login user `user`, repo cloned at
+`~/AI-Cyber-Intro-Cert`. It serves Module 6's models to student VMs on the range, and a
+colleague's course shares it through the same gateway.
+
+**Deployment state as of 2026-10-07 — confirm each before trusting it:**
+
+| thing | state |
+|---|---|
+| Ollama service | **working**, after a reinstall. Earlier it was broken; see below. |
+| the five models | **pulled once (46 GB, all five listed), then `ollama list` went empty after the reinstall.** Unresolved — this is the live question. |
+| Ollama tuning drop-in | **not applied.** It was deleted during debugging and the reinstall rewrote the unit. Re-apply with `server/tune-ollama.sh`. |
+| the gateway | **never installed on the box.** `sudo server/install-service.sh`. |
+| Module 6 live pass | **not done.** This is the actual goal; see "what the live pass must do" below. |
+
+**Start by finding out where the models are.** `ollama pull` writes to wherever *the server*
+keeps its models, not the user running the CLI — so after a reinstall that creates an `ollama`
+system user, pulls land in `/usr/share/ollama/.ollama/models` no matter who types the command.
+The pre-reinstall copy is probably still in `/home/user/.ollama/models`. **Check free space
+first**: two copies is ~92 GB and the disk may be filling.
+
+```bash
+df -h / /home /usr
+systemctl show ollama -p User -p Environment
+sudo find / -xdev -type d -name models -path "*ollama*" -exec du -sh {} \; 2>/dev/null
+curl -s localhost:11434/api/tags | python3 -m json.tool   # what `ollama list` actually sees
+```
+
+If a home-directory copy exists and the service reads elsewhere, move it rather than widening
+home permissions — `server/README.md` has the commands and the reasoning (Ubuntu homes are
+`0750`, so the `ollama` user cannot traverse in).
+
+**Five systemd failures were already paid for. Do not repeat them.**
+
+1. **Never `systemctl edit --full ollama`.** Saving a buffer of only comment lines replaces the
+   real unit and destroys `ExecStart=`, which is what forced the reinstall. Plain `systemctl
+   edit` writes a drop-in and is safe; better still, use `server/tune-ollama.sh`.
+2. **A drop-in needs a `[Service]` header.** An `Environment=` line outside a section is a hard
+   parse error → `LoadState=bad-setting` → the unit will not start at all.
+3. **Commented-out `Environment=` lines do nothing.** This started the whole saga: CLAUDE.md's
+   own instructions showed the file contents prefixed with `#`, meaning "type this", and they
+   were reasonably pasted literally. Fixed in `server/README.md`; do not reintroduce that style.
+4. **`daemon-reload` is not optional**, and systemd's "changed on disk" warning is easy to read
+   past.
+5. **`status=217/USER` means the user in `User=` does not exist.** Check `id ollama` before
+   writing a unit that references it.
+
+`server/tune-ollama.sh` now refuses to run if the base unit has no `ExecStart`, because a
+drop-in cannot fix that and layering one on top hides the real fault.
+
+**Then, in order:** fix the model location → `sudo server/tune-ollama.sh` → `sudo systemctl
+restart ollama` → `sudo server/install-service.sh` → `curl -s localhost:8080/healthz` →
+`curl -s localhost:8080/v1/models`. Five models back from the gateway means students are
+unblocked.
+
+**The prize is the Module 6 live pass**, which has never been possible before now. It must do
+two things, not one: confirm the module runs, and confirm each LLM-dependent claim holds *in the
+direction* its teaching note predicts — the zero-shot/few-shot crossover (§2), the
+injection-vs-capability trend (§3), the rationale/attribution mismatch (§4), and per-stage triage
+recall (§5). Every one is stated as a direction rather than a digit, deliberately, because LLM
+output is not reproducible even at `temperature=0`. Afterwards, transplant outputs into both
+copies as for every other module, and replace "never run against a real model" wherever this
+file says it.
 
 ## The gateway — built 2026-09-30, lives in `server/`
 
