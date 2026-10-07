@@ -102,6 +102,37 @@ done
 say "Installed models"
 $OLLAMA list
 
+# Where models land depends on which user the service runs as, and a reinstall can
+# change that -- the official installer creates an 'ollama' user reading
+# /usr/share/ollama/.ollama, while a manually started server reads $HOME/.ollama.
+# When they disagree, `ollama list` comes back empty and it looks like the models
+# vanished. Surface the mismatch here instead.
+say "Where the models actually live"
+SVC_USER="$(systemctl show ollama -p User --value 2>/dev/null || true)"
+[ -z "$SVC_USER" ] && SVC_USER="(not a systemd service)"
+echo "    service runs as : $SVC_USER"
+EXPLICIT="$(systemctl show ollama -p Environment --value 2>/dev/null | tr ' ' '\n' | grep '^OLLAMA_MODELS=' || true)"
+[ -n "$EXPLICIT" ] && echo "    OLLAMA_MODELS   : ${EXPLICIT#OLLAMA_MODELS=}"
+for d in /usr/share/ollama/.ollama/models "$HOME/.ollama/models" /var/lib/ollama/.ollama/models; do
+  if [ -d "$d" ]; then
+    sz="$(du -sh "$d" 2>/dev/null | cut -f1)"
+    n="$(find "$d/manifests" -type f 2>/dev/null | wc -l | tr -d ' ')"
+    echo "    $d  ->  ${sz:-?} , $n manifest(s)"
+  fi
+done
+cat <<'ENDLOC'
+
+    If a directory above holds your models but `ollama list` is empty, the
+    service is reading a different one. Move them to the directory the service
+    user owns rather than widening permissions on a home directory:
+
+      sudo systemctl stop ollama
+      sudo mkdir -p /usr/share/ollama/.ollama/models
+      sudo mv "$HOME"/.ollama/models/* /usr/share/ollama/.ollama/models/
+      sudo chown -R ollama:ollama /usr/share/ollama/.ollama
+      sudo systemctl start ollama
+ENDLOC
+
 # --- 5. service tuning --------------------------------------------------------
 say "Service tuning (apply these, then restart Ollama)"
 cat <<'ENDTUNE'

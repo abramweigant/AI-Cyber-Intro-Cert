@@ -107,6 +107,42 @@ Confirm it took effect:
 systemctl show ollama -p Environment     # all three should be listed
 ```
 
+### If `ollama list` is empty but you pulled the models
+
+They are almost certainly still on disk. Where models live depends on **which
+user the service runs as**, and reinstalling Ollama changes that: the official
+installer creates an `ollama` system user reading
+`/usr/share/ollama/.ollama/models`, whereas a server you started yourself reads
+`$HOME/.ollama/models`. When the two disagree, `ollama list` returns nothing and
+it looks like 46 GB evaporated.
+
+```bash
+sudo du -sh /home/*/.ollama/models /usr/share/ollama/.ollama/models 2>/dev/null
+systemctl show ollama -p User -p Environment
+```
+
+Found them in a home directory? Move them to the directory the service user owns:
+
+```bash
+df /home /usr/share | awk '{print $1, $6}'   # same filesystem -> mv is instant
+
+sudo systemctl stop ollama
+sudo mkdir -p /usr/share/ollama/.ollama/models
+sudo mv /home/<you>/.ollama/models/* /usr/share/ollama/.ollama/models/
+sudo chown -R ollama:ollama /usr/share/ollama/.ollama
+sudo systemctl start ollama
+ollama list
+```
+
+Pointing the service at the home directory with
+`Environment="OLLAMA_MODELS=/home/<you>/.ollama/models"` also works, but Ubuntu
+creates home directories `0750`, so the `ollama` user cannot traverse in without
+`chmod o+x` on your home — weakening its privacy for a path that breaks again on
+the next reinstall. Moving the data once is cleaner.
+
+`./provision_models.sh` prints both the service user and every model directory it
+finds, so a mismatch is visible without digging.
+
 ### If systemctl says `bad-setting`
 
 ```
