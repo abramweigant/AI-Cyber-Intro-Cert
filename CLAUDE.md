@@ -2,7 +2,8 @@
 
 Context for Claude Code sessions in this repo. Started 2026-08-21, last updated 2026-10-09.
 
-**If you are running on the GPU box, read "Working on the GPU box" below before anything else.**
+**If you are running anywhere on the range, read "Which box am I on?" below before anything
+else — there are two boxes with different jobs, and the student VM is where modules get tested.**
 
 **Status: all 7 modules built. Modules 1–5 ran end to end on Google Colab on 2026-08-30 with
 zero execution errors** — 315 pages of output reviewed. Modules 1–4 reproduced *every* figure
@@ -43,10 +44,68 @@ fix, so a fresh pass is the cleaner source. Read
 "Module 6" below before touching it: what *was* verified locally, what was not, and why it
 ships without stored outputs.
 
-## Working on the GPU box — read this first if you are running on it
+## Which box am I on? — read this first if you are running on the range
 
-Added 2026-10-07, when Abe gave a session direct access. Everything below was learned the hard
-way over several rounds of remote debugging; none of it needs rediscovering.
+There are **two** and they have different jobs. Check `hostname` before doing anything.
+
+| hostname | what it is | what you do there |
+|---|---|---|
+| `R-AI-Cert-team01-gpu-ubuntu` | the GPU box: Ollama + the gateway | serve models; never test notebooks here |
+| `R-AI-Cert-team01-jumpbox3` | a **student VM** | test the modules exactly as a student would |
+
+If you are on the student VM and Ollama looks broken, **it is not yours to fix** — the models
+live on the other box. Check `curl -s http://192.168.1.10:8080/healthz` and tell Abe.
+
+## Working on a student VM — testing the modules
+
+**The box.** `R-AI-Cert-team01-jumpbox3`, Ubuntu, Python 3.12.3, 4 cores, **3.8 GB RAM and no
+swap**, xrdp desktop with Firefox running. Repo at `~/AI-Cyber-Intro-Cert`; `.env` needs
+`LLM_BASE_URL=http://192.168.1.10:8080`.
+
+**Memory is the binding constraint and it has already killed runs.** Measured kernel peak RSS:
+M1 0.5 GB, M2 0.9, M3 **1.4**, M4 0.6, M5 **~1.6 per section**, M6 0.74, M7 **1.67**. VS Code
+itself costs ~630 MB real (1.3 GB RSS), leaving roughly 1.0 GB with Firefox also open. The M5
+kernel was OOM-killed twice — at cell 57 (Malimg float conversion) and at cell 70 (CEAS load,
+which took 212 s then died, against 2.2 s in a fresh kernel).
+
+**The verified workaround: run each of M5's Sections 4, 5 and the final lab in a fresh kernel**,
+executing only setup cell 2 first. Do that rather than fighting it. **Nothing in M5 has been
+changed for this** — Abe has not yet decided between 8 GB VMs and in-notebook memory guidance,
+so do not add either without asking.
+
+**Image gaps that may still be unfixed** (both need root, which the test box did not have):
+`python3.12-venv` is absent, so `setup.sh` cannot build the venv — it now detects this and prints
+the apt command. And VS Code shipped with no extensions at all; `.vscode/extensions.json`
+recommends the two needed, and VS Code opens the folder in Restricted Mode until you click
+**Trust**.
+
+**All seven modules were already tested on 2026-10-07.** Read
+`instructor/test-reports/student-vm-2026-10-07/REPORT.md` before planning anything — every
+deterministic figure reproduced and the findings are already fixed. **Do not redo that work.**
+
+**What actually needs testing now** — the 2026-10-09 fixes, none of which has run on a real box:
+
+1. **Module 6 Task 1.1's `reasoning_effort: "none"`.** Does §2 now score properly instead of
+   78/78 unparseable? This is the one that mattered.
+2. **Module 4's new given cell** (M4 is now 85 cells). Task 7.1 plus 8.1–8.3 from a clean kernel;
+   the silhouette should come out 0.930.
+3. **`CAPSTONE` is now `gpt-oss:20b`**, not `gemma3:27b`. Does §5's capstone still work, and what
+   is the per-stage recall? §3's third model changed with it.
+4. That the reworded cells render correctly in VS Code.
+
+**Reuse the harness, do not rebuild it.** `instructor/test-reports/student-vm-2026-10-07/`
+contains `inject.py` (replaces exercise cells in a *copy*, asserting each target really is an
+exercise cell) and `run_nb.py` (per-cell timing, errors, kernel peak RSS). Note `run_nb.py`
+hardcodes `REPO = "/home/user/AI-Cyber-Intro-Cert"`.
+
+**The discipline the last session got right, and to keep:** work on **copies** in a scratch
+directory and never modify a shipped notebook. That report proved it with MD5s afterwards, which
+is why its findings could be trusted.
+
+## Working on the GPU box — serving the models
+
+Everything below was learned the hard way over several rounds of remote debugging; none of it
+needs rediscovering.
 
 **The box.** `R-AI-Cert-team01-gpu-ubuntu`, Ubuntu 24.04, login user `user`, repo cloned at
 `~/AI-Cyber-Intro-Cert`. It serves Module 6's models to student VMs on the range, and a
@@ -60,7 +119,7 @@ colleague's course shares it through the same gateway.
 | the five models | **all five served**, from `/usr/share/ollama/.ollama/models`. Resolved 2026-10-07, see below. |
 | Ollama tuning drop-in | **applied** (`override.conf` from `tune-ollama.sh`, verified loading). |
 | the gateway | **installed 2026-10-07** as `aicyber-gateway.service`, enabled at boot; `/v1/models` returns all five. |
-| Module 6 live pass | **not done.** This is the actual goal; see "what the live pass must do" below. |
+| Module 6 live pass | **done 2026-10-07.** Three of four claims held; §3's inverted. See the report and "Section 3's trend inverted" below. |
 
 **What the "empty `ollama list`" actually was (resolved 2026-10-07).** There were *two* Ollamas:
 the original 46 GB pull went into a **snap** (`ollama` 0.34, publisher `mz2`, store
@@ -120,8 +179,9 @@ direction* its teaching note predicts — the zero-shot/few-shot crossover (§2)
 injection-vs-capability trend (§3), the rationale/attribution mismatch (§4), and per-stage triage
 recall (§5). Every one is stated as a direction rather than a digit, deliberately, because LLM
 output is not reproducible even at `temperature=0`. Afterwards, transplant outputs into both
-copies as for every other module, and replace "never run against a real model" wherever this
-file says it.
+copies as for every other module. (The live pass itself happened on 2026-10-07; this paragraph
+is kept because the four claims it names are the right things to re-check after any change to
+the models or the client, and the capstone model changed on 2026-10-09.)
 
 ## Section 3's trend inverted, and why that is fine
 
@@ -1088,7 +1148,10 @@ promise any of the three, so nothing inside the module is broken. That was luck,
 
 **Genuinely open.**
 
-1. **Module 6 has never run against a real model.** Everything else about it is verified;
+1. **Module 6's outputs have never been transplanted.** It ran against real models on
+   2026-10-07 (see the report), but no run has been shipped into the notebooks, and the one that
+   worked depended on the `reasoning_effort` fix — so a fresh pass is the cleaner source. Also
+   unverified on a real box: all the 2026-10-09 fixes. Everything else about it is verified;
    see its section above for exactly what that means and what the live pass must do.
 2. **Malimg at full resolution.** Malimg encodes file size in image height and the 64×64 resize
    destroys it, so `Yuner.A` and `Autorun.K` collapse to one image each. They may be separable
