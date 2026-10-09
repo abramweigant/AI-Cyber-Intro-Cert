@@ -1,6 +1,6 @@
 # AI-Cyber Intro Certification — Working Context
 
-Context for Claude Code sessions in this repo. Started 2026-08-21, last updated 2026-10-07.
+Context for Claude Code sessions in this repo. Started 2026-08-21, last updated 2026-10-09.
 
 **If you are running on the GPU box, read "Working on the GPU box" below before anything else.**
 
@@ -29,10 +29,17 @@ approximations. The next Colab pass must execute them and transplant outputs. Al
 (0/1/2 rubric for all 100+ written questions). **All of the above is committed and pushed** in
 both repos as of 2026-09-01.
 
-**Module 6 built 2026-09-01 — and it is still the one module not verified by execution.** LLMs +
-Explainable AI, 62 cells, 16 coding tasks, 6 write-ups. Its labs require a live model endpoint.
-As of 2026-10-07 the endpoint exists — a GPU box on the range with the models pulled — so the
-live pass is finally possible and is the next real piece of work. Read
+**Module 6 ran against real models for the first time on 2026-10-07, and all seven modules were
+tested on a real student VM.** The full report is in the private repo at
+`instructor/test-reports/student-vm-2026-10-07/REPORT.md`, with the answer scripts and per-cell
+logs beside it. Every deterministic figure in Modules 1–5 and 7 reproduced; three of Module 6's
+four LLM-dependent claims held. **The fourth did not — see "Section 3's trend inverted" below.**
+Fixes from that report were applied 2026-10-09; what remains open is listed at the end of this
+section.
+
+Module 6 is 62 cells, 16 coding tasks, 6 write-ups. **No outputs have been transplanted into any
+notebook yet** — that is still pending, and it depends on a run made with the `reasoning_effort`
+fix, so a fresh pass is the cleaner source. Read
 "Module 6" below before touching it: what *was* verified locally, what was not, and why it
 ships without stored outputs.
 
@@ -115,6 +122,61 @@ recall (§5). Every one is stated as a direction rather than a digit, deliberate
 output is not reproducible even at `temperature=0`. Afterwards, transplant outputs into both
 copies as for every other module, and replace "never run against a real model" wherever this
 file says it.
+
+## Section 3's trend inverted, and why that is fine
+
+Measured on the range 2026-10-07, attack success per payload
+(naive / role-play / delimiter-break / plausible-cover):
+
+| model | naive | role-play | delimiter-break | plausible-cover |
+|---|---|---|---|---|
+| `llama3.2:3b` | 40% | 40% | **0%** | 80% |
+| `phi4:latest` | 0% | 100% | **100%** | 80% |
+| `gemma3:27b` (since retired) | 0% | 100% | **100%** | 80% |
+
+**"A bigger model is harder to talk out of its instructions" held only for the naive payload.**
+For the payloads that forge a *format* it inverted: the 3B model resisted delimiter-break
+completely while both larger models fell to it every time. The likely mechanism is worth stating
+in feedback — a model that follows instructions better also follows the *attacker's* forged
+instruction better, so instruction-following capability is the attack surface rather than a
+defence against it.
+
+**No student-facing content was changed for this, deliberately.** Task 3.1 is already worded as
+"the claim to test", and write-up 3.3 already asks students to "note any payload that breaks the
+pattern" — the exercise anticipates exactly this outcome. What was changed is the instructor
+expectation note, which predicted the opposite and would have misled a grader, and the §3.1
+defence table, which called random delimiters "genuinely useful" when delimiter-break stayed at
+100% *with* them. **Do not mark a student down for reporting the inversion**; mark one down for
+reporting a clean trend their own numbers do not support.
+
+## Defects the student-VM test found in my own work, 2026-10-07
+
+Recorded because each was invisible to the verification I had done, and the pattern is worth
+remembering: **a mock cannot test a deployment, and reading cannot test reproducibility.**
+
+| what | why my verification missed it |
+|---|---|
+| **`/no_think` is ignored**, so every qwen3 call returned `''` — Module 6 §2 scored **accuracy 0.000, 78/78 unparseable** | I verified against a mock server, which answered whatever I told it to |
+| **Module 4 Task 7.1 was not reproducible.** The generator parameters appear nowhere in the student copy, yet the task says "set seed 42 FIRST so your anomalies match" and Tasks 8.1–8.3 quote figures built on its output | the instructor solution has the generator, so every check I ran passed |
+| **Module 6 printed the real server IP** in the markdown cell headed "The server's address lives in `.env`, not in this notebook", three lines above "Publishing where it is does the reconnaissance for them". In a public repo | I wrote both lines in the same edit |
+| **Stale bearer-token wording** in five places after the 2026-09-30 auth removal | CLAUDE.md said §1.1 must change with any auth change; I changed §1.1 and missed the rest |
+| **Module 7 never loads the Module 5 artifact** though M5 and the README promised it did — zero `load_model(` calls, and its contract check compares the rebuilt model against its own feature list, so it cannot fail | "load your own if you kept it" read as implemented because I wrote the sentence |
+
+All five are fixed. The Module 4 generator is now a **given cell** (which is why M4 is 85 cells),
+identical in both copies, verified to reproduce the downstream silhouette of 0.930.
+
+**Still open, and not mine to fix:**
+
+- **P1/P3 — the VM image.** It lacks `python3.12-venv` (so `setup.sh` cannot build the venv) and
+  ships VS Code with no Python or Jupyter extension. `setup.sh` now detects the first and prints
+  the apt command; `.vscode/extensions.json` recommends the second. The image still needs both.
+- **P5 — 3.8 GB RAM is not enough.** Modules 3, 5 and 7 peak at 1.4–1.7 GB per kernel and the M5
+  kernel was OOM-killed twice. VS Code alone costs ~630 MB. Either 8 GB VMs, or M5 needs
+  section-boundary memory guidance. **Nothing has been changed in M5 for this yet.**
+- **C6 — this file is in the public repo** and visible in the student's VS Code explorer, with
+  every planted surprise the "predict before you run" questions depend on. Decided 2026-10-09:
+  leave it for now for convenience, **move it to the private repo with a public stub before
+  students get access.**
 
 ## The gateway — built 2026-09-30, lives in `server/`
 
@@ -366,7 +428,7 @@ Retired originals live in the private repo, never in this one:
    matches `resolution` and ordinary prose, and returns four false positives.
 
 Cell counts, both copies (verified 2026-08-30, post-audit; M6 2026-09-01): **M1 62, M2 58,
-M3 67, M4 84, M5 92, M6 62, M7 31.** Each module now carries one **checkpoint cell** asserting deterministic dataset
+M3 67, M4 **85**, M5 92, M6 62, M7 31.** Each module now carries one **checkpoint cell** asserting deterministic dataset
 facts at its most error-prone pipeline joint (the drift rule decides what is safe to
 assert — dataset facts yes, model metrics never). Keep checkpoints identical in both
 copies; they are teaching cells, not exercises.
@@ -1179,9 +1241,9 @@ Two things follow that are worth keeping:
 
 | use | model | why |
 |---|---|---|
-| workhorse (few-shot phishing, most exercises) | `qwen3:8b` | best instruction-following per parameter; serves concurrent students. Disable thinking mode for classification labs (`/no_think`) or output is slow and hard to parse |
-| capstone log triage | `gemma3:27b` | 128k context; logs are long |
-| prompt-injection demo | `llama3.2:3b` **and** `gemma3:27b` | same payload against both — the small model folds, the large one usually resists. The contrast is the lesson: model capability is itself a security control |
+| workhorse (few-shot phishing, most exercises) | `qwen3:8b` | best instruction-following per parameter; serves concurrent students. **`/no_think` does not work on this deployment** — use the request parameter `reasoning_effort: "none"` or the reply comes back empty |
+| capstone log triage | ~~`gemma3:27b`~~ → **`gpt-oss:20b`** | **Changed 2026-10-09.** gemma3:27b is 17 GB and the range GPU is a **16 GB vGPU** (`GRID A100D-16C`), so it ran on partial CPU offload. gpt-oss:20b (13 GB) is the largest that fits. The 128k-context reason never bound anyway: a capstone chunk measures ~2,400 tokens |
+| prompt-injection demo | `llama3.2:3b`, `phi4:latest`, `gpt-oss:20b` | same payloads across a capability range. **The expected contrast did not survive measurement** — see below |
 | XAI section | `gpt-oss:20b` | exposes reasoning traces; compare its stated reasoning against SHAP attributions on the same email. Plausible is not faithful |
 
 Read the base URL from `.env` (`LLM_BASE_URL`), never hardcode it — a hostname is coming to

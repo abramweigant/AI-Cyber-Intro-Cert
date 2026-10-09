@@ -15,6 +15,7 @@ KERNEL_LABEL="Python (AI-Cyber)"
 
 say()  { printf '\n\033[1m==> %s\033[0m\n' "$*"; }
 warn() { printf '\033[33m    !! %s\033[0m\n' "$*"; }
+die()  { printf '\033[31m    !! %s\033[0m\n' "$*"; exit 1; }
 ok()   { printf '\033[32m    ok  %s\033[0m\n' "$*"; }
 
 # --- 1. interpreter ----------------------------------------------------------
@@ -59,10 +60,28 @@ ok "using $PY (Python $(py_version "$PY"))"
 
 # --- 2. virtual environment --------------------------------------------------
 say "Creating the virtual environment at .venv"
+# A failed earlier run can leave a .venv with no bin/activate. Treating that as
+# "already exists -- reusing it" made the re-run die on `source` instead, which
+# contradicted this script's own promise that re-running is safe.
+if [ -d "$VENV" ] && [ ! -x "$VENV/bin/python" ]; then
+  warn ".venv exists but is incomplete (no bin/python) -- recreating it"
+  rm -rf "$VENV"
+fi
 if [ -d "$VENV" ]; then
   ok ".venv already exists -- reusing it"
 else
-  "$PY" -m venv "$VENV"
+  if ! "$PY" -m venv "$VENV" 2>/tmp/_venverr; then
+    sed 's/^/    /' /tmp/_venverr
+    rm -rf "$VENV"                     # do not leave a broken shell behind
+    if grep -qi "ensurepip is not available" /tmp/_venverr; then
+      warn "This image is missing the venv package for $PY."
+      PYV_FULL="$("$PY" -c 'import sys;print("%d.%d"%sys.version_info[:2])')"
+      warn "Install it, then re-run:   sudo apt install python${PYV_FULL}-venv"
+    fi
+    rm -f /tmp/_venverr
+    die "could not create the virtualenv"
+  fi
+  rm -f /tmp/_venverr
   ok "created"
 fi
 # shellcheck disable=SC1091

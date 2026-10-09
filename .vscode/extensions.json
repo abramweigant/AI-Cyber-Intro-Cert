@@ -1,0 +1,9 @@
+{
+  // VS Code prompts the student to install these when the folder is opened.
+  // The range image shipped with no extensions at all, which left the Jupyter
+  // kernel picker empty and the notebooks unopenable.
+  "recommendations": [
+    "ms-python.python",
+    "ms-toolsai.jupyter"
+  ]
+}

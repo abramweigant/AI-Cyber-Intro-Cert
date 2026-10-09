@@ -10,9 +10,9 @@
 *.ystore.db
 
 # STUDENT VM ENVIRONMENT -- THIS REPO IS PUBLIC.
-# .env carries each student's issued model-server token. It must never be
-# committed. setup.sh creates it locally at mode 600; Module 6 Section 1.1
-# is built around why it lives outside the notebook.
+# .env carries the model server's address. It stays out of the repo so that
+# environment-specific values stay out of the notebook cells -- Module 6
+# Section 1.1 is built around why.
 .env
 .env.*
 !.env.example
@@ -21,10 +21,9 @@ venv/
 __pycache__/
 *.pyc
 
-# GATEWAY SECRETS -- THIS REPO IS PUBLIC.
-# tokens.json holds the SHA-256 of every student's token plus the roster. The
-# hashes are not directly usable, but the file is still an access-control list
-# for the GPU box and has no business in a public repo.
+# GATEWAY -- THIS REPO IS PUBLIC.
+# The gateway has no tokens any more (auth was removed 2026-09-30), but keep
+# these ignored so a future token file cannot be committed by accident.
 server/tokens.json
 server/**/tokens.json
 server/gateway.env

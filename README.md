@@ -61,7 +61,8 @@ Modules 6 and 7 preview two sister courses — one on LLMs in depth, one on secu
 systems in depth — while standing on their own.
 
 **Keep your Module 5 final-lab artifacts** (`backdoor_detector.keras` and its threshold
-JSON). Module 7 attacks the exact model you build there.
+JSON). Module 7 attacks the same model and architecture; it rebuilds them from the public data
+so it stands alone, and your saved copy is the optional path.
 
 ## Prerequisites
 

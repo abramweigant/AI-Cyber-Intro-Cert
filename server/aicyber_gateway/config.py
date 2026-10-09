@@ -28,7 +28,10 @@ def _int(name: str, default: int) -> int:
 # Set ALLOWED_MODELS to an EMPTY string to allow whatever Ollama is serving. Do
 # that if someone else's course shares this box and pulls its own models --
 # otherwise their requests get a 403 from a list that has nothing to do with them.
-DEFAULT_MODELS = "qwen3:8b,gemma3:27b,gpt-oss:20b,llama3.2:3b,phi4:latest"
+# gemma3:27b was dropped 2026-10-09: 17 GB will not fit the range's 16 GB vGPU
+# (GRID A100D-16C), so it ran on partial CPU offload. gpt-oss:20b (13 GB) is the
+# largest that fits and took over as Module 6's capstone model.
+DEFAULT_MODELS = "qwen3:8b,gpt-oss:20b,llama3.2:3b,phi4:latest"
 
 
 @dataclass(frozen=True)

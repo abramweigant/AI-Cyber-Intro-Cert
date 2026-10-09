@@ -26,10 +26,12 @@ MODELS=(
   "llama3.2:3b|Section 3 prompt injection -- the model that folds   (~2.0 GB)"
   "qwen3:8b|WORKHORSE -- Section 2 classification labs              (~5.2 GB)"
   "phi4:latest|Section 3 prompt injection -- middle of the range    (~9.1 GB)"
-  "gpt-oss:20b|Section 4 XAI -- exposes reasoning traces            (~13 GB)"
-  "gemma3:27b|CAPSTONE Section 5 log triage, and S3 'resists'       (~17 GB)"
+  "gpt-oss:20b|CAPSTONE S5 log triage, S4 XAI, S3 largest model    (~13 GB)"
 )
-NEED_GB=50            # ~46 GB of models plus working room
+# gemma3:27b is deliberately absent: 17 GB does not fit the range's 16 GB vGPU
+# (GRID A100D-16C), so it ran on partial CPU offload. gpt-oss:20b took over as
+# the capstone model. If you re-add it, raise NEED_GB and expect swapping.
+NEED_GB=35            # ~29 GB of models plus working room
 
 say()  { printf '\n\033[1m==> %s\033[0m\n' "$*"; }
 ok()   { printf '\033[32m    ok  %s\033[0m\n' "$*"; }

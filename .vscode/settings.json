@@ -4,7 +4,7 @@
   "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
 
   // Load .env into the notebook kernel's environment. This is how Module 6
-  // reads LLM_BASE_URL and LLM_API_KEY without either value entering a cell.
+  // reads LLM_BASE_URL without that value entering a cell.
   "python.envFile": "${workspaceFolder}/.env",
 
   // Resolve relative paths from the repository root, not the notebook's folder.

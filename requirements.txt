@@ -34,4 +34,4 @@ tensorflow>=2.16,<2.22     ; sys_platform == "darwin"
 # --- Module 6: LLMs and explainability -------------------------------------
 requests>=2.31             # the course talks to the model server over plain HTTP
 shap>=0.44                 # Section 4 confirms the hand-derived attributions
-python-dotenv>=1.0         # reads .env so the API token never enters a notebook cell
+python-dotenv>=1.0         # reads .env so the server address never enters a notebook cell
