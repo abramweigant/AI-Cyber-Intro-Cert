@@ -58,20 +58,18 @@ live on the other box. Check `curl -s http://192.168.1.10:8080/healthz` and tell
 
 ## Working on a student VM — testing the modules
 
-**The box.** `R-AI-Cert-team01-jumpbox3`, Ubuntu, Python 3.12.3, 4 cores, **3.8 GB RAM and no
-swap**, xrdp desktop with Firefox running. Repo at `~/AI-Cyber-Intro-Cert`; `.env` needs
-`LLM_BASE_URL=http://192.168.1.10:8080`.
+**The box.** `R-AI-Cert-team01-jumpbox3`, Ubuntu, Python 3.12.3, 4 cores, **8 GB RAM (raised
+from 3.8 GB on 2026-10-11) and no swap**, xrdp desktop. Repo at `~/AI-Cyber-Intro-Cert`; `.env`
+needs `LLM_BASE_URL=http://192.168.1.10:8080`.
 
-**Memory is the binding constraint and it has already killed runs.** Measured kernel peak RSS:
-M1 0.5 GB, M2 0.9, M3 **1.4**, M4 0.6, M5 **~1.6 per section**, M6 0.74, M7 **1.67**. VS Code
-itself costs ~630 MB real (1.3 GB RSS), leaving roughly 1.0 GB with Firefox also open. The M5
-kernel was OOM-killed twice — at cell 57 (Malimg float conversion) and at cell 70 (CEAS load,
-which took 212 s then died, against 2.2 s in a fresh kernel).
-
-**The verified workaround: run each of M5's Sections 4, 5 and the final lab in a fresh kernel**,
-executing only setup cell 2 first. Do that rather than fighting it. **Nothing in M5 has been
-changed for this** — Abe has not yet decided between 8 GB VMs and in-notebook memory guidance,
-so do not add either without asking.
+**Memory was the binding constraint; 8 GB resolved it — decided and verified 2026-10-11.** On
+3.8 GB the M5 kernel was OOM-killed twice. Measured 2026-10-11, whole module in **one kernel**,
+peak RSS including child processes: M1 0.6 GB, M2 0.9–1.0, M3 1.4 (student) / **2.7**
+(instructor, grid-search workers), M4 0.6, **M5 3.3**, M6 0.7, M7 1.9–2.0. The box never fell
+below 3.5 GB available. VS Code costs ~630 MB real and Firefox more, so headroom is ~2 GB at the
+M5 peak. **No section-per-kernel workaround is needed any more, and no in-notebook memory
+guidance was added.** On a 4 GB VM even a fresh kernel per section would not save M5 (sections
+peak at 1.9–2.0 GB).
 
 **Image gaps that may still be unfixed** (both need root, which the test box did not have):
 `python3.12-venv` is absent, so `setup.sh` cannot build the venv — it now detects this and prints
@@ -83,15 +81,24 @@ recommends the two needed, and VS Code opens the folder in Restricted Mode until
 `instructor/test-reports/student-vm-2026-10-07/REPORT.md` before planning anything — every
 deterministic figure reproduced and the findings are already fixed. **Do not redo that work.**
 
-**What actually needs testing now** — the 2026-10-09 fixes, none of which has run on a real box:
+**All fourteen copies were re-run on 2026-10-11 on the 8 GB VM** (report beside the 10-07 one).
+Every module runs with zero errors in both copies; every deterministic figure reproduced. The
+2026-10-09 fixes: qwen3 `reasoning_effort` holds (§2 0 unparseable); M4's given cell gives 0.930.
+**`gpt-oss:20b` broke §3 and §5, for two reasons, both now fixed:**
 
-1. **Module 6 Task 1.1's `reasoning_effort: "none"`.** Does §2 now score properly instead of
-   78/78 unparseable? This is the one that mattered.
-2. **Module 4's new given cell** (M4 is now 85 cells). Task 7.1 plus 8.1–8.3 from a clean kernel;
-   the silhouette should come out 0.930.
-3. **`CAPSTONE` is now `gpt-oss:20b`**, not `gemma3:27b`. Does §5's capstone still work, and what
-   is the per-stage recall? §3's third model changed with it.
-4. That the reworded cells render correctly in VS Code.
+- **Ollama's context was 4096.** A capstone prompt is ~3,900–4,100 tokens on gpt-oss's
+  tokenizer (the old "~2,400" was gemma3's), so replies were cut off empty — and Ollama silently
+  truncates longer prompts instead of refusing. `tune-ollama.sh` now sets
+  `OLLAMA_CONTEXT_LENGTH=8192`, applied on the GPU box; gpt-oss stays 25/25 layers on GPU.
+- **gpt-oss cannot turn reasoning off.** It spent `max_tokens=8` (§3) and `1200` (capstone)
+  thinking. `chat()` now sends `reasoning_effort: "low"` for gpt-oss (its floor), the
+  classifiers use 256, the capstone 3000; Task 1.1/2.5/5.1 text says so. §3's gpt-oss row went
+  from 0/5 caught at baseline (all its "100%" were artefacts) to 5/5. Capstone, instructor
+  solution: 28 findings, 0 unparseable, **P 0.41 / R 0.85 / F1 0.55** vs flag-all 0.11;
+  lateral movement and collection still missed; 0 fabricated references.
+
+Still open: reworded cells not yet eyeballed in VS Code (runs were headless), and no Module 6
+outputs transplanted.
 
 **Reuse the harness, do not rebuild it.** `instructor/test-reports/student-vm-2026-10-07/`
 contains `inject.py` (replaces exercise cells in a *copy*, asserting each target really is an
@@ -1305,7 +1312,7 @@ Two things follow that are worth keeping:
 | use | model | why |
 |---|---|---|
 | workhorse (few-shot phishing, most exercises) | `qwen3:8b` | best instruction-following per parameter; serves concurrent students. **`/no_think` does not work on this deployment** — use the request parameter `reasoning_effort: "none"` or the reply comes back empty |
-| capstone log triage | ~~`gemma3:27b`~~ → **`gpt-oss:20b`** | **Changed 2026-10-09.** gemma3:27b is 17 GB and the range GPU is a **16 GB vGPU** (`GRID A100D-16C`), so it ran on partial CPU offload. gpt-oss:20b (13 GB) is the largest that fits. The 128k-context reason never bound anyway: a capstone chunk measures ~2,400 tokens |
+| capstone log triage | ~~`gemma3:27b`~~ → **`gpt-oss:20b`** | **Changed 2026-10-09.** gemma3:27b is 17 GB and the range GPU is a **16 GB vGPU** (`GRID A100D-16C`), so it ran on partial CPU offload. gpt-oss:20b (13 GB) is the largest that fits. The 128k-context reason never bound: a capstone chunk is ~4,100 tokens on gpt-oss (needs `OLLAMA_CONTEXT_LENGTH=8192`, see "Working on a student VM") |
 | prompt-injection demo | `llama3.2:3b`, `phi4:latest`, `gpt-oss:20b` | same payloads across a capability range. **The expected contrast did not survive measurement** — see below |
 | XAI section | `gpt-oss:20b` | exposes reasoning traces; compare its stated reasoning against SHAP attributions on the same email. Plausible is not faithful |
 

@@ -98,13 +98,20 @@ is required, and nothing may be commented out:
 [Service]
 Environment="OLLAMA_MAX_LOADED_MODELS=2"
 Environment="OLLAMA_KEEP_ALIVE=30m"
+Environment="OLLAMA_NUM_PARALLEL=2"
+Environment="OLLAMA_CONTEXT_LENGTH=8192"
 Environment="OLLAMA_HOST=127.0.0.1:11434"
 ```
+
+`OLLAMA_CONTEXT_LENGTH` is not optional. Ollama's default is 4096, a Module 6
+capstone prompt is ~4,100 tokens on `gpt-oss:20b`, and Ollama *silently*
+truncates rather than refusing — every capstone reply comes back empty.
 
 Confirm it took effect:
 
 ```bash
-systemctl show ollama -p Environment     # all three should be listed
+systemctl show ollama -p Environment     # all five should be listed
+ollama ps                                # CONTEXT column should read 8192
 ```
 
 ### If `ollama list` is empty but you pulled the models
@@ -300,7 +307,7 @@ courses report everything being slow, check `ollama ps` before touching
 | `run.sh` | start it in the foreground; `--install-only` just builds the venv |
 | `tune-ollama.sh` | write Ollama's systemd drop-in correctly |
 | `install-service.sh` | install it as a systemd service, paths detected |
-| `tests/test_gateway.py` | 13 tests, no network needed |
+| `tests/test_gateway.py` | 20 tests, no network needed |
 
 ```bash
 ./.venv/bin/python -m pytest tests/ -q

@@ -18,6 +18,12 @@ CONF="$DIR/override.conf"
 MAX_LOADED="${MAX_LOADED:-2}"
 KEEP_ALIVE="${KEEP_ALIVE:-30m}"
 NUM_PARALLEL="${NUM_PARALLEL:-2}"
+# Ollama's default is 4096, and a Module 6 capstone chunk is ~3,900 prompt tokens
+# on gpt-oss:20b -- the model is cut off mid-reasoning and returns ''. Ollama also
+# silently truncates longer prompts rather than refusing them. Each NUM_PARALLEL
+# slot gets its own context, so this costs VRAM twice; 8192 keeps gpt-oss fully
+# GPU-resident on the 16 GB vGPU (measured 2026-10-11).
+CONTEXT_LENGTH="${CONTEXT_LENGTH:-8192}"
 # Empty BIND_LOOPBACK=0 leaves OLLAMA_HOST alone, for a box where something
 # still talks to :11434 directly.
 BIND_LOOPBACK="${BIND_LOOPBACK:-1}"
@@ -61,6 +67,7 @@ mkdir -p "$DIR"
   echo "Environment=\"OLLAMA_MAX_LOADED_MODELS=$MAX_LOADED\""
   echo "Environment=\"OLLAMA_KEEP_ALIVE=$KEEP_ALIVE\""
   echo "Environment=\"OLLAMA_NUM_PARALLEL=$NUM_PARALLEL\""
+  echo "Environment=\"OLLAMA_CONTEXT_LENGTH=$CONTEXT_LENGTH\""
   if [ "$BIND_LOOPBACK" = "1" ]; then
     echo "Environment=\"OLLAMA_HOST=127.0.0.1:11434\""
   fi
