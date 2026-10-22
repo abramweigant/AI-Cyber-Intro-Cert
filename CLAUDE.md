@@ -96,6 +96,13 @@ Every module runs with zero errors in both copies; every deterministic figure re
   from 0/5 caught at baseline (all its "100%" were artefacts) to 5/5. Capstone, instructor
   solution: 28 findings, 0 unparseable, **P 0.41 / R 0.85 / F1 0.55** vs flag-all 0.11;
   lateral movement and collection still missed; 0 fabricated references.
+- **2026-10-22: gpt-oss loops at temperature 0.** After Ollama's compat migration (GPU-box
+  section) one capstone chunk (lines 481-560) came back empty 6 times in 8: its reasoning
+  repeats one phrase (`Also 523. Also 523. ...`) until `max_tokens`, so more budget does not
+  help. `chat()` now also sends `frequency_penalty: 0.1` for gpt-oss (Task 1.1 and §2.4 say
+  why); 0 loops in 46 calls, and the capstone stays reproducible run to run. 0.3 also breaks
+  the loop but cost precision (F1 0.40). Task 5.1's solution retries an empty reply once.
+  Capstone now: 24 findings, 0 unparseable, **P 0.44 / R 0.87 / F1 0.59**, recon 12/12.
 
 Still open: reworded cells not yet eyeballed in VS Code (runs were headless), and no Module 6
 outputs transplanted.
@@ -139,6 +146,15 @@ snapd snapshots 45 GB of data onto a nearly full disk. Disk went 96% → 88% (12
 **The GPU is a 16 GB vGPU (`GRID A100D-16C`), not a full card.** `gemma3:27b` (17 GB) cannot be
 fully GPU-resident, and two large models will not fit at once whatever `OLLAMA_MAX_LOADED_MODELS`
 says, so expect partial CPU offload and model swapping. A cold first request took ~67 s.
+
+**Ollama 0.40.0 converts models on its own when the disk has room.** On load it may run a
+"local compat GGUF migration" (journal: `starting local compat GGUF migration`), which needs
+~17.8 GB free for gpt-oss and is skipped otherwise. It writes a second 13.8 GB copy, rewrites
+the `gpt-oss:20b` manifest into a list pointing at it (`ollama list` then shows `gpt-oss:20b`
+twice plus a `llamacpp:<digest>` entry), and serves from the copy. This happened on
+2026-10-22, once gemma3's removal freed space; deleting the copy just triggers it again on the
+next load, and there is no setting to disable it. Treat the converted copy as the model:
+the 2026-10-22 Module 6 figures were measured on it. Budget its ~14 GB of disk.
 
 **Start by finding out where the models are.** `ollama pull` writes to wherever *the server*
 keeps its models, not the user running the CLI — so after a reinstall that creates an `ollama`
