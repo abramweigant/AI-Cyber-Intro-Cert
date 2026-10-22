@@ -38,7 +38,9 @@ class Ollama:
         if r.status_code != 200:
             raise UpstreamError(502, f"Ollama returned {r.status_code} for /v1/models")
         try:
-            return sorted(m["id"] for m in r.json().get("data", []))
+            # set(): Ollama lists a model once per format it holds, and after its own
+            # "compat GGUF migration" gpt-oss:20b appears twice under one name.
+            return sorted({m["id"] for m in r.json().get("data", [])})
         except (ValueError, KeyError, TypeError) as e:
             raise UpstreamError(502, f"unreadable /v1/models payload: {e}") from e
 

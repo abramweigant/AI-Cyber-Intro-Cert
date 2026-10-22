@@ -307,7 +307,7 @@ courses report everything being slow, check `ollama ps` before touching
 | `run.sh` | start it in the foreground; `--install-only` just builds the venv |
 | `tune-ollama.sh` | write Ollama's systemd drop-in correctly |
 | `install-service.sh` | install it as a systemd service, paths detected |
-| `tests/test_gateway.py` | 20 tests, no network needed |
+| `tests/test_gateway.py` | 21 tests, no network needed |
 
 ```bash
 ./.venv/bin/python -m pytest tests/ -q

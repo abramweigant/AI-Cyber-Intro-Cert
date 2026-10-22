@@ -170,6 +170,23 @@ async def test_models_filtered_to_course_set(client, fake):
     r = await client.get("/v1/models")
     assert sorted(m["id"] for m in r.json()["data"]) == ["gemma3:27b", "qwen3:8b"]
 
+async def test_upstream_model_list_has_no_duplicates():
+    # Ollama lists a model once per format after converting it; students saw
+    # "gpt-oss:20b" twice in Module 6's connectivity check.
+    import httpx
+    from aicyber_gateway.upstream import Ollama
+    def handler(request):
+        return httpx.Response(200, json={"data": [
+            {"id": "gpt-oss:20b"}, {"id": "gpt-oss:20b"}, {"id": "qwen3:8b"}]})
+    o = Ollama("http://upstream.test", timeout=5)
+    await o.aclose()
+    o._client = httpx.AsyncClient(base_url="http://upstream.test",
+                                  transport=httpx.MockTransport(handler))
+    try:
+        assert await o.list_models() == ["gpt-oss:20b", "qwen3:8b"]
+    finally:
+        await o.aclose()
+
 async def test_disallowed_model_is_403(client, fake):
     r = await client.post("/v1/chat/completions", json=body(model="llama4:scout"))
     assert r.status_code == 403 and "not available" in r.json()["error"]["message"]

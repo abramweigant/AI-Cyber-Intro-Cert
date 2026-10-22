@@ -265,7 +265,7 @@ identical in both copies, verified to reproduce the downstream silhouette of 0.9
 
 FastAPI service on the GPU box between the student VMs and Ollama. Serves `GET /v1/models` and
 `POST /v1/chat/completions`, so Module 6 needs no change beyond `LLM_BASE_URL`. Deployment is
-`./provision_models.sh` then `sudo ./install-service.sh`. 20 tests, upstream faked.
+`./provision_models.sh` then `sudo ./install-service.sh`. 21 tests, upstream faked.
 
 **Run it as a service, not `./run.sh &`.** `run.sh` `exec`s uvicorn, so backgrounding it over SSH
 gives uvicorn the SIGHUP on logout, and nothing restarts it after a crash or reboot.
