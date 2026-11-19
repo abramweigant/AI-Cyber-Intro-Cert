@@ -10,8 +10,9 @@ grading.
 ## How the course works
 
 Each module is one notebook. Open it in **VS Code** on your lab VM, run cells top to bottom,
-and complete the coding tasks (`# YOUR CODE HERE`) and written questions (`[insert response]`)
-as you meet them. Every dataset downloads automatically from this repository — no accounts and
+and complete the coding tasks (`# YOUR CODE HERE`) and written questions (**[insert response]**)
+as you meet them. Questions marked *(Stretch.)* are optional. How everything is marked is in
+[`GRADING.md`](GRADING.md). Every dataset downloads automatically from this repository — no accounts and
 no manual uploads. Checkpoint cells are placed after error-prone steps; if one passes, your
 pipeline state matches the reference and you can continue with confidence.
 
@@ -37,13 +38,16 @@ learning to find out why is the skill being certified.
 
 | # | Module | Focus | Est. time |
 |---|---|---|---|
-| 1 | Course Introduction & The Role of AI in Cybersecurity | AI/ML/DL foundations; your first dataset audit — finding missing values that are not marked missing | 3–4 h |
-| 2 | Threat Landscape, Data Sources, Preprocessing, First ML Model | Kill Chain & MITRE ATT&CK; cleaning a broken log; your first classifier, and why its perfect score is a symptom | 4–5 h |
-| 3 | Supervised Machine Learning | EDA and correlation as interrogation; the accuracy trap; measuring (not assuming) the standard fixes for class imbalance; model comparison and fold-safe tuning | 5–6 h |
-| 4 | Unsupervised Learning: Anomaly Detection & Threat Hunting | Scaling, PCA, K-Means, DBSCAN, hierarchical clustering, Isolation Forests; evaluating without ground truth | 4–5 h |
-| 5 | Deep Learning Models for Cybersecurity | Autoencoders, MLPs, 1D/2D CNNs, LSTMs, embeddings — and auditing your own evaluation at every step | 6–8 h |
-| 6 | Large Language Models & Explainable AI | Calling an LLM over an API; phishing triage against the model you built in Module 5; prompt injection; SHAP derived from first principles; capstone: LLM-assisted forensic log triage | 5–6 h |
-| 7 | Adversarial Attacks & the Secure AI/ML Lifecycle | Attacking the DGA and backdoor detectors **you** built in Module 5 — evasion, poisoning, membership inference, model extraction — then defending them and threat-modelling the lifecycle with MITRE ATLAS | 5–6 h |
+| 1 | Course Introduction & The Role of AI in Cybersecurity | What ML is and where it is oversold; your first dataset audit — finding missing values that are not marked missing | 3–5 h |
+| 2 | Threat Landscape, Data Sources, Preprocessing, First ML Model | Kill Chain & MITRE ATT&CK; cleaning a broken log; your first classifier, explained, and why its perfect score is a symptom | 5–7 h |
+| 3 | Supervised Machine Learning | Correlation as interrogation, and what one accidental bit is worth; the accuracy trap; what the standard fixes for class imbalance really change; choosing thresholds without the test set; model comparison and fold-safe tuning | 8–10 h |
+| 4 | Unsupervised Learning: Anomaly Detection & Threat Hunting | How scale decides what distance can see; PCA; K-Means, DBSCAN and dendrograms; Isolation Forests; evaluating a detector without labels; hunting fraud in real data | 6–8 h |
+| 5 | Deep Learning Models for Cybersecurity | Autoencoders, MLPs, 1D/2D CNNs, LSTMs, embeddings — and auditing your own evaluation at every step. Two sittings, with a marked midpoint | 10–14 h |
+| 6 | Large Language Models & Explainable AI | Calling an LLM over an API; phishing triage against the model you built in Module 5; prompt injection; SHAP derived from first principles; capstone: LLM-assisted forensic log triage | 7–9 h |
+| 7 | Adversarial Attacks & the Secure AI/ML Lifecycle | Attacking the DGA and backdoor detectors **you** built in Module 5 — evasion, poisoning, membership inference, model extraction — then defending them and threat-modelling a pipeline you built with MITRE ATLAS | 6–8 h |
+
+About 45 to 60 hours in all. These are estimates for someone new to machine learning and
+will be revised as cohorts complete the course.
 
 Time estimates include the written questions. A few cells are long-running by design and say so
 where they appear — the Module 3 grid search and Module 5's networks each take several minutes.
@@ -51,8 +55,8 @@ where they appear — the Module 3 grid search and Module 5's networks each take
 CPU. Long cells print progress while they work, so if output is still appearing, nothing is
 wrong. Module 6 is paced by the shared model server rather than by your VM.
 
-**Module 6 is the one module you cannot complete offline.** It needs a live language-model
-model server on the range. `setup.sh` writes a `.env` file in this folder holding its address;
+**Module 6 is the one module you cannot complete offline.** It needs the live
+language-model server on the range. `setup.sh` writes a `.env` file in this folder holding its address;
 confirm `LLM_BASE_URL` matches what your instructor gives you and restart the notebook kernel.
 The server needs no password from you — Section 1 explains why, and what you would write in a
 report if you found a service like it on a real engagement.
@@ -60,9 +64,10 @@ report if you found a service like it on a real engagement.
 Modules 6 and 7 preview two sister courses — one on LLMs in depth, one on securing AI
 systems in depth — while standing on their own.
 
-**Keep your Module 5 final-lab artifacts** (`backdoor_detector.keras` and its threshold
-JSON). Module 7 attacks the same model and architecture; it rebuilds them from the public data
-so it stands alone, and your saved copy is the optional path.
+**Keep your Module 5 final-lab artifacts** (`backdoor_detector.keras` and
+`backdoor_detector_meta.json`) in this folder. Module 7 loads them and attacks the model you
+trained. If they are missing, or do not fit Module 7's data, it builds a reference model
+instead.
 
 ## Prerequisites
 
@@ -79,17 +84,34 @@ All hosted in this repository and loaded by URL from each notebook's setup cell:
 | file | contents | used in |
 |---|---|---|
 | `phishing_dataset1.parquet` | 88,647 URLs × 111 lexical/host features | Modules 1, 2, 3 |
-| `Log_Data.csv` | 30-row toy firewall log (deliberately broken) | Module 2 |
+| `Log_Data.csv` | 30-row constructed firewall log (deliberately broken) | Module 2 |
 | `creditcard.csv.zip` | 284,807 card transactions, 492 fraudulent | Modules 3, 4, 5 |
 | `dga_websites.csv` / `legit_websites.csv` | ~675k generated vs. legitimate domains | Module 5 |
 | `malimg_64.npz` | 9,339 malware binaries rendered as 64×64 grayscale images | Module 5 |
-| `CEAS_08.parquet` | 39,154 labelled emails with full body text | Module 5 |
+| `CEAS_08.parquet` | 39,154 labelled emails with full body text | Modules 5, 6 |
 | `Backdoor_Malware.pcap.parquet` / `Recon-PortScan.pcap.parquet` | IoT network flow records | Module 5 final lab, Module 7 |
+| `UNSW_2018_IoT_Botnet_*.csv.zip` | not used by any module at present | — |
 | `forensic_log.csv` / `forensic_log_truth.csv` | One week of server logs (774 lines) with a multi-stage intrusion planted inside, and its ground truth | Module 6 capstone |
+
+### Where the data comes from
+
+The course redistributes these datasets for teaching. They remain the work of their authors;
+if you use them beyond this course, cite the originals and check their terms.
+
+| data | source |
+|---|---|
+| phishing URLs | Vrbančič, Fister and Podgorelec, *Datasets for phishing websites detection*, Data in Brief 33 (2020) |
+| credit card transactions | Machine Learning Group, Université Libre de Bruxelles; Dal Pozzolo et al., IEEE CIDM 2015 |
+| malware images | Nataraj et al., *Malware Images: Visualization and Automatic Classification*, VizSec 2011 (downsampled to 64×64 here) |
+| emails | CEAS 2008 Live Spam Challenge corpus |
+| IoT flows | the `Backdoor_Malware` and `Recon-PortScan` captures of CICIoT2023 (Neto et al., Sensors 23, 2023) |
+| firewall log, forensic log | constructed for this course |
+
+Each module's last cell lists its sources in full.
 
 ## Completion
 
 Each module is assessed on its coding tasks and written responses. The written questions
 carry the weight: they ask you to predict before you run, argue from the numbers your own
-notebook produced, and defend trade-offs — not to restate definitions. Grading rubrics are
-maintained by the instructor.
+notebook produced, and defend trade-offs — not to restate definitions. The scale, the pass
+mark and the rules that apply to every question are in [`GRADING.md`](GRADING.md).

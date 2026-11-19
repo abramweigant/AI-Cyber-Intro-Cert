@@ -91,7 +91,9 @@ ok "pip $(pip --version | awk '{print $2}')"
 
 # --- 3. dependencies ---------------------------------------------------------
 say "Installing course dependencies (this pulls ~500 MB and takes a few minutes)"
-if [ -f "$REPO/requirements.lock" ]; then
+# The lock was frozen on the Linux student VM (it pins tensorflow-cpu), so it is only used
+# there. Any other platform resolves from requirements.txt and its platform markers.
+if [ -f "$REPO/requirements.lock" ] && [ "$(uname -s)" = "Linux" ]; then
   pip install -r "$REPO/requirements.lock"
   ok "installed from requirements.lock (pinned)"
 else
